@@ -45,6 +45,7 @@
 % Greek Support
 \usepackage[no-math]{fontspec}
 \usepackage[Greek,Latin]{ucharclasses}%handles mixed english-greek hyphenation
+\usepackage[greek]{babel}  %need to be commended out on texstudio for some reason
 \usepackage{xgreek}
 \setTransitionsForGreek{\setlanguage{greek}}{\setlanguage{american}}%handles mixed english-greek hyphenation
 
@@ -425,7 +426,7 @@
         % Περίληψη
         \ifgrthesisoption
 	        \include{sections/abstract}
-	    \include{sections/abstract_eng}
+	        \include{sections/abstract_eng}
         \else
 	        \include{sections/abstract_eng}
 	        \include{sections/abstract}
