@@ -45,7 +45,8 @@
 % Greek Support
 \usepackage[no-math]{fontspec}
 \usepackage[Greek,Latin]{ucharclasses}%handles mixed english-greek hyphenation
-\usepackage[greek]{babel}  %need to be commended out on texstudio for some reason
+%\usepackage[american, greek]{babel}  %need to be commended out on texstudio for some reason - creates issues with contents etc
+\usepackage[american]{babel} %must for correct contents formatting
 \usepackage{xgreek}
 \setTransitionsForGreek{\setlanguage{greek}}{\setlanguage{american}}%handles mixed english-greek hyphenation
 
