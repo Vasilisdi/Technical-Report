@@ -43,10 +43,11 @@
 
 
 % Greek Support
+\usepackage[no-math]{fontspec}
 \usepackage[Greek,Latin]{ucharclasses}%handles mixed english-greek hyphenation
 \usepackage{xgreek}
 \setTransitionsForGreek{\setlanguage{greek}}{\setlanguage{american}}%handles mixed english-greek hyphenation
-\usepackage[no-math]{fontspec}
+
 \defaultfontfeatures{Mapping=tex-text}
 % Math
 \usepackage{amssymb,amsmath,amsthm,amsfonts} 
