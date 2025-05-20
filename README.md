@@ -12,7 +12,12 @@
 ---
 
 ## 📌 Abstract  
-This thesis investigates the design and implementation of a software system for machine vibration analysis, focusing on [briefly state key goals, e.g., "real-time monitoring, fault detection, and predictive maintenance using signal processing techniques"]. The proposed solution leverages [mention key technologies, e.g., "FFT algorithms, machine learning, or IoT frameworks"] to achieve [main outcomes].  
+This thesis investigates the design and implementation of a software system for **continuous, year-round machine vibration monitoring**, enabling robust detection of mechanical component failures. By analyzing vibration data through **Fast Fourier Transform (FFT)** techniques, the system identifies fault patterns to generate actionable insights for **predictive maintenance planning**. The proposed solution combines **state-of-the-art technologies** with **low-cost hardware** (e.g. ADXL335 accelerometers), balancing accuracy and affordability for industrial applications.  
+
+Key outcomes:  
+✅ Real-time fault detection in rotating machinery  
+✅ Data-driven preventive maintenance strategies  
+✅ Cost-effective FFT-based analysis pipeline  
 
 ---
 
