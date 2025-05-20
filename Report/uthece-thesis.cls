@@ -680,10 +680,10 @@
 }{}
 \newenvironment{abbreviations}{%
 \ifgrthesisoption
-  \chapter*{section/Συντομογραφίες}%
+  \chapter*{Συντομογραφίες}%
   \addcontentsline{toc}{chapter}{Συντομογραφίες}%
 \else
-  \chapter*{section/Abbreviations}%
+  \chapter*{Abbreviations}%
   \addcontentsline{toc}{chapter}{Abbreviations}%
 \fi
 }{}

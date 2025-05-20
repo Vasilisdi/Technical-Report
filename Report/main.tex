@@ -17,7 +17,8 @@
 \usepackage{ifthen}
 \usepackage{hyperref} % Για ενεργά URLs
 
-
+%%%%%%
+% VASILEIOS DIMITRIOU
 %αριθμός γενικού μητρώου: Μ011723007
 %αριθμός μητρώου: 00578
 
@@ -93,11 +94,11 @@
 %% OPTIONAL MATERIAL / ΠΡΟΑΙΡΕΤΙΚΕΣ ΕΝΟΤΗΤΕΣ
 %%
 % Κατάλογος Σχημάτων προαιρετικά
-%	\listoffigures % σε σχόλια για μη εμφάνιση
+	\listoffigures % σε σχόλια για μη εμφάνιση
 % Κατάλογος Πινάκων προαιρετικά
 %	\listoftables % σε σχόλια για μη εμφάνιση
 % Συντομογραφίες - Αρκτικόλεξα - Ακρωνύμια προαιρετικά
-%	\include{sections/abbreviations} % σε σχόλια για μη εμφάνιση 
+	\include{sections/abbreviations} % σε σχόλια για μη εμφάνιση 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -124,9 +125,6 @@
 %% APPENDICES (optional) / ΠΑΡΑΡΤΗΜΑΤΑ (ΠΡΟΑΙΡΕΤΙΚΑ)
 %%
 
-% Εάν υπάρχουν περισσότερα από ένα Παραρτήματα
-% είναι ενεργή η ακόλουθη εντολή
-% και ανενεργή για μεμονωμένο Παράρτημα
     \include{sections/appendices}
 
 % Μην τροποποιήσετε τις ακόλουθες εντολές
@@ -136,23 +134,10 @@
     \renewcommand{\chaptername}{Appendix}
 \fi
 
-% Πριν το κάθε Παράρτημα (για περισσότερα από ένα), 
-% ρυθμίζεται η κατάλληλη αλφαβητική αρίθμηση
-    \renewcommand{\thechapter}{A} 
-  	\include{sections/appA}	
-% %	
-    \renewcommand{\thechapter}{B}
-    \include{sections/appB}
+   \renewcommand{\thechapter}{} 
+   \renewcommand{\thesection}{\arabic{section}}
 
-% Εάν υπάρχει μόνο ένα Παράρτημα,
-% μπαίνουν σε σχόλια οι παραπάνω γραμμές 
-% και ρυθμίζεται αρίθμηση χωρίς γράμμα
-%   \renewcommand{\thechapter}{} 
-%   \renewcommand{\thesection}{\arabic{section}}
-%
-% Ακολουθεί αρχείο μεμονωμένου Παραρτήματος
-% (διαφορετική δομή από appA/appΒ)
-%   \include{single_app} 
+   \include{sections/single_app} 
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
