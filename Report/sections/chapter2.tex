@@ -25,21 +25,65 @@ As previously mentioned, the authors make use of a model-based approach, which e
 \label{fig:faultsunfaults}
 \end{figure}
 
+The procedure to calculate critical frequencies involves two steps: first computing the bearing frequency factors, then deriving the vibration frequencies. The following analysis covers the case where the inner race rotates while the outer race remains stationary.
+
+\begin{align}
+	F_{\text{OR}} &= \frac{Z}{2} \left(1 - \frac{d}{D} \cos\alpha\right) 
+	&&\text{(Outer Race Fault)} \label{eq:OR} \\
+	F_{\text{IR}} &= \frac{Z}{2} \left(1 + \frac{d}{D} \cos\alpha\right) 
+	&&\text{(Inner Race Fault)} \label{eq:IR} \\
+	F_{\text{FTF}} &= \frac{1}{2} \left(1 - \frac{d}{D} \cos\alpha\right) 
+	&&\text{(Cage Frequency, Inner Race Rotating)} \label{eq:FT} \\
+	F_{\text{BS}} &= \frac{D}{d} \left[1 - \left(\frac{d}{D}\right)^2 \cos^2\alpha\right] 
+	&&\text{(Ball Spin Frequency)} \label{eq:BS}
+\end{align}
+
+Then, the aforementioned factors when multiplied with shaft speed ($f$) give specific critical bearing vibration frequencies:
+\begin{align}
+	\text{BPFO} &= f \times F_{\text{OR}} \label{eq:BPFO} \\
+	\text{BPFI} &= f \times F_{\text{IR}} \label{eq:BPFI} \\
+	\text{BSF}  &= f \times F_{\text{BS}} \label{eq:BSF} \\
+	\text{FTF}  &= f \times F_{\text{FTF}} \label{eq:FTF}
+\end{align}
+
+where:
+\begin{align*}
+	&f    &&: \text{Shaft rotational speed (\si{\hertz})} \\
+	&\text{BPFI} &&: \text{Ball pass frequency, inner race} \\
+	&\text{BPFO} &&: \text{Ball pass frequency, outer race} \\
+	&\text{FTF}  &&: \text{Fundamental train frequency} \\
+	&\text{BSF}  &&: \text{Ball spin frequency} \\
+	&Z    &&: \text{Number of rolling elements} \\
+	&D    &&: \text{Pitch circle diameter of the bearing (\si{\milli\meter})} \\
+	&d    &&: \text{Rolling element (ball) diameter (\si{\milli\meter})} \\
+	&\alpha &&: \text{Contact angle (\si{\degree})} \\
+\end{align*}
+
+It is also worth noting that the bearing frequency factors can be obtained through: 
+\begin{itemize}
+	\item Manufacturer-provided values
+	\item Direct calculation using the above equations \eqref{eq:OR}--\eqref{eq:BS}
+	\item Reverse calculation from measured vibration frequencies \eqref{eq:BPFO}--\eqref{eq:FTF}
+\end{itemize}
+
+To summarize the preceding analysis, Figure \ref{fig:faultTree} provides a clear visualization of the fault diagnosis procedure. When analysis reveals elevated frequency tones, a systematic approach must be followed to identify the source of these dominant frequencies. This process essentially involves mapping characteristic vibration patterns to specific machine faults on a frequency spectrum plot.
+
 \begin{figure}[h]
 	\centering
-	\begin{tikzpicture}
-		\node (box1) [draw, rectangle] at (0,0) {unfault model};
-		\node (box2) [draw, rectangle, left of=box1, node distance=6cm] {fault model};
- 		\node (box3) [draw, rectangle] at (-7.5,-2) {unbalance};
-		\node (box4) [draw, rectangle] at (-2,-2) {misalignment};
-		\node (box5) [draw, rectangle] at (-5,-2) {bearing failure};
-		\node (box6) [draw, rectangle] at (-10,-2) {looseness};
+	\begin{tikzpicture}[node distance=1.5cm]
+		\node (box1) [draw, rectangle] at (0,0) {Unfault model};
+		\node (box2) [draw, rectangle, left of=box1, node distance=6cm] {Fault model};
+		\node (box3) [draw, rectangle] at (-7.5,-2) {Unbalance};
+		\node (box4) [draw, rectangle] at (-2,-2) {Misalignment};
+		\node (box5) [draw, rectangle] at (-5,-2) {Bearing failure};
+		\node (box6) [draw, rectangle] at (-10,-2) {Looseness};
 		\node (box7) [draw, rectangle] at (-6,-4) {BPFO};
 		\node (box8) [draw, rectangle] at (-2,-4) {BPFI};
 		\node (box9) [draw, rectangle] at (-4,-4) {BSF};
 		\node (box10) [draw, rectangle] at (-8,-4) {FTF};
 		
-		% Arrows
+		% Arrows with labels
+		\draw[->] (box2) -- node[midway, above] {No} (box1);
 		\draw[->] (box2) -- (box3);
 		\draw[->] (box2) -- (box4);
 		\draw[->] (box2) -- (box5);
@@ -49,10 +93,10 @@ As previously mentioned, the authors make use of a model-based approach, which e
 		\draw[->] (box5) -- (box9);
 		\draw[->] (box5) -- (box10);
 	\end{tikzpicture}
-	\caption{Unfault and fault model sub-categories} \label{fig:faultTree}
+	\caption{Fault tree analysis diagram showing the relationship between machine conditions and specific fault frequencies.} \label{fig:faultTree}
 \end{figure}
 
-It is also worth noting that a fault-emulation method can be used in such cases to simulate the faulty models. This entails that additional tones can be stressed, and crucial spectra modifications may take place for research and comparison purposes.
+It must be that a fault-emulation method can be used in such cases to simulate the faulty models. This entails that additional tones can be stressed, and crucial spectra modifications may take place for research and comparison purposes.
 }
 
 
