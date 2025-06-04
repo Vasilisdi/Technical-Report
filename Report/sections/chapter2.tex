@@ -110,13 +110,19 @@ It must be that a fault-emulation method can be used in such cases to simulate t
 \subsection{Signal Processing}
 \subsubsection{Fast Fourier Transform (FFT)}
 {
+The Fast Fourier Transform (FFT) is an efficient algorithm for computing the Discrete Fourier Transform (DFT) and its inverse. One of the most prominent FFT algorithms, the Cooley-Tukey algorithm \cite{CooleyTukey1965}, employs a divide-and-conquer approach to reduce the computational complexity from $\mathcal{O}(n^2)$ (for the naive DFT) to $\mathcal{O}(n \log n)$, enabling significant speedups for large amount of data. The mathematical formulation, given a waveform $x_0, x_1, \dots, x_{n-1}$, containing real values, is structured as follows:
+\begin{equation}
+	X(j) = \sum_{k=0}^{n-1} x(k) \exp\left( - \frac{i2\pi jk}{n} \right) \quad, \text{for} \quad j = 0,1,\dots,n-1
+	\label{eq:FFT}
+\end{equation}
 
-The Cooley-Tukey algorithm (1965) is a divide-and-conquer method that provides a fast algorithm for computing the complex Fourier transform efficiently:
-\[
-X_j = \sum_{k=0}^{n-1} x_k \exp\left( \frac{i2\pi jk}{n} \right) \quad \text{for} \quad j = 0,1,\dots,n-1,
-\]
+This reduces complexity from $\mathcal{O}(n^2)$ (naive DFT) to $\mathcal{O}(n \log n)$ (see \eqref{eq:FFT}), enabling major time savings for complex and large-scale transforms. It is also worth articulating that the complexity can be interpreted as the number of operations executed \cite{CooleyTukey1965}, \cite{Singeleton1967}. 
 
-This reduces complexity from $\mathcal{O}(n^2)$ (naive DFT) to $\mathcal{O}(n \log n)$, enabling major time savings for complex and large-scale transforms. The algorithm is implemented in major numerical packages including MATLAB and NumPy's FFT routines.
+This algorithm is implemented in major numerical packages including MATLAB and NumPy's FFT routines \cite{FFT}. What is highlighted  by Singeleton is that the Cooley-Tukey approach is considerably faster and decently performing especially when coupled with some additional practices so as to execute the Fast Fourier Transform \cite{Singeleton1967}. 
+
+The computation time according to the aforementioned article decreases drastically by making use of the Cooley-Tukey algorithm. In addition, this very algorithm performs and adapts better to different applications compared to Good's, Danielson's and Goertzel's approaches.
+
+It is hereby worth it elaboration on the Fast Fourier Transform algorithm \cite{CooleyTukey1965}.
 }
 
 \subsection{Embedded Systems \& IoT}
