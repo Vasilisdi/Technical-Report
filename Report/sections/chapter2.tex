@@ -113,16 +113,73 @@ It must be that a fault-emulation method can be used in such cases to simulate t
 The Fast Fourier Transform (FFT) is an efficient algorithm for computing the Discrete Fourier Transform (DFT) and its inverse. One of the most prominent FFT algorithms, the Cooley-Tukey algorithm \cite{CooleyTukey1965}, employs a divide-and-conquer approach to reduce the computational complexity from $\mathcal{O}(n^2)$ (for the naive DFT) to $\mathcal{O}(n \log n)$, enabling significant speedups for large amount of data. The mathematical formulation, given a waveform $x_0, x_1, \dots, x_{n-1}$, containing real values, is structured as follows:
 \begin{equation}
 	X(j) = \sum_{k=0}^{n-1} x(k) \exp\left( - \frac{i2\pi jk}{n} \right) \quad, \text{for} \quad j = 0,1,\dots,n-1
-	\label{eq:FFT}
+	\label{eq:DFT}
 \end{equation}
 
-This reduces complexity from $\mathcal{O}(n^2)$ (naive DFT) to $\mathcal{O}(n \log n)$ (see \eqref{eq:FFT}), enabling major time savings for complex and large-scale transforms. It is also worth articulating that the complexity can be interpreted as the number of operations executed \cite{CooleyTukey1965}, \cite{Singeleton1967}. 
+This reduces complexity from $\mathcal{O}(n^2)$ (naive DFT entails direct implementation of the equation \eqref{eq:DFT}) to $\mathcal{O}(n \log n)$ (a Fast Fourier Transform implementation), enabling major time savings for complex and large-scale transforms. It is also worth articulating that the complexity can be interpreted as the number of operations executed \cite{CooleyTukey1965}, \cite{Singeleton1967}. 
 
-This algorithm is implemented in major numerical packages including MATLAB and NumPy's FFT routines \cite{FFT}. What is highlighted  by Singeleton is that the Cooley-Tukey approach is considerably faster and decently performing especially when coupled with some additional practices so as to execute the Fast Fourier Transform \cite{Singeleton1967}. 
+Both algorithms are implemented in major numerical packages including MATLAB and NumPy's routines \cite{FFT}. What is highlighted  by Singeleton is that the Cooley-Tukey approach is considerably faster and decently performing especially when coupled with some additional practices so as to execute the Fast Fourier Transform \cite{Singeleton1967}. 
 
 The computation time according to the aforementioned article decreases drastically by making use of the Cooley-Tukey algorithm. In addition, this very algorithm performs and adapts better to different applications compared to Good's, Danielson's and Goertzel's approaches.
 
-It is hereby worth it elaboration on the Fast Fourier Transform algorithm \cite{CooleyTukey1965}.
+Cooley and Tukey proved that the sample length can be composite size where it is preferable to make use of sample points sized as power of 2, especially when it comes to personal computers with binary arithmetic system. In addition to this the authors have proven that the power of 3 is formally the most efficient approach, however in the context of the fast Fourier Analysis the so-called Radix-2 implementation is the prominent one \cite{CooleyTukey1965}.
+
+\begin{equation}
+	N = 2^m \label{eq:radix_condition}
+\end{equation} 
+
+It is hereby worth it elaboration on the Fast Fourier Transform algorithm \cite{CooleyTukey1965}. The indices of the equation \eqref{eq:DFT} for the Radix-2 scenario can be expressed as follows: 
+
+\begin{equation}
+	\begin{aligned}
+		j &= j_{m-1} \cdot 2^{m-1} + j_{m-2} \cdot 2^{m-2} + \dots + j_1 \cdot 2 + j_0, \\
+		k &= k_{m-1} \cdot 2^{m-1} + \dots + k_1 \cdot 2 + k_0,
+	\end{aligned}
+\end{equation}
+
+where \( j_{v} \) and \( k_{v} \) are the contents of the respective bit positions within the binary representation, which ensues that they are equal to 0 or 1.
+
+The aforementioned set-up (see eq. \eqref{eq:DFT}) leads to the following equation \eqref{eq:FFT}, encompassing twiddle factors expressed as:
+
+\begin{equation}
+	W = e^{-2\pi i/N}
+\end{equation}
+
+And the Fast Fourier Transform:
+
+\begin{equation}
+	X(j_{m-1}, \cdots ,j_0) = \sum_{k_{0}} \sum_{k_{1}} \cdots \sum_{m-1} x({k_{m-1} , \cdots , k_0}) \cdot W^{j \cdot k_{m-1} \cdot 2^{m-1} + \cdots + j \cdot k_0}
+	\label{eq:FFT}
+\end{equation}
+
+where as per the first step:
+\begin{equation}
+	W^{j \cdot k_{m-1} \cdot 2^{m-1}} = W^{j_{0} \cdot k_{m-1} \cdot 2^{m-1}}
+\end{equation}
+
+Furthermore, in the context of the first calculation, the first array can be expressed as follows:
+
+\begin{equation}
+	x_{1}(j_0, k_{m-2}, \cdots, k_0) = \sum_{\mathbf{k_{m-1}}} x(\mathbf{k_{m-1, \cdots, k_0}}) \cdot W^{\mathbf{j_0}  \cdot \mathbf{k_{m-1}} \cdot \mathbf{2^{m-1}} }
+\end{equation}
+
+And hereunder can be contemplated that proceeding to the next innermost-successive sum:
+
+\begin{equation}
+	W^{j \cdot k_{m-1} \cdot 2^{m-1}} = W^{(j_{l-1} \cdot 2^{l-1} + \cdots + j_0) \cdot k_{m-l} \cdot 2^{m-l}}
+\end{equation}
+
+followed by the calculation of the arrays:
+
+\begin{equation}
+	x_{l}(j_0, \cdots, j_{l-1} , k_{m-l-1} , \cdots, k_0) = \sum_{\mathbf{k_{m-l}}} x_{l-1}(j_0, \cdots , j_{l-2} \cdots, k_{m-l} , \cdots , k_0) \cdot  W^{(j_{l-1} \cdot 2^{l-1} + \cdots + j_0) \cdot k_{m-l} \cdot 2^{m-l}}
+\end{equation}
+
+for l = 1, 2, ... , m
+
+And this could constitute a recursive procedure obtaining the successive arrays. And last but not least, this finally could lead to the calculation of X spectrum.
+
+All in all, this section yields an overview of utmost importance highlighting the most invaluable Fourier Transform algorithms expressed by equation \eqref{eq:DFT} and equation \eqref{eq:FFT}.
 }
 
 \subsection{Embedded Systems \& IoT}
