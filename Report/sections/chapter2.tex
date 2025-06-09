@@ -68,6 +68,7 @@ It is also worth noting that the bearing frequency factors can be obtained throu
 
 To summarize the preceding analysis, Figure \ref{fig:faultTree} provides a clear visualization of the fault diagnosis procedure. When analysis reveals elevated frequency tones, a systematic approach must be followed to identify the source of these dominant frequencies. This process essentially involves mapping characteristic vibration patterns to specific machine faults on a frequency spectrum plot.
 
+
 \begin{figure}[h]
 	\centering
 	\begin{tikzpicture}[node distance=1.5cm]
@@ -108,15 +109,93 @@ It must be that a fault-emulation method can be used in such cases to simulate t
 \section{Algorithms and Technologies}
 % Summary of FFT, data flow, etc.
 \subsection{Signal Processing}
-\subsubsection{Fast Fourier Transform (FFT)}
+\subsubsection{Fourier Analysis}
 {
-The Fast Fourier Transform (FFT) is an efficient algorithm for computing the Discrete Fourier Transform (DFT) and its inverse. One of the most prominent FFT algorithms, the Cooley-Tukey algorithm \cite{CooleyTukey1965}, employs a divide-and-conquer approach to reduce the computational complexity from $\mathcal{O}(n^2)$ (for the naive DFT) to $\mathcal{O}(n \log n)$, enabling significant speedups for large amount of data. The mathematical formulation, given a waveform $x_0, x_1, \dots, x_{n-1}$, containing real values, is structured as follows:
+In this section a deeper elabotation on Fourier Analysis and Transform is going to take place. 
+
+Serafeimidou explains in detail the theoritical background of the Fourier Analysis \cite{diff_eq}. For an arbitrary finite range [-L,L] there is a family of functions, which meet the Dirichlet condition, and these functions can be expressed as a trigonometric sequence: 
+
 \begin{equation}
-	X(j) = \sum_{k=0}^{n-1} x(k) \exp\left( - \frac{i2\pi jk}{n} \right) \quad, \text{for} \quad j = 0,1,\dots,n-1
-	\label{eq:DFT}
+    f(x) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \left( a_n \cos(n\pi \omega x) + b_n \sin(n\pi \omega x) \right),
+    \label{eq:tri_seq}
 \end{equation}
 
-This reduces complexity from $\mathcal{O}(n^2)$ (naive DFT entails direct implementation of the equation \eqref{eq:DFT}) to $\mathcal{O}(n \log n)$ (a Fast Fourier Transform implementation), enabling major time savings for complex and large-scale transforms. It is also worth articulating that the complexity can be interpreted as the number of operations executed \cite{CooleyTukey1965}, \cite{Singeleton1967}. 
+where \( \omega = \frac{\pi}{L} \).
+
+In addition its constants can be expressed as follows:
+
+\begin{equation}
+    a_n = \frac{1}{L} \int_{-L}^{L} f(u) \cos(n \omega u) \,du   
+\end{equation}
+
+\begin{equation}
+    b_n = \frac{1}{L} \int_{-L}^{L} f(u) \sin(n \omega u) \,du    
+\end{equation}
+
+The equation \eqref{eq:tri_seq} needs to be expressed as a valid form within the whole \( x \in \mathbb{R} \). For this reason the  trigonometric integral (which is called Fourier integral) can be expressed as follows: 
+
+\begin{equation}
+    F(x) = \int_0^{\infty} \left[ A(\omega) \cos(\omega x) + B(\omega) \sin(\omega x) \right] \, d\omega
+    \label{eq:tri_int}
+\end{equation}
+
+where: 
+\begin{equation}
+    A(\omega) = \frac{1}{\pi} \int_{-\infty}^{\infty} f(u) \cos(\omega u) \,du
+    \label{eq:Aomega}
+\end{equation}
+
+\begin{equation}
+    B(\omega) = \frac{1}{\pi} \int_{-\infty}^{\infty} f(u) \sin(\omega u) \,du
+    \label{eq:Bomega}
+\end{equation}
+
+Assuming that there exist real functions \( f(x) \) defined in \( \mathbb{R} \) meeting the following points: 
+\begin{itemize}
+{
+    \item \( f(x) \) and its derivative \( f'(x) \) are continuous in the range \( [-L, L] \subset \mathbb{R} \).
+    \item \( f(x) \) is integrable in \( \mathbb{R} \):
+	\[
+    \int_{-\infty}^{\infty} |f(x)| \,dx < \infty.
+    \]
+}
+\end{itemize}
+
+Hence, given that the aforementioned conditions are met, \( A(\omega) \) (see Eq. \eqref{eq:Aomega}) and \( B(\omega) \) (see Eq. \eqref{eq:Bomega}) tend to attain a real value for \( \omega \), which implies that \( A(\omega) \) and \( B(\omega) \) are defined for every \( \omega \in \mathbb{R} \). In addition to this, the integral of the equation \eqref{eq:tri_int} tends to attain a real value for x, which ensues that F(x) is defined for every \( x \in \mathbb{R} \).
+
+\( F(x) \) is identical to \( f(x) \) whenever \( f(x) \) is a continuous function. 
+There are some special cases when \( f(x) \) is not a continuous function, and to deal with these cases, we define:
+
+\begin{equation}
+    F(x) = \frac{1}{2} \left[ \lim_{x \to x^+} f(x) + \lim_{x \to x^-} f(x) \right]
+\end{equation}
+
+This ensures that \( F(x) \) is properly handled even in cases of discontinuity.
+
+All things considered the Fourier Transform \( F(\omega) = \mathcal{F} \{ F(x) \} \) can be mathematically expressed as follows:
+
+
+\begin{equation}
+    F(\omega) = \int_{-\infty}^{\infty} f(t) e^{-i \omega t} \,dt
+\end{equation}
+
+
+where the frequency can derive from the following form: \( \omega = \frac{2\pi j k}{N} \).
+
+In practice, the Discrete Fourier Transform (DFT) boasts an extremely wide variety of applications, facilitating the Fourier Transform when applied to sampled signals. 
+
+Hence, the mathematical formulation for determining the amplitude of each frequency, given a waveform \( x_0, x_1, \dots, x_{n-1} \) consisting of real values, is structured as follows:
+
+\begin{equation}
+    X(j) = \sum_{k=0}^{n-1} x(k) e^{ - \frac{i 2\pi jk}{n/2} }, \quad \text{for } j = 0,1,\dots,n-1.
+    \label{eq:DFT}
+\end{equation}
+}
+\subsubsection{Fast Fourier Transform (FFT)}
+{
+The Fast Fourier Transform (FFT) is an efficient algorithm for computing the Discrete Fourier Transform (DFT), expessed by the equation \eqref{eq:DFT} and its inverse. One of the most prominent FFT algorithms, the Cooley-Tukey algorithm \cite{CooleyTukey1965}, employs a divide-and-conquer approach to reduce the computational complexity from $\mathcal{O}(n^2)$ (for the naive DFT) to $\mathcal{O}(2 n \log n)$, enabling significant speedups for large amount of data.
+
+This reduces complexity from $\mathcal{O}(n^2)$ (naive DFT entails direct implementation of the equation \eqref{eq:DFT}) to less than $\mathcal{O}(2 n \log n)$ (a Fast Fourier Transform implementation), enabling major time savings for complex and large-scale transforms. It is also worth articulating that the complexity can be interpreted as the number of operations executed \cite{CooleyTukey1965}, \cite{Singeleton1967}. 
 
 Both algorithms are implemented in major numerical packages including MATLAB and NumPy's routines \cite{FFT}. What is highlighted  by Singeleton is that the Cooley-Tukey approach is considerably faster and decently performing especially when coupled with some additional practices so as to execute the Fast Fourier Transform \cite{Singeleton1967}. 
 
@@ -128,7 +207,7 @@ Cooley and Tukey proved that the sample length can be composite size where it is
 	N = 2^m \label{eq:radix_condition}
 \end{equation} 
 
-It is hereby worth it elaboration on the Fast Fourier Transform algorithm \cite{CooleyTukey1965}. The indices of the equation \eqref{eq:DFT} for the Radix-2 scenario can be expressed as follows: 
+It is hereby worth it elaboration on the Fast Fourier Transform algorithm \cite{CooleyTukey1965}. The indices of the equation \eqref{eq:DFT} can be expressed as follows: 
 
 \begin{equation}
 	\begin{aligned}
@@ -143,6 +222,7 @@ The aforementioned set-up (see eq. \eqref{eq:DFT}) leads to the following equati
 
 \begin{equation}
 	W = e^{-2\pi i/N}
+	\label{eq:twiddle}
 \end{equation}
 
 And the Fast Fourier Transform:
@@ -173,13 +253,104 @@ followed by the calculation of the arrays:
 
 \begin{equation}
 	x_{l}(j_0, \cdots, j_{l-1} , k_{m-l-1} , \cdots, k_0) = \sum_{\mathbf{k_{m-l}}} x_{l-1}(j_0, \cdots , j_{l-2} \cdots, k_{m-l} , \cdots , k_0) \cdot  W^{(j_{l-1} \cdot 2^{l-1} + \cdots + j_0) \cdot k_{m-l} \cdot 2^{m-l}}
+	\label{eq:Radix2}
 \end{equation}
 
 for l = 1, 2, ... , m
 
-And this could constitute a recursive procedure obtaining the successive arrays. And last but not least, this finally could lead to the calculation of X spectrum.
+And this could constitute a recursive procedure obtaining the successive arrays. And last but not least, this finally could lead to the calculation of X spectrum. It can be contemplated that from the Equation \eqref{eq:Radix2}, there is at all times two consecutive values, the even and the odd value that can be stored at a specific location corresponding to an index of: 
+
+\begin{equation}
+	(j_0 2^{m-1} + \cdots + j_{l-1} 2^{m-l} +  k_{m-l-1} 2^{m-l-1} + \cdots + k_0)
+\end{equation}
+
+It is also worth it recalling that m is defined by \( N = 2^m \). Since bit positions \( 2^(m-l) \), meaning the j and k coefficients, can only get the values 0 and 1, which ensues that there is multiple-storage locations that can be calculated simultanously.
+
+Last but not least, the array calculated gives the desired Fourier sums: 
+
+\begin{equation}
+	X(j_{m-1}, cdots, j_0) = A_{m}((j_0 , cdots , j_{m-1})
+\end{equation}
+
+
+At this point there is a need to simplify the Fast Fourier Transform algorithm. It is mendatory to recall the \eqref{eq:FFT} so as to depict the algorithm. 
+
+The calculations workload can be reduced, by decomposing the original input sequence \( X[k] \), of length \( N \), into two subsequences:
+
+\begin{itemize}
+    \item A sequence consisting of elements at even-numbered indices: \( X_{\text{even}}[k] \)
+    \item A sequence consisting of elements at odd-numbered indices: \( X_{\text{odd}}[k] \)
+\end{itemize}
+
+By processing these smaller sequences independently, the algorithm substantially reduces the computational workload. The FFT is applied recursively to each half, and this decomposition continues until each subproblem has length 1, at which point the computation becomes trivial (the amplitude value corresponding to a specific frequency). Furthermore, the results from the smaller FFTs are recombined using twiddle factors (see Equation \eqref{eq:twiddle}).
+
+The evens and odds decomposition:
+\begin{equation}
+    X_{even}(j) = \sum_{k=0}^{n/2-1} x(2k) e^{ - \frac{i 2\pi jk}{n/2} }, \quad \text{for } j = 0,1,\dots,n/2-1.
+\end{equation}
+
+\begin{equation}
+    X_{odd}(j) =  \sum_{k=0}^{n/2-1} x(2k+1) e^{ - \frac{i 2\pi jk}{n/2} }, \quad \text{for } j = 0,1,\dots,n/2-1.
+\end{equation}
+
+So from the Equation \eqref{eq:FFT}:
+\begin{equation}
+    X(j) =  X_{even}(j) + e^{- \frac{i 2\pi j}{n}} X_{odd}(j)
+\end{equation}
+
+And this procedure is scalable since each and every \( X_even \) and \( X_odd \) can be deplited into a subsequent set of \( X_even \) and \( X_odd \) to the point that the length 1 is reached. Some properties of this algorithm are that, in the case of \( j > \frac{n}{2} \), the values are repeated due to the sinusoidal property of \( \exp \), which is known as the symmetry identity.
+
+\begin{equation}
+    X(j) =  X_{even}(j) + e^{- \frac{i 2\pi j}{n}} X_{odd}(j)
+\end{equation}
+
+\begin{equation}
+    X(j+n/2) =  X_{even}(j) - e^{- \frac{i 2\pi j}{n}} X_{odd}(j)
+\end{equation}
+
+The radix-2 DIT algorithm to be formulated as follows on Figure \ref{fig:RecFFT}. 
+
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+
+        % Level 0
+        \node[draw, rectangle] (X) at (0,0) {Input \( X[0 \dots] \)};
+
+        % Level 1
+        \node[draw, rectangle] (Xe) at (-4,-2) {\( X_{\text{even}} \)};
+        \node[draw, rectangle] (W) at (0,-2) {\( W \)};
+        \node[draw, rectangle] (Xo) at (4,-2) {\( X_{\text{odd}} \)};
+        \draw[->] (X) -- (Xe);
+        \draw[->] (X) -- (Xo);
+
+        % Level 2
+        \node[draw, rectangle] (Xee) at (-6,-4) {\( X_{\text{even}} \)};
+        \node[draw, rectangle] (W) at (-4,-2) {\( W \)};
+        \node[draw, rectangle] (Xeo) at (-2,-4) {\( X_{\text{odd}} \)};
+        \node[draw, rectangle] (Xoe) at (2,-4) {\( X_{\text{even}} \)};
+        \node[draw, rectangle] (W) at (4,-2) {\( W \)};
+        \node[draw, rectangle] (Xoo) at (6,-4) {\( X_{\text{odd}} \)};
+        \draw[->] (Xe) -- (Xee);
+        \draw[->] (Xe) -- (Xeo);
+        \draw[->] (Xo) -- (Xoe);
+        \draw[->] (Xo) -- (Xoo);
+
+        % Ellipsis (continued decomposition)
+        \node at (-6,-5.5) {\dots};
+        \node at (-2,-5.5) {\dots};
+        \node at (2,-5.5) {\dots};
+        \node at (6,-5.5) {\dots};
+
+    \end{tikzpicture}
+    \caption{Recursive decomposition using even-odd splitting.}
+    \label{fig:RecFFT}
+\end{figure}
 
 All in all, this section yields an overview of utmost importance highlighting the most invaluable Fourier Transform algorithms expressed by equation \eqref{eq:DFT} and equation \eqref{eq:FFT}.
+As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algorithm significantly accelerates the computation of the Discrete Fourier Transform (DFT) by recursively breaking the problem into smaller, more manageable subproblems. This divide-and-conquer approach is fundamental to the algorithm’s performance advantage.
+
 }
 
 \subsection{Embedded Systems \& IoT}
