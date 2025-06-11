@@ -266,7 +266,7 @@ And this could constitute a recursive procedure obtaining the successive arrays.
 
 It is also worth it recalling that m is defined by \( N = 2^m \). Since bit positions \( 2^(m-l) \), meaning the j and k coefficients, can only get the values 0 and 1, which ensues that there is multiple-storage locations that can be calculated simultanously.
 
-Last but not least, the array calculated gives the desired Fourier sums: 
+The array calculated gives the desired Fourier sums: 
 
 \begin{equation}
 	X(j_{m-1}, cdots, j_0) = A_{m}((j_0 , cdots , j_{m-1})
@@ -284,32 +284,44 @@ The calculations workload can be reduced, by decomposing the original input sequ
 
 By processing these smaller sequences independently, the algorithm substantially reduces the computational workload. The FFT is applied recursively to each half, and this decomposition continues until each subproblem has length 1, at which point the computation becomes trivial (the amplitude value corresponding to a specific frequency). Furthermore, the results from the smaller FFTs are recombined using twiddle factors (see Equation \eqref{eq:twiddle}).
 
+An significant property of this algorithm is that that, in the case of \( j > \frac{n}{2} \), the values are repeated due to the sinusoidal property of \( \exp \), which is known as the symmetry identity. This entails that for the values \( j = 0,1,\dots,n/2-1 \):
+
+\begin{equation}
+	X_{\text{even}}(j + n/2) = X_{\text{even}}(j) \quad \text{and} \quad X_{\text{odd}}(j + n/2) = X_{\text{odd}}(j)
+	\label{eq:Sym}
+\end{equation}
+
+
 The evens and odds decomposition:
 \begin{equation}
     X_{even}(j) = \sum_{k=0}^{n/2-1} x(2k) e^{ - \frac{i 2\pi jk}{n/2} }, \quad \text{for } j = 0,1,\dots,n/2-1.
+    \label{eq:Xeven}  
 \end{equation}
 
 \begin{equation}
     X_{odd}(j) =  \sum_{k=0}^{n/2-1} x(2k+1) e^{ - \frac{i 2\pi jk}{n/2} }, \quad \text{for } j = 0,1,\dots,n/2-1.
+    \label{eq:Xodd}
 \end{equation}
 
 So from the Equation \eqref{eq:FFT}:
 \begin{equation}
     X(j) =  X_{even}(j) + e^{- \frac{i 2\pi j}{n}} X_{odd}(j)
+    \label{eq:expterm}
 \end{equation}
 
-And this procedure is scalable since each and every \( X_even \) and \( X_odd \) can be deplited into a subsequent set of \( X_even \) and \( X_odd \) to the point that the length 1 is reached. Some properties of this algorithm are that, in the case of \( j > \frac{n}{2} \), the values are repeated due to the sinusoidal property of \( \exp \), which is known as the symmetry identity.
+And this procedure is scalable since each and every \( X_{even} \) and \( X_{odd} \) can be deplited into a subsequent set of \( X_{eve} \) and \( X_{odd} \) to the point that the length 1 is reached.
+
+Last but not least, the symmetry identity as described by the Equation \eqref{eq:Sym}, leads to the following set of equations (see also \eqref{eq:expterm}):
 
 \begin{equation}
-    X(j) =  X_{even}(j) + e^{- \frac{i 2\pi j}{n}} X_{odd}(j)
+    X(j+n/2) =  X_{even}(j) + e^{- \frac{i 2\pi (j+n/2)}{n}} X_{odd}(j)
 \end{equation}
 
-\begin{equation}
-    X(j+n/2) =  X_{even}(j) - e^{- \frac{i 2\pi j}{n}} X_{odd}(j)
-\end{equation}
+For the values \( j = 0,1,\dots,n/2-1 \).
 
-The radix-2 DIT algorithm to be formulated as follows on Figure \ref{fig:RecFFT}. 
+The objective of this algorithm is to get to the point that the length is of the sums is 1, meaning that the sums of the Equations \eqref{eq:Xeven} and \eqref{eq:Xodd} are applicable for k=0. The only  remaining exponential terms  \( e^{- \frac{i 2\pi j}{n}} \) in the Equation \eqref{eq:expterm} - as previously described by Equation \eqref{eq:Radix2}.
 
+The aforementioned procedure can be further repeated, by breaking the branches problem into sub-branches. The radix-2 DIT algorithm to be formulated as follows on Figure \ref{fig:RecFFT}, depicting the concept of narrowing down the problem. 
 
 \begin{figure}[h]
     \centering
@@ -320,17 +332,17 @@ The radix-2 DIT algorithm to be formulated as follows on Figure \ref{fig:RecFFT}
 
         % Level 1
         \node[draw, rectangle] (Xe) at (-4,-2) {\( X_{\text{even}} \)};
-        \node[draw, rectangle] (W) at (0,-2) {\( W \)};
+        \node[draw, rectangle] (W) at (3,-2) {\( W \)};
         \node[draw, rectangle] (Xo) at (4,-2) {\( X_{\text{odd}} \)};
         \draw[->] (X) -- (Xe);
         \draw[->] (X) -- (Xo);
 
         % Level 2
         \node[draw, rectangle] (Xee) at (-6,-4) {\( X_{\text{even}} \)};
-        \node[draw, rectangle] (W) at (-4,-2) {\( W \)};
+        \node[draw, rectangle] (W) at (-3,-4) {\( W \)};
         \node[draw, rectangle] (Xeo) at (-2,-4) {\( X_{\text{odd}} \)};
         \node[draw, rectangle] (Xoe) at (2,-4) {\( X_{\text{even}} \)};
-        \node[draw, rectangle] (W) at (4,-2) {\( W \)};
+        \node[draw, rectangle] (W) at (5,-4) {\( W \)};
         \node[draw, rectangle] (Xoo) at (6,-4) {\( X_{\text{odd}} \)};
         \draw[->] (Xe) -- (Xee);
         \draw[->] (Xe) -- (Xeo);
