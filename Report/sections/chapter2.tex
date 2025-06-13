@@ -365,13 +365,24 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 
 }
 
-\subsection{Embedded Systems \& IoT}
-\subsubsection{ADXL335 Sensor}
-Analog signal from sensor breakout to arduino. To elaborate on signal transferring
-\begin{itemize}
-\item what a sensor breakout is
-\item what analog signal is
+
+
+\subsection{Embedded Systems \& IoT}  
+\subsubsection{ADXL335 Sensor}  
+The ADXL335 is a 3-axis accelerometer that measures acceleration using analog voltage outputs. This section discusses its interfacing with an Arduino and signal processing.  
+
+\begin{itemize}  
+	\item \textbf{Sensor Breakout Board}  
+	A breakout board simplifies the connection of the ADXL335 by providing necessary components (e.g., voltage regulation, filtering capacitors) and standardized pin headers. This avoids the need for complex PCB design when prototyping.  
+	
+	\item \textbf{Analog Signal Transmission}  
+	The ADXL335 outputs analog voltages proportional to acceleration. Unlike digital signals (discrete values), analog signals are continuous and susceptible to noise. The Arduino's ADC (Analog-to-Digital Converter) reads these voltages for processing.  
+	
+	\item \textbf{Signal Conditioning \& Processing}  
+	Since analog signals degrade over long wires, techniques like filtering (RC low-pass) and amplification may be needed. Calibration (mapping voltage to g-forces) is also essential for accurate readings.  
 \end{itemize}
+
+
 
 
 \subsubsection{Arduino Microcontroller}
