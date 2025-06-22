@@ -367,7 +367,34 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 
 
 
-\subsection{Embedded Systems \& IoT}  
+\subsection{Embedded Systems \& IoT} 
+{
+The ultimate objective of this project is to create a set-up that is well-rounded and has a real-time monitoring and assessment competency. Two of the most prominent technologies that are being utilized by Internet of Things (IoT) is the cloud computing and the wireless communication. It is also worth mentioning that, Internet of things encompasses interconnection of physical devices and applicaitons making the most of sensors, networks and data analysis. 
+
+The sensing unit of this project's application collects physical data and connects to the microcontroller through a specific interface like analog input. There are also other communication interface options such as digital input, \textbf{SPI} (Serial Peripheral Interface), \textbf{UART} (Universal Asynchronous Receiver-Transmitter), and \textbf{I\textsuperscript{2}C} (Inter-Integrated Circuit) \cite{Dharmarathne2025}.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.5cm,
+        box/.style={draw, rectangle, minimum width=2cm, minimum height=1cm}
+    ]
+        % Level 0 (Single node)
+        \node[box] (Sensor) {Sensor};
+        
+        % Level 1 (Straight-line flow)
+        \node[box, right=of Sensor] (IoTDevice) {IoT Device};
+        \node[box, right=of IoTDevice] (IoTIntegration) {IoT Integration};
+
+        % Arrows
+        \draw[->] (Sensor) -- (IoTDevice);
+        \draw[->] (IoTDevice) -- (IoTIntegration);
+    \end{tikzpicture}
+    \caption{Hierarchical IoT data flow from Sensor to Cloud Integration.}
+    \label{fig:IoTHierarchy}
+\end{figure}
+}
+ 
 \subsubsection{ADXL335 Sensor}  
 The ADXL335 is a 3-axis accelerometer that measures acceleration using analog voltage outputs. This section discusses its interfacing with an Arduino and signal processing.  
 
