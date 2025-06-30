@@ -369,7 +369,33 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 
 \subsection{Embedded Systems \& IoT} 
 {
-The ultimate objective of this project is to create a set-up that is well-rounded and has a real-time monitoring and assessment competency. Two of the most prominent technologies that are being utilized by Internet of Things (IoT) is the cloud computing and the wireless communication. It is also worth mentioning that, Internet of things encompasses interconnection of physical devices and applicaitons making the most of sensors, networks and data analysis. 
+The ultimate objective of this project is to create a set-up that is well-rounded and has a real-time monitoring and assessment competency. Two of the most prominent technologies that are being incorporated by Internet of Things (IoT) is the cloud computing and the wireless communication. It is also worth mentioning that, Internet of things encompasses interconnection of physical devices and applicaitons making the most of sensors, networks and data analysis. 
+
+An extremely accurate definition of the \textit{Internet of Things} is given by Gubbi et al \cite{Gubbi2013}, articulating that:
+
+\begin{quote}
+    ``Interconnection of sensing and actuating devices providing the ability to share information across platforms through a unified framework, developing a common operating picture for enabling innovative applications. This is achieved by seamless ubiquitous sensing, data analytics and information representation with Cloud computing as the unifying framework.''
+\end{quote}
+
+Hardware-sensor breakouts are critically important, as they serve as the primary means of data collection in IoT systems. Middleware and computing tools for data analytics are equally invaluable, as they enable the processing of raw sensor data into actionable insights. Finally, visualization tools and dashboards play a key role in user interaction with the IoT environment, while also providing stakeholders with an intuitive and accessible representation of the data \cite{Gubbi2013}.
+
+As regards the approach of Atzori et al, there is given a different definition by considering two different approaches, the "Internet"-oriented approach and the "Things"-oriented approach \cite{Atzori2010}. The "Things"-oriented approach targets mainly at Big Data applications, since according to Atzori et al the time, the place and multipe recipients are the most important factors of this approach. In essnece the "Things" that contribute to this perspective are the Radio-Frequency IDentification (RFID), Near Field Communications (NFC) and Wireless Sensor and Actuator Networks (WSAN) among others.
+
+As regards the "Internet"-oriented vision, 
+
+The whole concept of most of the projects requires a semantic approach so as to set some thresholds and yield some feedback or take some action over something. In addition to this the semantic vision according to Atzori et al expresses the need for a representation of the collected data \cite{Atzori2010}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{figures/IoT.png}
+    \caption{The Internet of Things paradigm as a result of the convergence of different visions. Source: \cite{Atzori2010}.}
+    \label{fig:IoT}
+\end{figure}
+
+All in all Atzori defines Internet of Things (IoT) as follows:
+\begin{quote}
+a world-wide network of interconnected objects uniquely addressable, based on standard communication protocols
+\end{quote}
 
 The sensing unit of this project's application collects physical data and connects to the microcontroller through a specific interface like analog input. There are also other communication interface options such as digital input, \textbf{SPI} (Serial Peripheral Interface), \textbf{UART} (Universal Asynchronous Receiver-Transmitter), and \textbf{I\textsuperscript{2}C} (Inter-Integrated Circuit) \cite{Dharmarathne2025}.
 
