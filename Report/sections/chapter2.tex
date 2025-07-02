@@ -367,112 +367,135 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 
 
 
-\subsection{Embedded Systems \& IoT} 
+\subsection{Internet of Things} 
 {
-The ultimate objective of this project is to create a set-up that is well-rounded and has a real-time monitoring and assessment competency. Two of the most prominent technologies that are being incorporated by Internet of Things (IoT) is the cloud computing and the wireless communication. It is also worth mentioning that, Internet of things encompasses interconnection of physical devices and applicaitons making the most of sensors, networks and data analysis. 
-
-An extremely accurate definition of the \textit{Internet of Things} is given by Gubbi et al \cite{Gubbi2013}, articulating that:
-
-\begin{quote}
-    ``Interconnection of sensing and actuating devices providing the ability to share information across platforms through a unified framework, developing a common operating picture for enabling innovative applications. This is achieved by seamless ubiquitous sensing, data analytics and information representation with Cloud computing as the unifying framework.''
-\end{quote}
-
-This approach is mostly "Cloud"-oriented. The authors focus mostly on the concept of ubiquitous information and evolving communication networks. The means to give ground to this very concept is Smart Connectivity. It is fueled by the prevalence of devices enabled
-by open wireless technology such as Bluetooth, radio frequency
-identification (RFID), Wi-Fi, and telephonic data services as well as
-embedded sensor.
-
-Nevertheless, Hardware-sensor breakouts are critically important, as they serve as the primary means of data collection in IoT systems. Middleware and computing tools for data analytics are equally invaluable, as they enable the processing of raw sensor data into actionable insights. Finally, visualization tools and dashboards play a key role in end-user interaction with the IoT environment, while also providing stakeholders with an intuitive and accessible representation of the data \cite{Gubbi2013}.
-
-As regards the approach of Atzori et al, there is given a different definition by considering two different approaches, the "Internet"-oriented approach and the "Things"-oriented approach \cite{Atzori2010}. The "Things"-oriented approach targets mainly at Big Data applications, since according to Atzori et al the time, the place and multipe recipients are the most important factors of this approach. In essnece the "Things" that contribute to this perspective are the Radio-Frequency IDentification (RFID), Near Field Communications (NFC) and Wireless Sensor and Actuator Networks (WSAN) among others.
-
-As regards the "Internet"-oriented vision given by Atzori et al, it is highlighted that the IP (Internet Protocol) constitutes the core technology of Internet of Things (IoT). The Internet Protocol (IP) is lightweight, scalable, and capable of connecting smart objects worldwide—even on low-power devices. The authors also introduce Internet Ø, a similar approach that further simplifies IP to enable "IP over anything," ensuring seamless IoT integration. The ultimate goal of both strategies is to make all objects addressable, reachable, and interoperable through IP, moving from a basic "Internet of Devices" to a fully connected "Internet of Things" \cite{Atzori2010}. 
-
-In addition to the aforementioned perspectives there is an emerging need for representation and storage of the invaluable information, which leads to the "Semantic"-oriented approach (see \ref{fig:IoT}). This final approach creates a well-rounded Internet of Things (IoT) concept, yielding more details on it. 
-
-The whole concept of the vast majority of different projects requires a semantic approach so as to set some thresholds and yield some feedback or take some action over something. In addition to this the semantic vision according to Atzori et al expresses the need for a representation of the collected data \cite{Atzori2010}.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\linewidth]{figures/IoT.png}
-    \caption{The Internet of Things paradigm as a result of the convergence of different visions. Source: \cite{Atzori2010}.}
-    \label{fig:IoT}
-\end{figure}
-
-All in all Atzori defines Internet of Things (IoT) as follows:
-\begin{quote}
-a world-wide network of interconnected objects uniquely addressable, based on standard communication protocols
-\end{quote}
-
-The sensing unit of this project's application collects physical data and connects to the microcontroller through a specific interface like analog input. There are also other communication interface options such as digital input, \textbf{SPI} (Serial Peripheral Interface), \textbf{UART} (Universal Asynchronous Receiver-Transmitter), and \textbf{I\textsuperscript{2}C} (Inter-Integrated Circuit) \cite{Dharmarathne2025}.
-
-\begin{figure}[h]
-    \centering
-    \begin{tikzpicture}[
-        node distance=1.5cm,
-        box/.style={draw, rectangle, minimum width=2cm, minimum height=1cm}
-    ]
-        % Level 0 (Single node)
-        \node[box] (Sensor) {Sensor};
-        
-        % Level 1 (Straight-line flow)
-        \node[box, right=of Sensor] (IoTDevice) {IoT Device};
-        \node[box, right=of IoTDevice] (IoTIntegration) {IoT Integration};
-
-        % Arrows
-        \draw[->] (Sensor) -- (IoTDevice);
-        \draw[->] (IoTDevice) -- (IoTIntegration);
-    \end{tikzpicture}
-    \caption{Hierarchical IoT data flow from Sensor to Cloud Integration.}
-    \label{fig:IoTHierarchy}
-\end{figure}
-}
+	\subsubsection{Introduction to Internet of Things \& Key Technologies}
+	{
+		The ultimate objective of this project is to create a set-up that is well-rounded and has a real-time monitoring and assessment competency. Two of the most prominent technologies that are being incorporated by Internet of Things (IoT) is the cloud computing and the wireless communication. It is also worth mentioning that, Internet of things encompasses interconnection of physical devices and applicaitons making the most of sensors, networks and data analysis. 
+	}
+	
+	\subsubsection{Cloud-Oriented Perspective \cite{Gubbi2013}}
+	{
+		An extremely accurate definition of the \textit{Internet of Things} is given by Gubbi et al, articulating that:
+		
+		\begin{quote}
+			``Interconnection of sensing and actuating devices providing the ability to share information across platforms through a unified framework, developing a common operating picture for enabling innovative applications. This is achieved by seamless ubiquitous sensing, data analytics and information representation with Cloud computing as the unifying framework.''
+		\end{quote}
+		
+		This approach is mostly "Cloud"-oriented. The authors focus mostly on the concept of ubiquitous information and evolving communication networks. The means to give ground to this very concept is Smart Connectivity. It is fueled by the prevalence of devices enabled by open wireless technology such as Bluetooth, radio frequency identification (RFID), Wi-Fi, and telephonic data services as well as embedded sensor.
+		
+		Nevertheless, Hardware-sensor breakouts are critically important, as they serve as the primary means of data collection in IoT systems. Middleware and computing tools for data analytics are equally invaluable, as they enable the processing of raw sensor data into actionable insights. Finally, visualization tools and dashboards play a key role in end-user interaction with the IoT environment, while also providing stakeholders with an intuitive and accessible representation of the data \cite{Gubbi2013}.
+	}
+	
+	\subsubsection{Internet- vs. Things-Oriented Perspectives \cite{Atzori2010}}
+	{
+		As regards the approach of Atzori et al, there is given a different definition by considering two different approaches, the "Internet"-oriented approach and the "Things"-oriented approach. The "Things"-oriented approach targets mainly at Big Data applications, since according to Atzori et al the time, the place and multipe recipients are the most important factors of this approach. In essnece the "Things" that contribute to this perspective are the Radio-Frequency IDentification (RFID), Near Field Communications (NFC) and Wireless Sensor and Actuator Networks (WSAN) among others.
+		
+		The "Internet"-oriented vision given by Atzori et al, it is highlighted that the IP (Internet Protocol) constitutes the core technology of Internet of Things (IoT). The Internet Protocol (IP) is lightweight, scalable, and capable of connecting smart objects worldwide—even on low-power devices. The authors also introduce Internet Ø, a similar approach that further simplifies IP to enable "IP over anything," ensuring seamless IoT integration. The ultimate goal of both strategies is to make all objects addressable, reachable, and interoperable through IP, moving from a basic "Internet of Devices" to a fully connected "Internet of Things" \cite{Atzori2010}. 
+	}
+	
+	\subsubsection{Semantic-Oriented Approach}
+	{
+		In addition to the aforementioned perspectives there is an emerging need for representation and storage of the invaluable information, which leads to the "Semantic"-oriented approach (see \ref{fig:IoT}). This final approach creates a well-rounded Internet of Things (IoT) concept, yielding more details on it. 
+		
+		The whole concept of the vast majority of different projects requires a semantic approach so as to set some thresholds and yield some feedback or take some action over something. In addition to this the semantic vision according to Atzori et al expresses the need for a representation of the collected data \cite{Atzori2010}.
+		
+		\begin{figure}[h]
+			\centering
+			\includegraphics[width=\linewidth]{figures/IoT.png}
+			\caption{The Internet of Things paradigm as a result of the convergence of different visions. Source: \cite{Atzori2010}.}
+			\label{fig:IoT}
+		\end{figure}
+			
+		All in all Atzori defines Internet of Things (IoT) as follows:
+			\begin{quote}
+				a world-wide network of interconnected objects uniquely addressable, based on standard communication protocols
+			\end{quote}
+		}
+		
+		
+		
+		
+		
+		
+		
+	\subsubsection{Project Implementation: Sensing \& Communication}
+	{
+		The sensing unit in this project utilizes an ADXL335 accelerometer to collect physical acceleration data, which connects to the microcontroller through an analog input interface \cite{Dharmarathne2025}. 
+		
+		Some key-traits of this set-up are the following points:
+		
+		\begin{itemize}
+			\item The ADXL335 natively provides analog voltage outputs proportional to acceleration ($\pm3g$ range)
+			\item Analog input allows continuous measurement of acceleration values
+			\item It simplifies the signal conditioning chain compared to digital alternatives
+		\end{itemize}
+		
+		The system architecture supports multiple communication protocol options, each with distinct advantages:
+		
+		\begin{itemize}
+			\item \textbf{Analog Input}: Currently implemented for direct sensor interfacing (ADXL335)
+			\item \textbf{Digital Input}: Available for threshold-based detection applications
+			\item \textbf{SPI (Serial Peripheral Interface)}: Suitable for high-speed (up to 10 Mbps) communication with multiple peripherals
+			\item \textbf{I\textsuperscript{2}C (Inter-Integrated Circuit)}: Enables multi-device communication using only two wires (SDA/SCL)
+			\item \textbf{UART (Universal Asynchronous Receiver-Transmitter)}: Implemented at 9600 baud (8N1 format) for Arduino-to-Raspberry Pi communication
+		\end{itemize}
+		
+		The UART protocol was specifically selected for inter-processor communication due to:
+		\begin{itemize}
+			\item Native hardware support on both Arduino and Raspberry Pi platforms
+			\item Simplified point-to-point implementation
+			\item Sufficient bandwidth for the project's real-time data transmission needs
+		\end{itemize}
+		
+		This hybrid approach combining analog sensor interfacing with digital serial communication provides optimal balance between:
+		\begin{itemize}
+			\item Signal fidelity at the sensing stage
+			\item System-wide data reliability
+			\item Implementation efficiency
+		\end{itemize}
+	}
  
-\subsubsection{ADXL335 Sensor}  
-The ADXL335 is a 3-axis accelerometer that measures acceleration using analog voltage outputs. This section discusses its interfacing with an Arduino and signal processing.  
-
-\begin{itemize}  
-	\item \textbf{Sensor Breakout Board}  
-	A breakout board simplifies the connection of the ADXL335 by providing necessary components (e.g., voltage regulation, filtering capacitors) and standardized pin headers. This avoids the need for complex PCB design when prototyping.  
-	
-	\item \textbf{Analog Signal Transmission}  
-	The ADXL335 outputs analog voltages proportional to acceleration. Unlike digital signals (discrete values), analog signals are continuous and susceptible to noise. The Arduino's ADC (Analog-to-Digital Converter) reads these voltages for processing.  
-	
-	\item \textbf{Signal Conditioning \& Processing}  
-	Since analog signals degrade over long wires, techniques like filtering (RC low-pass) and amplification may be needed. Calibration (mapping voltage to g-forces) is also essential for accurate readings.  
-\end{itemize}
-
-
-
-
-\subsubsection{Arduino Microcontroller}
-UART serial communication sending data to RPi. To elaborate on this protocol
-\begin{itemize}
-\item what serial protocol is
-\item what Arduino is
-\end{itemize}
-
-\subsubsection{Raspberry Pi 4}
-RPi receiving data using a script and posing HTTP Post data to a supabase api. Elaborate on this
-
-\begin{itemize}
-\item how to collect data and analyse
-\item what Raspberry Pi 4 is
-\end{itemize}
-
-
-
-
-\subsection{Backend \& Database}
-\subsubsection{Supabase}
-\begin{itemize}  
-	\item PostgreSQL. 
-	\item APIs
-	\item what http post is
-\end{itemize}  
-
-\subsubsection{Vercel and Next.js}
-\begin{itemize}  
-	\item nextjs 
-	\item vercel
-\end{itemize} 
+ 
+ 
+	 
+	 
+	\subsection{Embedded System Design} 
+	{
+		\subsubsection{Sensor Layer: ADXL335 Accelerometer}  
+		The ADXL335 is a 3-axis accelerometer that measures acceleration using analog voltage outputs. This section discusses its interfacing with an Arduino and signal processing.  
+		
+		\begin{itemize}  
+			\item \textbf{Sensor Breakout Board}  
+			A breakout board simplifies the connection of the ADXL335 by providing necessary components (e.g., voltage regulation, filtering capacitors) and standardized pin headers. This avoids the need for complex PCB design when prototyping.  
+			
+			\item \textbf{Analog Signal Transmission}  
+			The ADXL335 outputs analog voltages proportional to acceleration. Unlike digital signals (discrete values), analog signals are continuous and susceptible to noise. The Arduino's ADC (Analog-to-Digital Converter) reads these voltages for processing.  
+			
+			\item \textbf{Signal Conditioning \& Processing}  
+			Since analog signals degrade over long wires, techniques like filtering (RC low-pass) and amplification may be needed. Calibration (mapping voltage to g-forces) is also essential for accurate readings.  
+		\end{itemize}
+		
+		\subsubsection{Microcontroller: Arduino}  
+		\begin{itemize}  
+			\item \textbf{UART Protocol}: 9600 baud, 8N1 frame format.  
+			\item \textbf{Data Relay}: Reads ADC, sends CSV string via serial.  
+		\end{itemize}  
+		
+		\subsubsection{Gateway: Raspberry Pi 4}  
+		\begin{itemize}  
+			\item \textbf{UART-to-HTTP Bridge}:  
+			\begin{enumerate}
+				\item Python script reads serial port.  
+				\item Formats JSON payload.  
+				\item POSTs to Supabase API.  
+			\end{enumerate}
+		\end{itemize}  
+		
+		\subsubsection{Backend: Supabase \& Vercel}  
+		\begin{itemize}  
+			\item \textbf{Supabase}: PostgreSQL tables with time-series data.  
+			\item \textbf{Vercel}: Hosts Next.js dashboard fetching Supabase data.  
+		\end{itemize}  
+	}
+	 
