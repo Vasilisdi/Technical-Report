@@ -99,14 +99,25 @@ To summarize the preceding analysis, Figure \ref{fig:faultTree} provides a clear
 
 It must be that a fault-emulation method can be used in such cases to simulate the faulty models. This entails that additional tones can be stressed, and crucial spectra modifications may take place for research and comparison purposes.
 }
-
-
 }
 
 
 
 
 \section{Algorithms and Technologies}
+\subsection{Algorithm Introduction}
+{
+This section aims at yielding a brief introduction into the concept of bearing failure prdictive maintenance plan. The set-up utilizes an accelerometer which collects data that are going to be used for model assessment, by the means of Fast-Fourier Analysis.
+
+In most of the actual applications a machine learning implementation is a common practice. A figure that depicts this modeling has been presented by Dharmarathne et al \cite{Dharmarathne2025}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\linewidth]{figures/DataFlow.png}
+	\caption{Data collection and assessment algorithm for bearing failure prediction. Source: \cite{Dharmarathne2025}.}
+	\label{fig:Dataflow}
+\end{figure}
+}
 % Summary of FFT, data flow, etc.
 \subsection{Signal Processing}
 \subsubsection{Fourier Analysis}
@@ -409,7 +420,7 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 			
 		All in all Atzori defines Internet of Things (IoT) as follows:
 			\begin{quote}
-				a world-wide network of interconnected objects uniquely addressable, based on standard communication protocols
+				``Internet of Things constitutes a world-wide network of interconnected objects uniquely addressable, based on standard communication protocols.``
 			\end{quote}
 		}
 		
@@ -421,15 +432,49 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 		
 	\subsubsection{Project Implementation: Sensing \& Communication}
 	{
-		The sensing unit in this project utilizes an ADXL335 accelerometer to collect physical acceleration data, which connects to the microcontroller through an analog input interface \cite{Dharmarathne2025}. 
+As it has been highlighted by the Internet of Things definitions, the sensors are among the most important devices of this technology. The sensing unit in this project utilizes an ADXL335 accelerometer to collect physical acceleration data, which connects to the microcontroller through an analog input interface. 
 		
-		Some key-traits of this set-up are the following points:
-		
-		\begin{itemize}
-			\item The ADXL335 natively provides analog voltage outputs proportional to acceleration ($\pm3g$ range)
-			\item Analog input allows continuous measurement of acceleration values
-			\item It simplifies the signal conditioning chain compared to digital alternatives
-		\end{itemize}
+Its operational principles can be summarized as follows \cite{ADXL335}:
+
+\paragraph{Sensing Mechanism}
+\begin{itemize}
+	\item Utilizes a surface-micromachined polysilicon structure suspended by springs 
+	\item Employs a differential capacitor design with:
+	\begin{itemize}
+		\item Fixed plates driven by 180° out-of-phase square waves
+		\item Moving plates attached to the proof mass
+	\end{itemize}
+	\item Acceleration causes proof mass deflection, unbalancing the capacitor
+	\item Phase-sensitive demodulation determines acceleration magnitude/direction
+\end{itemize}
+
+\paragraph{Key Features}
+\begin{itemize}
+	\item \textbf{Monolithic Construction}: Single structure for X/Y/Z axes ensures:
+	\begin{itemize}
+		\item High orthogonality ($<$1\% cross-axis sensitivity)
+		\item Temperature stability ($<$3mg hysteresis from -25°C to +70°C)
+	\end{itemize}
+	\item \textbf{Signal Conditioning}:
+	\begin{itemize}
+		\item On-chip 32k$\Omega$ output resistor
+		\item User-adjustable bandwidth (0.5-1600Hz via external capacitors)
+	\end{itemize}
+	\item \textbf{Power Management}:
+	\begin{itemize}
+		\item Basic decoupling: 0.1$\mu$F capacitor near supply pins
+		\item Enhanced noise rejection: 100$\Omega$ ferrite bead + 1$\mu$F bulk capacitor 
+	\end{itemize}
+\end{itemize}
+
+\paragraph{Measurement Capabilities}
+The device measures both:
+\begin{itemize}
+	\item Static acceleration (e.g., tilt sensing through gravity detection)
+	\item Dynamic acceleration (vibration, shock, motion)
+\end{itemize}
+
+This combination of mechanical design and signal processing provides robust acceleration measurement without requiring temperature compensation circuits or complex calibration procedures \cite{ADXL335}.
 		
 		The system architecture supports multiple communication protocol options, each with distinct advantages:
 		
