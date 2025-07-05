@@ -1,4 +1,4 @@
-\chapter{Theoretical Background}
+\chapter{Background}
 \label{chap2}
 \section{Fundamentals of Bearing Fault Frequencies}
 {
@@ -378,14 +378,14 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 
 
 
-\subsection{Internet of Things} 
+\section{Internet of Things} 
 {
-	\subsubsection{Introduction to Internet of Things \& Key Technologies}
+	\subsection{Introduction to Internet of Things \& Key Technologies}
 	{
 		The ultimate objective of this project is to create a set-up that is well-rounded and has a real-time monitoring and assessment competency. Two of the most prominent technologies that are being incorporated by Internet of Things (IoT) is the cloud computing and the wireless communication. It is also worth mentioning that, Internet of things encompasses interconnection of physical devices and applicaitons making the most of sensors, networks and data analysis. 
 	}
 	
-	\subsubsection{Cloud-Oriented Perspective \cite{Gubbi2013}}
+	\subsection{Cloud-Oriented Perspective \cite{Gubbi2013}}
 	{
 		An extremely accurate definition of the \textit{Internet of Things} is given by Gubbi et al, articulating that:
 		
@@ -398,14 +398,14 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 		Nevertheless, Hardware-sensor breakouts are critically important, as they serve as the primary means of data collection in IoT systems. Middleware and computing tools for data analytics are equally invaluable, as they enable the processing of raw sensor data into actionable insights. Finally, visualization tools and dashboards play a key role in end-user interaction with the IoT environment, while also providing stakeholders with an intuitive and accessible representation of the data \cite{Gubbi2013}.
 	}
 	
-	\subsubsection{Internet- vs. Things-Oriented Perspectives \cite{Atzori2010}}
+	\subsection{Internet- vs. Things-Oriented Perspectives \cite{Atzori2010}}
 	{
 		As regards the approach of Atzori et al, there is given a different definition by considering two different approaches, the "Internet"-oriented approach and the "Things"-oriented approach. The "Things"-oriented approach targets mainly at Big Data applications, since according to Atzori et al the time, the place and multipe recipients are the most important factors of this approach. In essnece the "Things" that contribute to this perspective are the Radio-Frequency IDentification (RFID), Near Field Communications (NFC) and Wireless Sensor and Actuator Networks (WSAN) among others.
 		
 		The "Internet"-oriented vision given by Atzori et al, it is highlighted that the IP (Internet Protocol) constitutes the core technology of Internet of Things (IoT). The Internet Protocol (IP) is lightweight, scalable, and capable of connecting smart objects worldwide—even on low-power devices. The authors also introduce Internet Ø, a similar approach that further simplifies IP to enable "IP over anything," ensuring seamless IoT integration. The ultimate goal of both strategies is to make all objects addressable, reachable, and interoperable through IP, moving from a basic "Internet of Devices" to a fully connected "Internet of Things" \cite{Atzori2010}. 
 	}
 	
-	\subsubsection{Semantic-Oriented Approach}
+	\subsection{Semantic-Oriented Approach}
 	{
 		In addition to the aforementioned perspectives there is an emerging need for representation and storage of the invaluable information, which leads to the "Semantic"-oriented approach (see \ref{fig:IoT}). This final approach creates a well-rounded Internet of Things (IoT) concept, yielding more details on it. 
 		
@@ -430,49 +430,23 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 		
 		
 		
-	\subsubsection{Project Implementation: Sensing \& Communication}
+	\section{Project Implementation: Sensing \& Communication}
+	\subsection{The Sensor}
 	{
 As it has been highlighted by the Internet of Things definitions, the sensors are among the most important devices of this technology. The sensing unit in this project utilizes an ADXL335 accelerometer to collect physical acceleration data, which connects to the microcontroller through an analog input interface. 
-		
-Its operational principles can be summarized as follows \cite{ADXL335}:
 
-\paragraph{Sensing Mechanism}
-\begin{itemize}
-	\item Utilizes a surface-micromachined polysilicon structure suspended by springs 
-	\item Employs a differential capacitor design with:
-	\begin{itemize}
-		\item Fixed plates driven by 180° out-of-phase square waves
-		\item Moving plates attached to the proof mass
-	\end{itemize}
-	\item Acceleration causes proof mass deflection, unbalancing the capacitor
-	\item Phase-sensitive demodulation determines acceleration magnitude/direction
-\end{itemize}
+The ADXL335 is a single component sensing X, Y and Z, having a wide measuring range in all three axes. Typical applications of this sensor is structure deflection projects. This sensor is the ideal choice when it comes to vibration analysis applications, since it retains a measuring range of $\pm 3g$. This range adequate with respect to vibration analysis because in most of the rotating equipment applications an acceleration greater than 1,5g indicates a defective component. This entails that the $\pm 3g$ is sufficient in the context of this project. In addition to this, it offers higher resolution, up to 300mV/g for vibration detection, which means it has relatively high sensitivity to small vibrations. As regards its frequency bandwidth, it ranges 0.5-1600Hz. As regards its noise density, it equals to 150μg/sqrt(Hz), which is ideal for low-amplitude vibration waveforms\cite{ADXL335}.
 
-\paragraph{Key Features}
-\begin{itemize}
-	\item \textbf{Monolithic Construction}: Single structure for X/Y/Z axes ensures:
-	\begin{itemize}
-		\item High orthogonality ($<$1\% cross-axis sensitivity)
-		\item Temperature stability ($<$3mg hysteresis from -25°C to +70°C)
-	\end{itemize}
-	\item \textbf{Signal Conditioning}:
-	\begin{itemize}
-		\item On-chip 32k$\Omega$ output resistor
-		\item User-adjustable bandwidth (0.5-1600Hz via external capacitors)
-	\end{itemize}
-	\item \textbf{Power Management}:
-	\begin{itemize}
-		\item Basic decoupling: 0.1$\mu$F capacitor near supply pins
-		\item Enhanced noise rejection: 100$\Omega$ ferrite bead + 1$\mu$F bulk capacitor 
-	\end{itemize}
-\end{itemize}
+The Adafruit ADXL335 is a high performance sensor breakout, utilizing capacitors so as to decouple the noise of the power supply and filters om analog outputs for antialiasing and noise reduction. 
 
-\paragraph{Measurement Capabilities}
-The device measures both:
-\begin{itemize}
-	\item Static acceleration (e.g., tilt sensing through gravity detection)
-	\item Dynamic acceleration (vibration, shock, motion)
-\end{itemize}
+As for the sensor's theory of operation \cite{ADXL335}:
+\begin{quote}
+ADXL335 is a polysilicon surface-micromachined structure built on top of a silicon wafer. Polysilicon springs suspend the structure over the surface of the wafer and provide a resistance against acceleration forces Deflection of the structure is meas
+ured using a differential capacitor that consists of independent fixed plates and plates attached to the moving mass. The fixed plates are driven by 180° out-of-phase square waves. Acceleration deflects the moving mass and unbalances the differential capacitor resulting in a sensor output whose amplitude is proportional to acceleration. Phase-sensitive demodulation techniques are then used to determine the magnitude and direction of the acceleration. 
+\end{quote}
+
+
+
 
 This combination of mechanical design and signal processing provides robust acceleration measurement without requiring temperature compensation circuits or complex calibration procedures \cite{ADXL335}.
 		
