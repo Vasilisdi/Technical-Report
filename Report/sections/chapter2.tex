@@ -32,6 +32,118 @@ However there could be some more causes of machinery failure, specifically a loo
 How does vibration diagnosis contribute to operational reliability and cost efficiency in engineering applications? The answer to this question is that the implementation of vibration-analysis-based predictive maintenance helps in the direction of troubleshooting the cause of some issue. In addition, raising awareness on some upcoming failure leads to proper planning, which can prevent greater equipment damage.
 }
 
+\subsection{The Reliability}
+{	
+
+	To begin with, the ultimate objective of the preventive maintenance concept is to improve the dependability. In essence, it is a concept that encompasses different subconcepts like Reliability, Availability, Maintenability and others. The reliability interprets the successful uninterrupted operation of an adequately-performing device or an engineering system. This entails that the operating system must retain not only a low Failure rate, but the most important trait of a device in operation must be the absence of failures so as to claim the title of a "reliable system".
+	
+	According to Martz, "reliability analysis is the engineering and statistical methodology used to assess the unknown reliability of a device. It may be used qualitatively as a means for identifying the various failure modes and causes, or it may be applied quantitatively, using appropriate failure data, to provide a numerical estimate of the unknown reliability" \cite{Martz2001}. Hence, it is worth it utilizing the aforementioned metrics (MTTF and MTBF), when contemplating reliability, since these constitute the actual metrics of reliability.
+	
+	The initial aspect of the theoretical background to be elaborated upon is Mean Time to Failure (MTTF) is a fundamental reliability metric used to estimate the average operational lifetime of non-repairable components and systems. In the context of this very article, the main focus of the study is mechanical components (e.g bearings, gears) as well as a system-machine in operation.
+	
+	Some of the most important functions that are being used in the context of the metrics interpretation are the following:
+	
+	\begin{itemize}
+		\item \( f(x) \) is the probability density function of the time to failure.
+		\item \( R(t) \) represents the probability that the device is still operational at time \( t \) \cite{Martz2001}.
+		\item \( F(t) \) is the cumulative distribution function of the time to failure, representing the probability that the system has failed by time \( t \).
+	\end{itemize}
+	
+	\subsubsection{Interpretation of the MTTF}
+	\indent	
+	
+	In this regard the MTTF can be modeled as the integral of the reliability function \( R(t) \) over time, from zero to infinity:
+	
+	\[
+	\text{MTTF} = \int_{0}^{\infty} R(t) \, dt
+	\]
+	
+	Where:
+	
+	\[
+	\ R(t) \ = Pr(T > t) = \int_{t}^{\infty} f(x) \, dx = 1 - F(t)
+	\]
+	
+	
+	The MTTF interprets the expected time until failure for a large number of identical devices under similar operating conditions. 
+	
+	MTTF is used to predict the average lifespan of a device, providing critical information for maintenance planning, warranty determination, and lifecycle management. A higher MTTF indicates a more reliable device with a longer expected operational life. This metric is crucial for designing reliable products and for making informed decisions about product development and quality assurance.
+	
+	\subsubsection{Interpretation of the MTBF}
+	\indent	
+	
+	The MTBF is another critical metric used in reliability engineering, particularly for repairable systems. It represents the average time between failures for a system or component. For repairable systems, MTBF is calculated as the sum of the operational time divided by the number of failures:
+	
+	\[
+	\text{MTBF} = \frac{\text{Total operational time}}{\text{Number of failures}}
+	\]
+	
+	In this case, the reliability function would be:
+	
+	\[
+	R(t) = e^{-\lambda t}
+	\]
+	
+	Mathematically, MTBF is the inverse of the failure rate \(\lambda\) for systems with a constant failure rate \cite{Martz2001}:
+	
+	\[
+	\text{MTBF} = \int_{0}^{\infty} tf(t) \, dt = \int_{0}^{\infty} R(t) \, dt = \frac{1}{\lambda}
+	\]
+	
+	
+	MTBF helps in understanding the reliability of a system over time and is essential for planning maintenance schedules, improving system design, and ensuring continuous operation with minimal downtime. A higher MTBF indicates a more reliable system that experiences fewer failures over its operational life.
+	
+	
+	\subsubsection{Interpretation of the Failure Rate}
+	\indent	
+	
+	The Failure rate, often denoted as \(\lambda\), is defined as the frequency with which an engineered system or component fails. This metric is typically expressed in terms of the number of failures per unit time.
+	
+	In mathematical term the Failure rate can be expressed as follows: 
+	
+	
+	\[
+	\lambda(t) = \frac{f(t)}{R(t)} = \frac{f(t)}{1 - F(t)}
+	\]
+	
+	There is three failure rate cases that may be encountered: 
+	
+	\begin{itemize}
+		\item \textbf{Constant Failure Rate:} A constant \( \lambda \) suggests that the system is in its "useful life" period, where the rate of failure is steady and does not change over time.
+		\item \textbf{Increasing Failure Rate (IFR):} An increasing \( \lambda(t) \) indicates that the system is aging and becoming more prone to failure.
+		\item \textbf{Decreasing Failure Rate (DFR):} A decreasing \( \lambda(t) \) is often observed during the initial "infant mortality" period, where early failures occur, but the remaining items are more reliable over time.
+	\end{itemize}
+	
+	
+	\subsubsection{Constant Failure Rate}
+	For systems with an exponential distribution of failure times (i.e., a constant failure rate), the failure rate \( \lambda \) is constant over time:
+	
+	\[
+	\lambda = \text{constant}
+	\]
+	
+	In this case, the reliability function \( R(t) \) and the probability density function \( f(t) \) are given by:
+	
+	\[
+	R(t) = e^{-\lambda t}
+	\]
+	
+	\[
+	f(t) = \lambda e^{-\lambda t}
+	\]
+	
+	\subsubsection{Interpretation of the Availability}
+	Availability (A) is typically expressed as a percentage and is calculated using the following formula\cite{Ruane2022}:
+	\[
+	A = \frac{MTBF}{MTBF + MTTR} \times 100\%
+	\]
+	Where:
+	\begin{itemize}
+		\item MTBF (Mean Time Between Failures): The average time interval between two consecutive expected failures of a system component or mechanism.
+		\item MTTF (Mean Time To Repair): The average time required to repair a failed system component or mechanism and restore it to operational status.
+	\end{itemize}
+
+
 \subsection{Vibration Analysis Instruments}
 {
 There is a great number of vibration monitoring products. Some of them are listed hereunder:
@@ -71,6 +183,16 @@ For comprehensive vibration analysis, multi-channel FFT platforms are necessary.
 
 The primary technical distinctions between these solutions involve: their measurement approach (single versus multiple points), frequency analysis quality (basic versus high-definition), phase measurement availability, and specialized analytical features. Choosing the appropriate tool involves matching the instrument's capabilities to the diagnostic requirements - from preliminary condition checks with hand-held units to in-depth failure analysis using multi-channel systems.
 
+There is also some obsolete set-ups, for instance the station used by Betta et al for their experiment \cite{Betta2002}. This station encompasses an  acceleration sensor (8710A50M1 by Kistler™) with 5g measuring range, a signal conditioner with adjustable gain (5118B1 by
+Kistler™) for data translation, a DPC/C40 by Loughborough Sound Images™ for FFT-Analysis and a host PC (see Figure \ref{fig:station}). 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/vibrationanalysisstation.png}
+	\caption{Block diagram of the designed station for vibration analysis (source: \cite{Betta2002}).}
+	\label{fig:station}
+\end{figure}
+
 There is some more accessible alternatives. Specifically, there is some small sized low-cost acceleration sensor on breakouts that can be used on related projects (see Figure \ref{fig:adxl335}).
 
 \begin{figure}[h]
@@ -98,7 +220,7 @@ The most significant challenge that Betta et al had to deal with is that of the 
 
 \subsection{Unfault and Fault Models}
 {
-As previously mentioned, the authors make use of a model-based approach, which entails that the main concept is comparison-oriented. Specifically, there is the unfault model, which contains a high-amplitude peak at the shaft rotating frequency $F_{\omega}$. In addition to that, it can be noticed in Figure~\ref{fig:faultsunfaults} that some other patterns distinct themselves from the previously-mentioned unfault model. Regarding the unbalance model, it is obvious that the amplitude at the first tone is much greater. In the case of the misalignment model, it can be noticed that the tone at $2F_{\omega}$ has a much greater amplitude while the amplitude at the tone of the shaft speed $F_{\omega}$ remains at a high level. In the case of looseness, there are some more tones prevailing on the spectrum, among the tones related to the shaft speed. To top it all off, the most important vibration spectrum is that of the bearing failure (Refer to Figure~\ref{fig:faultTree}). Every bearing is characterized by four critical frequencies, given by its manufacturer, and these frequencies are associated with the four bearing components (inner and outer ring, balls, and cage):
+Betta et al make use of a model-based approach, which entails that the main concept is comparison-oriented. Specifically, there is the unfault model, which contains a high-amplitude peak at the shaft rotating frequency $F_{\omega}$. In addition to that, it can be noticed in Figure~\ref{fig:faultsunfaults} that some other patterns distinct themselves from the previously-mentioned unfault model. Regarding the unbalance model, it is obvious that the amplitude at the first tone is much greater. In the case of the misalignment model, it can be noticed that the tone at $2F_{\omega}$ has a much greater amplitude while the amplitude at the tone of the shaft speed $F_{\omega}$ remains at a high level. In the case of looseness, there are some more tones prevailing on the spectrum, among the tones related to the shaft speed. To top it all off, the most important vibration spectrum is that of the bearing failure (Refer to Figure~\ref{fig:faultTree}). Every bearing is characterized by four critical frequencies, given by its manufacturer, and these frequencies are associated with the four bearing components (inner and outer ring, balls, and cage) \cite{Betta2002}:
 
 \begin{itemize}
 	\item BPFO (Ball Pass Frequency Outer) - outer race failure
@@ -110,7 +232,7 @@ As previously mentioned, the authors make use of a model-based approach, which e
 \begin{figure}[h]
 \centering
 \includegraphics[width=\linewidth]{figures/FaultsAndUnfaults.png}
-\caption{Fault and unfault spectrum graphs \cite{Betta2002}.}
+\caption{Fault and unfault spectrum graphs (source: \cite{Betta2002}).}
 \label{fig:faultsunfaults}
 \end{figure}
 
