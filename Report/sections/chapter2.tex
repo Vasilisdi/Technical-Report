@@ -32,6 +32,45 @@ However there could be some more causes of machinery failure, specifically a loo
 How does vibration diagnosis contribute to operational reliability and cost efficiency in engineering applications? The answer to this question is that the implementation of vibration-analysis-based predictive maintenance helps in the direction of troubleshooting the cause of some issue. In addition, raising awareness on some upcoming failure leads to proper planning, which can prevent greater equipment damage.
 }
 
+
+\subsection{The Lack of Preventive Maintenance}
+{	
+It is worth mentioning that there is a large number of possible faults that may lead to vibration, when the preventive maintenance is not implemented properly. The most common defect that is encountered on machinery is this of the bearing failure (see Figure \ref{fig:bearings} some bearings components and on Figure \ref{fig:bearingsFailure} a bearing's component defect). 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/bearings.png}
+	\caption{Different bearings components (source: \cite{bearings}).}
+	\label{fig:bearings}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/bearingsFailure.png}
+	\caption{A bearing's defective outer raceway.}
+	\label{fig:bearingsFailure}
+\end{figure}
+
+A bearing's defective component will certainly lead to greater problems. Specifically, this could lead to a severe shaft wearing or even thread damage (see \ref{fig:shaft}). In some other cases this could lead to a bearing housing damage.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/shaft.png}
+	\caption{Possible defects of shafts.}
+	\label{fig:shaft}
+\end{figure}
+
+Chen et al included in their research some more photos related to faulty bearings and gearsets \cite{Chen2017}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/bearingsandgearsFaults.png}
+	\caption{Faulty bearings and gears (source: \cite{Chen2017}).}
+	\label{fig:bearingsandgearsFaults}
+\end{figure}
+
+}
+
 \subsection{The Reliability}
 {	
 
@@ -209,7 +248,19 @@ Some typical applications that use vibration analysis implementations are turbin
 
 Li and McKee explain in their research that most of the vibration analysis applications are related to electrical and mechanical equipment that utilize roller bearings \cite{Li2001}. 
 
-Lilly and Marscher have studied the the vibration and noise derived from pumps and motors separately \cite{Lilly2008}. In addition, the concept of translational and torsional vibration is introduced. In addition to this, the concept of vibration analysis on piping is studied as well.
+Similarly, Lilly and Marscher have studied the vibration and noise derived from pumps and motors separately \cite{Lilly2008}. In addition, the concept of translational and torsional vibration is introduced. In addition to this, the concept of vibration analysis on piping is studied as well. In this context, the translational vibration analysis is made for the engine-pump-support structure, investigating the lateral vibration.  For this study the usage of high-quality sensors is a prerequisite. There is also the concept of the torsional vibration analysis, which is also subtle and requires special study on the oscillating torque.
+
+In addition to the aforementioned study, Lilly and Marscher investigate also the possibility of using some actuators that may compensate the noise of the motor-pump compound, making the most of the electronically generated sound waves. This technique aims at the cancellation of noise pollution \cite{Lilly2008}.
+
+The study by Jiao et al. demonstrates the efficacy of time-domain feature extraction combined with Independent Component Analysis (ICA) for gearbox fault diagnosis. Their approach maximizes mutual information to isolate fault-related vibrations from noisy multi-channel measurements, achieving high accuracy in classifying faults such as teeth surface damage and loose foundations \cite{Jiao2017}. 
+
+There is also the chance of implementing advanced signal processing techniques, such as envelope analysis and cyclostationary methods, to enhance fault detection in complex systems like helicopters, where high noise and low signal-to-noise ratios are prevalent \cite{Girondin2012}.
+
+In the context of unmanned aerial vehicles (UAVs), Mohd Ghazali and Rahiman employ vibration sensors and artificial intelligence (AI) techniques, including fuzzy logic and neural networks, to detect faults in drone arms. Their framework addresses the challenges of real-time decision-making and integrates IoT for remote monitoring, showcasing the adaptability of vibration analysis to emerging technologies \cite{Ghazali2022}. Meanwhile, Girondin et al. focus on bearing faults in helicopters, proposing redundancy-based harmonic analysis to overcome limitations imposed by low sampling frequencies and environmental noise. Their geometric mean criterion proves robust in identifying fault frequencies despite parasitic vibrations \cite{Girondin2012}.
+
+Theoretical advancements in vibration analysis also emphasize the role of preprocessing steps, such as whitening and Minimum Entropy Deconvolution (MED), to accentuate impulsive features indicative of faults \cite{Girondin2012}. These methods, combined with machine learning classifiers like Support Vector Machines (SVM) and neural networks, enable automated fault diagnosis with minimal human intervention, as demonstrated in gearbox and bearing applications \cite{Jiao2017, Ghazali2022}.
+
+Vibration analysis serves as a versatile tool across industries, from traditional rotating machinery to cutting-edge UAVs. Its evolution—driven by innovations in signal processing, AI, and IoT—continues to expand its applicability and precision in fault detection and predictive maintenance.
 }
 
 \section{Fundamentals of Bearing Fault Frequencies}
