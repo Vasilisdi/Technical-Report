@@ -1,72 +1,351 @@
 \chapter{System Engineering and Design}  
 \label{chap3}  
 
-% ====== Section 1: Requirements ======  
-\section{System Requirements} 
-{ 
-The system is designed for low-cost, real-time vibration monitoring of rotating machinery. This set-up encompasses components that are of major importance and its aim is to collect data within a specific - prerequired range, store data safely at a database and finally process data.
-
-The following sections include more detailed overview of the system requirements. Hereunder, more details will be elaborated.
+% ====== Section 1: Intro ======  
+\section{Introduction} 
+{	
+	As it has already been articulated the objective of this very diploma thesis is to study and develop a measuring system that encompasses a sensor, a microcomputer and a microcontroller.
+	
+	The system is designed for low-cost, real-time vibration monitoring of rotating machinery. This set-up encompasses components that are of major importance and its aim is to collect data within a specific - prerequired range, store data safely at a database and finally process data.
+	
+	The following sections include more detailed overview of the system requirements, highlighting the functional and non-functional requirements. In addition to this, there will be yielded a detailed elaboration on the system set-up (See \ref{fig:SetUp}).
+	
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[node distance=2cm]
+		% Define nodes in proper order
+		\node (machine) [draw, rectangle] {Machine};
+		\node (sensor) [draw, rectangle, below of=machine]  {ADXL335 Breakout};
+		\node (arduino) [draw, rectangle, below of=sensor] {Arduino UNO R3};
+		\node (rpi) [draw, rectangle, below of=arduino] {Raspberry Pi 4};
+		
+		% Draw connections
+		\draw[->] (machine) -- node[right] {Vibration in mm/s$^{2}$} (sensor);
+		\draw[->] (sensor) -- node[right] {Vibration intepreted as voltage [0-5V]} (arduino);
+		\draw[->] (arduino) -- node[right] {Data converted into frequency domain [0-300 Hz]} (rpi);
+	\end{tikzpicture}
+	\caption{The concept layout.}
+	\label{fig:SetUp}
+\end{figure}
 }
 
-\subsection{Functional Requirements} 
-{ 
-The most commonly rotating speed of machinery goes up to 1500 [rpm] corresponds to 25 [Hz]. This relationship is defined by the following equation: 
 
-\begin{equation}
-	f \, [\mathrm{Hz}] = \frac{r \, [\mathrm{RPM}]}{60}
-\end{equation}
-
-The aforementioned relationship entails that the rotational speed of a machine can be interpreted in frequency, which in turn is of great help when related to Fourier Transform applications.
-
-All in all, the functional requirements are highlighted hereunder:
-\begin{itemize}  
-	\item \textbf{Frequency Range}: 0–300 Hz (covers common machine faults like imbalance, misalignment).  
-	\item \textbf{Real-Time Processing}: On-the-fly FFT computation for immediate fault detection.  
-	\item \textbf{Scalability}: Modular design for multi-sensor deployments.  
-\end{itemize}  
-}
-
-\subsection{Non-Functional Requirements} 
-{ 
-\begin{itemize}  
-	\item \textbf{Cost}: Minimize BOM cost (justifies Arduino + RPi4 over industrial PLCs).  
-	\item \textbf{Power}: Optimize for continuous operation (e.g., no active cooling).  
-	\item \textbf{Accuracy}: ADXL335’s ±3g range suffices for industrial vibrations (cite datasheet).  
-\end{itemize}  
-}
 
 % ====== Section 2: Hardware Design ======  
 \section{Hardware Architecture}  
-\subsection{Component Selection}  
+\subsection{ADXL335 Accelerometer}  
 {
-\begin{itemize}  
-	\item \textbf{ADXL335 Accelerometer}:  
-	\begin{itemize}  
-		\item Analog output simplifies Arduino ADC interfacing.  
-		\item 300Hz bandwidth meets requirements (vs. digital sensors like MPU6050 needing I2C).  
-	\end{itemize}  
-	\item \textbf{Arduino Uno}:  
-	\begin{itemize}  
-		\item Handles analog sampling at 600Hz (Nyquist-compliant for 300Hz signals).  
-		\item Low-latency preprocessing (e.g., DC removal, windowing).  
-	\end{itemize}  
-	\item \textbf{Raspberry Pi 4}:  
-	\begin{itemize}  
-		\item Runs Python-based FFT (e.g., NumPy) and SQLite for local storage.  
-		\item WiFi/Bluetooth enables cloud integration (e.g., AWS IoT, InfluxDB).  
-	\end{itemize}  
-\end{itemize}  
-
-\begin{figure}[h]  
-	\centering  
-	\includegraphics[width=\linewidth]{figures/System.png}  
-	\caption{Hardware architecture with signal flow}  
-	\label{fig:System}  
-\end{figure}
+	
+		\textbf{ADXL335 Accelerometer}:  
+		\begin{itemize}  
+			\item Analog output simplifies Arduino ADC interfacing.  
+			\item 300Hz bandwidth meets requirements (vs. digital sensors like MPU6050 needing I2C).  
+		\end{itemize}  
+		
 }  
 
-% ====== Section 3: Software & Data Flow ======  
+
+\subsection{Arduino Uno} 
+{
+	
+	The Arduino UNO represents one of the most accessible and widely adopted microcontroller platforms in the maker community. Built around the reliable ATmega328P architecture, this development board strikes an optimal balance between capability and user-friendliness, serving equally well as an educational tool for novices and a rapid prototyping solution for experienced engineers. Its plug-and-play design eliminates complex setup procedures - users can immediately begin development by connecting via standard USB or utilizing various power input methods including the convenient barrel jack for 9V battery operation.
+	
+	The specifications of Arduino are listed bellow \cite{Arduino}:
+	\begin{itemize}
+		\item \textbf{ATmega328P Microcontroller Unit} -- Serving as the computational core, this component delivers:
+		\begin{itemize}
+			\item Efficient 8-bit AVR RISC processing at 16 MHz clock speed
+			\item Substantial 32 kilobyte Flash memory for program storage
+			\item 2 kilobytes of volatile SRAM for dynamic memory operations
+			\item 1 kilobyte EEPROM for persistent data storage across power cycles
+		\end{itemize}
+		
+		\item \textbf{System Reliability Features:}
+		\begin{itemize}
+			\item Automatic Power-On Reset (POR) circuitry for stable initialization
+			\item Brown-Out Detection (BOD) protection against voltage fluctuations
+		\end{itemize}
+		
+		\item \textbf{Integrated Hardware Peripherals:}
+		\begin{itemize}
+			\item Dual 8-bit and single 16-bit hardware timers with advanced control capabilities
+			\item Full-duplex USART interface with sophisticated clock generation
+			\item Flexible SPI and I2C serial communication controllers
+			\item Precision analog comparator with configurable reference
+			\item System watchdog for fail-safe operation
+			\item Six-channel PWM generation for analog signal emulation
+			\item Pin-change interrupt system for efficient event handling
+		    \item Seamless bridge between USB host and USART peripheral
+			\item Automatic protocol conversion (USB packets $\leftrightarrow$ serial frames)
+			\item Built-in drivers for major operating systems
+		\end{itemize}
+		
+		\item \textbf{USB Interface Controller (ATmega16U2):}
+		\begin{itemize}
+			\item Dedicated 8-bit processor managing USB protocol
+			\item 16 kilobyte reprogrammable Flash memory
+			\item 512 bytes each of EEPROM and SRAM
+			\item On-chip debugging through debugWIRE interface
+		\end{itemize}
+		
+		\item \textbf{Input/Output Configuration:}
+		\begin{itemize}
+			\item Fourteen programmable digital I/O lines (with six supporting PWM)
+			\item Six-channel 10-bit analog-to-digital conversion
+			\item Standard USB Type-B connector for programming and power
+			\item In-circuit serial programming (ICSP) header
+			\item Dedicated hardware reset circuit
+		\end{itemize}
+		
+		\item \textbf{Power Management System:}
+		\begin{itemize}
+			\item Wide operating voltage range (2.7-5.5V DC)
+			\item Multiple power input options including regulated 5V USB power
+		\end{itemize}
+	\end{itemize}
+	
+	
+	The following tables \ref{table:JANALOG} and \ref{table:JDIGITAL} provide a clear view of the input and output signals, while some more information is also included about the supply lines. All these are represented on Figure \ref{fig:Arduino}.
+		
+	\begin{table}[h]
+		\centering
+		\caption{Analog Pins (JANALOG)}
+		\label{table:JANALOG}
+		\begin{tabular}{|c|l|l|l|}
+			\hline
+			\textbf{Pin} & \textbf{Function} & \textbf{Type} & \textbf{Description} \\ \hline
+			1 & NC & NC & Not connected \\ \hline
+			2 & IOREF & IOREF & Reference for digital logic V (connected to 5V) \\ \hline
+			3 & Reset & Reset & Reset \\ \hline
+			4 & +3V3 & Power & +3.3V Power Rail \\ \hline
+			5 & +5V & Power & +5V Power Rail \\ \hline
+			6 & GND & Power & Ground \\ \hline
+			7 & GND & Power & Ground \\ \hline
+			8 & VIN & Power & Voltage Input \\ \hline
+			9 & A0 & Analog/GPIO & Analog input 0 / GPIO \\ \hline
+			10 & A1 & Analog/GPIO & Analog input 1 / GPIO \\ \hline
+			11 & A2 & Analog/GPIO & Analog input 2 / GPIO \\ \hline
+			12 & A3 & Analog/GPIO & Analog input 3 / GPIO \\ \hline
+			13 & A4/SDA & Analog input/I2C & Analog input 4 / I2C Data line \\ \hline
+			14 & A5/SCL & Analog input/I2C & Analog input 5 / I2C Clock line \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\caption{Digital Pins (JDIGITAL)}
+		\label{table:JDIGITAL}
+		\begin{tabular}{|c|l|l|l|}
+			\hline
+			\textbf{Pin} & \textbf{Function} & \textbf{Type} & \textbf{Description} \\ \hline
+			1 & D0 & Digital/GPIO & Digital pin 0 / GPIO \\ \hline
+			2 & D1 & Digital/GPIO & Digital pin 1 / GPIO \\ \hline
+			3 & D2 & Digital/GPIO & Digital pin 2 / GPIO \\ \hline
+			4 & D3 & Digital/GPIO & Digital pin 3 / GPIO \\ \hline
+			5 & D4 & Digital/GPIO & Digital pin 4 / GPIO \\ \hline
+			6 & D5 & Digital/GPIO & Digital pin 5 / GPIO \\ \hline
+			7 & D6 & Digital/GPIO & Digital pin 6 / GPIO \\ \hline
+			8 & D7 & Digital/GPIO & Digital pin 7 / GPIO \\ \hline
+			9 & D8 & Digital/GPIO & Digital pin 8 / GPIO \\ \hline
+			10 & D9 & Digital/GPIO & Digital pin 9 / GPIO \\ \hline
+			11 & SS & Digital & SPI Chip Select \\ \hline
+			12 & MOSI & Digital & SPI Main Out Secondary In \\ \hline
+			13 & MISO & Digital & SPI Main In Secondary Out \\ \hline
+			14 & SCK & Digital & SPI Serial Clock Output \\ \hline
+			15 & GND & Power & Ground \\ \hline
+			16 & AREF & Digital & Analog Reference Voltage \\ \hline
+			17 & A4/SD4 & Digital & Analog input 4 / I2C Data line (duplicated) \\ \hline
+			18 & A5/SD5 & Digital & Analog input 5 / I2C Clock line (duplicated) \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	\begin{figure}[h]  
+		\centering  
+		\includegraphics[width=\linewidth]{figures/Arduino.png}  
+		\caption{Arduino schematic pinout (refer to Tables \ref{table:JANALOG} and \ref{table:JDIGITAL} for details).}  
+		\label{fig:Arduino}  
+	\end{figure}
+	
+	An exquisite trait of Arduino boards, is that these devices boast a built-in set up of pull-up and pull-down resistors, which is extremely helpful when it comes to implementing projects making use of some sensors. 
+	
+	Moreover, the Arduino UNO cleverly bridges modern USB communication with traditional serial (UART) communication through a two-chip design. The main ATmega328P microcontroller handles the actual programming and serial communication using simple UART protocol, while a secondary ATmega16U2 chip acts as a translator, converting between the computer's USB signals and the microcontroller's UART signals. This translation happens automatically in both directions - when you upload code, the USB chip converts your computer's USB commands into UART signals the main chip understands, and when the Arduino sends serial data back, the USB chip converts it back to USB for your computer. The system creates a virtual COM port on your computer, making the Arduino appear as a simple serial device even though it's actually communicating via USB. This elegant solution provides plug-and-play USB connectivity while maintaining compatibility with traditional serial communication, all without requiring any additional components or complex setup from the user. The dual-chip approach also keeps the main processor free from USB protocol handling, allowing it to focus on running your programs efficiently.
+	
+	The Arduino UNO's serial communication typically operates at standard baud rates ranging from 300 to 115200 bits per second, with 9600 baud being the most commonly used default speed for basic communication. The USB-UART bridge supports higher speeds up to 2 Mbps in theory, but in practice, most applications reliably use 115200 baud or lower. The actual stable maximum baud rate depends on several factors, including the clock accuracy (the UNO's 16MHz crystal provides $\pm 0.3\%$ stability), the quality of USB connections, and the timing requirements of the specific application. For most beginner projects and serial monitoring, 9600 or 115200 baud provide the best balance of speed and reliability, while advanced applications can push higher speeds if properly implemented. The baud rate must match on both the Arduino and the receiving device for successful communication.
+	
+	These is also a tremendous amount of source code that is adaptable to different projects. All this sketches can be easily downloaded, stored and modified (or just even tweak some parameters) so as to fit it in each project.
+	
+	All in all, the UNO is the most popular and well-documented board in the Arduino ecosystem, making it perfect for learning electronics and coding. Its processor ATmega328P chip, in most of the cases is not welded and this allows easy replacement procedure. In addition Arduino UNO is robust, flexible, and beginner-friendly platform for a wide variety of projects. Most importantly it supports easy and robust communication between Raspberry Pi and Arduino.
+}
+
+
+\subsection{Raspberry Pi 4} 
+{
+	The Raspberry Pi is a series of credit-card sized single-board computers developed by the Raspberry Pi Foundation. Designed originally for education, these low-cost computers have evolved into versatile platforms for computing and digital making \cite{Raspberry}.
+	
+	There is a plethora of current Raspberry Pi boards (e.g. Raspberry Pi 4 and Raspberry Pi 5). They are all extremely powerful and can cover the needs of highly demanding projects, in terms of memory and computational power \cite{Raspberry}. The Raspberry Pi's complete technical specifications are systematically organized in Tables~\ref{table:rpi_specs}, \ref{table:rpi_os}, and \ref{table:rpi_protocols}, yielding detailed hardware and software characteristics.
+	 
+	\begin{table}[h]
+		\centering
+		\caption{Key Specifications of Raspberry Pi}
+		\label{table:rpi_specs}
+		\begin{tabular}{|l|l|}
+			\hline
+			\textbf{Component} & \textbf{Specification} \\ \hline
+			Processor & Broadcom BCM2712 (Pi 5) or BCM2711 (Pi 4) ARM Cortex \\ \hline
+			Memory & 4GB LPDDR4X RAM \\ \hline
+			Storage & MicroSD card (64GB recommended) \\ \hline
+			Power Supply & 5V USB-C (3A recommended) \\ \hline
+			Connectivity & Dual-band 802.11ac Wi-Fi, Gigabit Ethernet \\ \hline
+			Video Output & Dual micro HDMI (up to 4K resolution) \\ \hline
+			GPIO & 40-pin header \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\caption{Raspberry Pi OS Features}
+		\label{table:rpi_os}
+		\begin{tabular}{|l|l|}
+			\hline
+			\textbf{Feature} & \textbf{Description} \\ \hline
+			OS Type & Debian-based Linux distribution \\ \hline
+			Desktop & Complete desktop environment \\ \hline
+			Development & Python tools pre-installed \\ \hline
+			Hardware Access & GPIO control libraries \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\caption{Supported Communication Protocols}
+		\label{table:rpi_protocols}
+		\begin{tabular}{|l|l|}
+			\hline
+			\textbf{Protocol} & \textbf{Description} \\ \hline
+			Digital I/O & General purpose input/output pins \\ \hline
+			SPI (Serial Peripheral Interface) & High-speed serial communication \\ \hline
+			I\textsuperscript{2}C (Inter-Integrated Circuit) & Two-wire serial bus \\ \hline
+			UART & Asynchronous serial communication \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	A clear representation of the Raspberry Pi 4 hardware is depicted on the Figure \ref{fig:RaspGPIO}. Raspberry Pi boasts a wide variety of input and output pins, resembling the capacity of Arduino. It is also programmable, having a source code back-up for multiple hardware options (sensors). The most frequently used coding language for this context is PYTHON.
+	
+	\begin{figure}[h]  
+		\centering  
+		\includegraphics[width=\linewidth]{figures/RaspberryGPIO.png}
+		\caption{40-PIN GPIO of Raspberry Pi 4 (source \cite{Raspberry}).}  
+		\label{fig:RaspGPIO}  
+	\end{figure}
+	
+	The Raspberry Pi 4 Model B offers comprehensive connectivity options as detailed in Table~\ref{table:rpi4_ports}. The board features dual display outputs through micro-HDMI ports capable of driving 4K resolution simultaneously. For peripheral connectivity, it provides a balanced mix of USB 3.0 and 2.0 ports, with the USB-C power input supporting higher current requirements. The onboard wireless interfaces deliver dual-band Wi-Fi and Bluetooth 5.0 for modern wireless applications.
+	
+	\begin{table}[h!]
+		\centering
+		\caption{Raspberry Pi 4 Model B Ports and Connectors}
+		\label{table:rpi4_ports}
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			\textbf{Port Name} & \textbf{Type} & \textbf{Quantity} & \textbf{Specifications} \\ \hline
+			\multicolumn{4}{|c|}{\textbf{Primary External Ports}} \\ \hline
+			USB 3.0 & Type-A & 2 & 5Gbps, BC1.2 charging support \\ \hline
+			USB 2.0 & Type-A & 2 & 480Mbps \\ \hline
+			Ethernet & RJ45 & 1 & Gigabit (Realtek RTL8111G) \\ \hline
+			HDMI & micro-HDMI & 2 & HDMI 2.0 (up to 4K@60Hz) \\ \hline
+			Power & USB-C & 1 & 5V/3A (minimum) \\ \hline
+			Audio & 3.5mm jack & 1 & Stereo output + composite video \\ \hline
+			\multicolumn{4}{|c|}{\textbf{GPIO Header}} \\ \hline
+			GPIO & 40-pin & 1 & 2×20 pin header, 0.1" spacing \\ \hline
+			\multicolumn{4}{|c|}{\textbf{Other Connectors}} \\ \hline
+			CSI & 15-pin FPC & 1 & Camera Serial Interface \\ \hline
+			DSI & 15-pin FPC & 1 & Display Serial Interface \\ \hline
+			MicroSD & Slot & 1 & UHS-I compatible \\ \hline
+			PoE & 4-pin header & 1 & 802.3af support (requires HAT) \\ \hline
+			\multicolumn{4}{|c|}{\textbf{Wireless Interfaces}} \\ \hline
+			Wi-Fi & Antenna & 1 & 2.4GHz/5GHz 802.11ac \\ \hline
+			Bluetooth & Antenna & 1 & BT 5.0, BLE \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	Table \ref{table:rpi4_gpio} details the 40-pin GPIO header configuration, which maintains backward compatibility with previous Raspberry Pi models. The header provides multiple voltage rails (3.3V and 5V) along with dedicated ground pins. The GPIO header serves as the primary interface for hardware projects, supporting everything from simple LED controls to complex sensor networks and custom communication protocols.
+		
+	\begin{table}[h!]
+		\centering
+		\caption{GPIO Pinout Details (An extended version of this table is on Appendix - extended version of the following table is the Table \ref{table:rpi4_gpio_part1} (see Chapter \ref{appendix}).}
+		\label{table:rpi4_gpio}
+		\begin{tabular}{|c|l|l|c|l|}
+			\hline
+			\textbf{Pin \#} & \textbf{Function} & \textbf{Alt Function} & \textbf{Voltage} & \textbf{Notes} \\ \hline
+			1 & 3.3V & - & 3.3V & 50mA max \\ \hline
+			2 & 5V & - & 5V & - \\ \hline
+			3 & GPIO2 & SDA1 & 3.3V & I²C \\ \hline
+			4 & 5V & - & 5V & - \\ \hline
+			5 & GPIO3 & SCL1 & 3.3V & I²C \\ \hline
+			6 & GND & - & - & - \\ \hline
+			7 & GPIO4 & - & 3.3V & - \\ \hline
+			... & ... & ... & ... & ... \\ \hline
+			37 & GPIO26 & - & 3.3V & - \\ \hline
+			38 & GPIO20 & MOSI1 & 3.3V & SPI \\ \hline
+			39 & GND & - & - & - \\ \hline
+			40 & GPIO21 & MISO1 & 3.3V & SPI \\ \hline
+		\end{tabular}
+	\end{table}
+
+}
+
+
+
+
+
+\subsection{The whole set-up} 
+{
+	Following the highlighting of the different ports of both the Raspberry Pi 4 and Arduino UNO R3, it is worth it highlighting what the interconnection between these two look like. Here follows a connectivity figure (see \ref{fig:System}): 
+	
+	\begin{figure}[h]  
+		\centering  
+		\includegraphics[width=\linewidth]{figures/System.png}  
+		\caption{Hardware architecture with signal flow.}  
+		\label{fig:System}  
+	\end{figure}
+}
+
+% ====== Section 3: Requirements ======  
+\section{System Requirements} 
+{ 
+	
+	
+	\subsection{Functional Requirements} 
+	{ 
+		The most commonly rotating speed of machinery goes up to 1500 [rpm] corresponds to 25 [Hz]. This relationship is defined by the following equation: 
+		
+		\begin{equation}
+			f \, [\mathrm{Hz}] = \frac{r \, [\mathrm{RPM}]}{60}
+		\end{equation}
+		
+		The aforementioned relationship entails that the rotational speed of a machine can be interpreted in frequency, which in turn is of great help when related to Fourier Transform applications.
+		
+		All in all, the functional requirements are highlighted hereunder:
+		\begin{itemize}  
+			\item \textbf{Frequency Range}: 0–300 Hz (covers common machine faults like imbalance, misalignment).  
+			\item \textbf{Real-Time Processing}: On-the-fly FFT computation for immediate fault detection.  
+			\item \textbf{Scalability}: Modular design for multi-sensor deployments.  
+		\end{itemize}  
+	}
+	
+	\subsection{Non-Functional Requirements} 
+	{ 
+		\begin{itemize}  
+			\item \textbf{Cost}: Minimize BOM cost (justifies Arduino + RPi4 over industrial PLCs).  
+			\item \textbf{Power}: Optimize for continuous operation (e.g., no active cooling).  
+			\item \textbf{Accuracy}: ADXL335’s ±3g range suffices for industrial vibrations (cite datasheet).  
+		\end{itemize}  
+	}
+}
+
+
+
+
+% ====== Section 4: Software & Data Flow ======  
 \section{Software Architecture and Data Flow}
  
 \subsection{Signal Processing Pipeline} 
@@ -112,6 +391,12 @@ Elaboration on (including the whole code):
 
 \subsection{Raspberry Pi coding}
 {
+	\textbf{Raspberry Pi 4}:  
+	\begin{itemize}  
+		\item Runs Python-based FFT (e.g., NumPy) and SQLite for local storage.  
+		\item WiFi/Bluetooth enables cloud integration (e.g., AWS IoT, InfluxDB).  
+	\end{itemize}
+	
 Elaboration on (including some parts of the code):
 \begin{itemize}
 \item Description of the whole program
