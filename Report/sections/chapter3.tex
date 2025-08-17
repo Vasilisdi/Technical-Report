@@ -4,29 +4,31 @@
 % ====== Section 1: Intro ======  
 \section{Introduction} 
 {	
-	As it has already been articulated the objective of this very diploma thesis is to study and develop a measuring system that encompasses a sensor, a microcomputer and a microcontroller.
+	As it has already been articulated, the objective of this diploma thesis is to study, design, and develop a complete measuring system that integrates a sensor, a microcomputer, and a microcontroller into a coherent and functional unit. The intention behind this effort is not only to demonstrate the feasibility of such a system, but also to provide a framework that can be applied to real-world industrial monitoring scenarios.
 	
-	The system is designed for low-cost, real-time vibration monitoring of rotating machinery. This set-up encompasses components that are of major importance and its aim is to collect data within a specific - prerequired range, store data safely at a database and finally process data.
+	The system is specifically conceived for low-cost, real-time vibration monitoring of rotating machinery, a task of significant importance in predictive maintenance and condition monitoring. By capturing the vibrational behavior of machines during operation, valuable insights can be obtained about their mechanical health, potential faults, and overall performance. This contributes directly to reducing downtime, optimizing maintenance schedules, and extending the operational lifespan of equipment.
 	
-	The following sections include more detailed overview of the system requirements, highlighting the functional and non-functional requirements. In addition to this, there will be yielded a detailed elaboration on the system set-up (See \ref{fig:SetUp}).
+	The chosen architecture relies on a modular set-up that combines hardware and software components of major importance. At its core lies a sensor element capable of detecting vibrations within a predetermined, application-relevant frequency range. The signals acquired are then transferred to a microcontroller, which is tasked with initial data handling, conditioning, and communication. Subsequently, the processed data is relayed to a microcomputer that ensures reliable storage in a structured database, while also providing the computational capacity required for further analysis and processing. In this manner, the system covers the complete cycle of measurement: from data acquisition, to secure storage, and finally to intelligent interpretation.
 	
-\begin{figure}[h]
-	\centering
-	\begin{tikzpicture}[node distance=2cm]
-		% Define nodes in proper order
-		\node (machine) [draw, rectangle] {Machine};
-		\node (sensor) [draw, rectangle, below of=machine]  {ADXL335 Breakout};
-		\node (arduino) [draw, rectangle, below of=sensor] {Arduino UNO R3};
-		\node (rpi) [draw, rectangle, below of=arduino] {Raspberry Pi 4};
-		
-		% Draw connections
-		\draw[->] (machine) -- node[right] {Vibration in mm/s$^{2}$} (sensor);
-		\draw[->] (sensor) -- node[right] {Vibration intepreted as voltage [0-5V]} (arduino);
-		\draw[->] (arduino) -- node[right] {Data converted into frequency domain [0-300 Hz]} (rpi);
-	\end{tikzpicture}
-	\caption{The concept layout.}
-	\label{fig:SetUp}
-\end{figure}
+	The following sections of this thesis provide a more detailed overview of the system requirements, addressing both functional requirements (such as measurement accuracy, sampling rates, and communication protocols) and non-functional requirements (such as cost efficiency, scalability, and reliability). Furthermore, a thorough elaboration on the system set-up is presented (see Figure~\ref{fig:SetUp}), offering a comprehensive description of the interaction between hardware modules, data flow, and the software infrastructure that binds them together.
+	
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}[node distance=2cm]
+			% Define nodes in proper order
+			\node (machine) [draw, rectangle] {Machine};
+			\node (sensor) [draw, rectangle, below of=machine]  {ADXL335 Breakout};
+			\node (arduino) [draw, rectangle, below of=sensor] {Arduino UNO R3};
+			\node (rpi) [draw, rectangle, below of=arduino] {Raspberry Pi 4};
+			
+			% Draw connections
+			\draw[->] (machine) -- node[right] {Vibration in mm/s$^{2}$} (sensor);
+			\draw[->] (sensor) -- node[right] {Vibration intepreted as voltage [0-5V]} (arduino);
+			\draw[->] (arduino) -- node[right] {Data converted into frequency domain [0-300 Hz]} (rpi);
+		\end{tikzpicture}
+		\caption{The concept layout.}
+		\label{fig:SetUp}
+	\end{figure}
 }
 
 
@@ -36,11 +38,59 @@
 \subsection{ADXL335 Accelerometer}  
 {
 	
-		\textbf{ADXL335 Accelerometer}:  
-		\begin{itemize}  
-			\item Analog output simplifies Arduino ADC interfacing.  
-			\item 300Hz bandwidth meets requirements (vs. digital sensors like MPU6050 needing I2C).  
-		\end{itemize}  
+	The ADXL335 is a small, low-power, 3-axis accelerometer capable of measuring acceleration with a minimum full-scale range of $\pm3\,g$. It is designed for motion- and tilt-sensing applications, making it suitable for mobile devices, gaming systems, disk drive protection, image stabilization, and sports and health devices. The device operates on a single supply voltage ranging from $1.8\,V$ to $3.6\,V$ and consumes only $350\,\mu A$ of current, making it ideal for power-sensitive applications \cite{ADXL335}. 
+	
+	The Adafruit breaout of this very sensor has a power supply at 5V which is cut off according to the needs of the sensor. The VCC takes up to 5V in and regulates it to 3.3V with an output pin. The analog outputs are ratiometric: that means that 0g measurement output is always at half of the 3.3V output (1.65V), -3g is at 0v and 3g is at 3.3V with full scaling in between.
+	
+	The aforementioned Adafruit ADXL335 accelerometer boasts a wide variety of amendments in comparison with the original stand-alone sensor. Most importantly, this breakout is an ideal choice when it comes to interfacing with 5V microcontrollers like Arduino. It is compatible with microcontrollers because there is pending connections on the breakout. Alternatively, a PCB must be designed so as to solder the small scale and hard to manage pins of the sensor itself. 
+	
+	Another significant feature of the breakouts is that manufacturing research has been conducted and this has lead to the optimal product development. This entails that these breakouts encompass decoupling capacitors, filters and power supply regulation that assures the pinout signals to be as accurate as possible.
+	
+	It can measure the static acceleration of gravity in tilt-sensing applications, as well as dynamic acceleration resulting from motion, shock, or vibration.
+	
+	A figure depicting the ADXL335 accelerometer is depicted on Figure \ref{fig:adxl335} of Chapter \ref{chap2}. The ADXL335 is housed in a 16-lead LFCSP (Low Profile Chip Scale Package). Table \ref{tab:pins} describes its key pin functions.
+	
+	\begin{table}[h]
+		\centering
+		\caption{ADXL335 Pin Functions \cite{ADXL335}}
+		\label{tab:pins}
+		\begin{tabular}{|c|l|p{7cm}|}
+			\hline
+			\textbf{Pin Number} & \textbf{Pin Name} & \textbf{Description} \\ \hline
+			2 & ST & Self-Test pin. When set to $V_S$, it generates an electrostatic force to test functionality. \\ \hline
+			3,5,6,7 & COM & Common ground pins. \\ \hline
+			12 & $X_{OUT}$ & X-axis analog output. \\ \hline
+			10 & $Y_{OUT}$ & Y-axis analog output. \\ \hline
+			8 & $Z_{OUT}$ & Z-axis analog output. \\ \hline
+			14,15 & $V_S$ & Supply voltage pins ($1.8\,V$ to $3.6\,V$). \\ \hline
+			- & Exposed Pad & Not internally connected but should be soldered for mechanical integrity. \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	Table \ref{tab:specs} summarizes the key specifications of the ADXL335 accelerometer \cite{ADXL335}.
+	
+	\begin{table}[h]
+		\centering
+		\caption{ADXL335 Key Specifications \cite{ADXL335}}
+		\label{tab:specs}
+		\begin{tabular}{|l|l|}
+			\hline
+			\textbf{Parameter} & \textbf{Value} \\ \hline
+			Measurement Range & $\pm3\,g$ (minimum), $\pm3.6\,g$ (maximum) \\ \hline
+			Sensitivity & $300\,mV/g$ (typical) at $V_S = 3\,V$ (ratiometric) \\ \hline
+			Zero $g$ Bias & $1.5\,V$ (typical) for X and Y axes, $1.5\,V$ (typical) for Z axis \\ \hline
+			Noise Performance (X,Y axes) & $150\,\mu g/\sqrt{Hz}$ (typical) \\ \hline
+			Noise Performance (Z axis) & $300\,\mu g/\sqrt{Hz}$ (typical) \\ \hline
+			Bandwidth (X,Y) & Adjustable up to $1600\,Hz$ via external capacitors \\ \hline
+			Bandwidth (Z) & Adjustable up to $550\,Hz$ via external capacitors \\ \hline
+			Operating Temperature & $-40^\circ C$ to $+85^\circ C$ \\ \hline
+			Shock Survival & $10,000\,g$ (unpowered or powered) \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	All in all, the ADXL335 is widely used in applications requiring precise motion detection and tilt sensing. Its excellent temperature stability and low power consumption make it suitable for portable and battery-operated devices. The device's performance is further enhanced by its low noise density and adjustable bandwidth, allowing for customization based on specific application requirements \cite{ADXL335}.
+	
+	For further details, refer to the ADXL335 datasheet \cite{ADXL335}. 
 		
 }  
 
@@ -104,60 +154,27 @@
 		\end{itemize}
 	\end{itemize}
 	
-	
-	The following tables \ref{table:JANALOG} and \ref{table:JDIGITAL} provide a clear view of the input and output signals, while some more information is also included about the supply lines. All these are represented on Figure \ref{fig:Arduino}.
-		
+	A concise overview of the available pins is given in Table~\ref{table:SummaryPins}.  
+	For completeness, the full pinout information is provided in the appendix in Tables~\ref{table:JANALOG} and \ref{table:JDIGITAL}, which list all analog, digital, and power connections in detail.  
+	These complement the schematic representation shown in Figure~\ref{fig:Arduino}.
+
+			
 	\begin{table}[h]
 		\centering
-		\caption{Analog Pins (JANALOG)}
-		\label{table:JANALOG}
-		\begin{tabular}{|c|l|l|l|}
+		\caption{Summary of Arduino Pin Functions}
+		\label{table:SummaryPins}
+		\begin{tabular}{|l|c|p{5cm}|}
 			\hline
-			\textbf{Pin} & \textbf{Function} & \textbf{Type} & \textbf{Description} \\ \hline
-			1 & NC & NC & Not connected \\ \hline
-			2 & IOREF & IOREF & Reference for digital logic V (connected to 5V) \\ \hline
-			3 & Reset & Reset & Reset \\ \hline
-			4 & +3V3 & Power & +3.3V Power Rail \\ \hline
-			5 & +5V & Power & +5V Power Rail \\ \hline
-			6 & GND & Power & Ground \\ \hline
-			7 & GND & Power & Ground \\ \hline
-			8 & VIN & Power & Voltage Input \\ \hline
-			9 & A0 & Analog/GPIO & Analog input 0 / GPIO \\ \hline
-			10 & A1 & Analog/GPIO & Analog input 1 / GPIO \\ \hline
-			11 & A2 & Analog/GPIO & Analog input 2 / GPIO \\ \hline
-			12 & A3 & Analog/GPIO & Analog input 3 / GPIO \\ \hline
-			13 & A4/SDA & Analog input/I2C & Analog input 4 / I2C Data line \\ \hline
-			14 & A5/SCL & Analog input/I2C & Analog input 5 / I2C Clock line \\ \hline
+			\textbf{Category} & \textbf{Typical Pins} & \textbf{Description} \\ \hline
+			Power Supply      & +3.3V, +5V, GND, VIN & Provides operating voltages and ground \\ \hline
+			Analog Inputs     & A0–A5                & 6 analog channels, some also used for I\textsuperscript{2}C \\ \hline
+			Digital I/O       & D0–D13               & General-purpose digital pins, PWM on some \\ \hline
+			Communication     & SDA, SCL, MOSI, MISO, SCK, SS & Interfaces for I\textsuperscript{2}C and SPI \\ \hline
+			Special           & Reset, IOREF, AREF   & Reset, voltage reference, and analog reference \\ \hline
 		\end{tabular}
 	\end{table}
-	
-	\begin{table}[h]
-		\centering
-		\caption{Digital Pins (JDIGITAL)}
-		\label{table:JDIGITAL}
-		\begin{tabular}{|c|l|l|l|}
-			\hline
-			\textbf{Pin} & \textbf{Function} & \textbf{Type} & \textbf{Description} \\ \hline
-			1 & D0 & Digital/GPIO & Digital pin 0 / GPIO \\ \hline
-			2 & D1 & Digital/GPIO & Digital pin 1 / GPIO \\ \hline
-			3 & D2 & Digital/GPIO & Digital pin 2 / GPIO \\ \hline
-			4 & D3 & Digital/GPIO & Digital pin 3 / GPIO \\ \hline
-			5 & D4 & Digital/GPIO & Digital pin 4 / GPIO \\ \hline
-			6 & D5 & Digital/GPIO & Digital pin 5 / GPIO \\ \hline
-			7 & D6 & Digital/GPIO & Digital pin 6 / GPIO \\ \hline
-			8 & D7 & Digital/GPIO & Digital pin 7 / GPIO \\ \hline
-			9 & D8 & Digital/GPIO & Digital pin 8 / GPIO \\ \hline
-			10 & D9 & Digital/GPIO & Digital pin 9 / GPIO \\ \hline
-			11 & SS & Digital & SPI Chip Select \\ \hline
-			12 & MOSI & Digital & SPI Main Out Secondary In \\ \hline
-			13 & MISO & Digital & SPI Main In Secondary Out \\ \hline
-			14 & SCK & Digital & SPI Serial Clock Output \\ \hline
-			15 & GND & Power & Ground \\ \hline
-			16 & AREF & Digital & Analog Reference Voltage \\ \hline
-			17 & A4/SD4 & Digital & Analog input 4 / I2C Data line (duplicated) \\ \hline
-			18 & A5/SD5 & Digital & Analog input 5 / I2C Clock line (duplicated) \\ \hline
-		\end{tabular}
-	\end{table}
+
+
 	
 	\begin{figure}[h]  
 		\centering  
@@ -175,6 +192,8 @@
 	These is also a tremendous amount of source code that is adaptable to different projects. All this sketches can be easily downloaded, stored and modified (or just even tweak some parameters) so as to fit it in each project.
 	
 	All in all, the UNO is the most popular and well-documented board in the Arduino ecosystem, making it perfect for learning electronics and coding. Its processor ATmega328P chip, in most of the cases is not welded and this allows easy replacement procedure. In addition Arduino UNO is robust, flexible, and beginner-friendly platform for a wide variety of projects. Most importantly it supports easy and robust communication between Raspberry Pi and Arduino.
+	
+	For further details, refer to the Arduino UNO R3 datasheet  \cite{Arduino}.
 }
 
 
@@ -290,16 +309,22 @@
 			40 & GPIO21 & MISO1 & 3.3V & SPI \\ \hline
 		\end{tabular}
 	\end{table}
-
+	
+	For further details, refer to the Raspberry Pi 4 Model B datasheet  \cite{Raspberry}.
 }
-
-
-
 
 
 \subsection{The whole set-up} 
 {
-	Following the highlighting of the different ports of both the Raspberry Pi 4 and Arduino UNO R3, it is worth it highlighting what the interconnection between these two look like. Here follows a connectivity figure (see \ref{fig:System}): 
+	Following the presentation of the different ports of both the Raspberry Pi 4 and the Arduino UNO R3, it is important to also describe the interconnection between these two devices and the way in which data flows through the system. The accelerometer module (Adafruit ADXL335 breakout) generates analog voltage signals corresponding to the acceleration along the three axes (X, Y, and Z). These signals are connected to the analog input pins of the Arduino UNO, which then uses its built-in Analog-to-Digital Converter (ADC) to digitize the incoming data. 
+	
+	After conversion, the Arduino transmits the measurements via serial communication to the Raspberry Pi 4. On the Raspberry Pi side, a Python script is used to set up the serial connection, send requests for new measurements, and receive the acceleration values. Specifically, the Raspberry Pi sends a command string to the Arduino, which responds with a comma-separated line containing the three acceleration components. The incoming data stream is subsequently retrieved as a text line, converted into a human-readable string, and then parsed into numerical values corresponding to the three acceleration axes.
+	. Finally the data is split into three floating-point numbers representing the X, Y, and Z axes.
+	
+	The baud rate of the serial communication, which must be pre-set identically on both the Arduino and the Raspberry Pi, plays a crucial role in ensuring reliable data transfer. The baud rate defines the speed at which bits are transmitted per second, and therefore determines how much information can be sent within a given time window. If the chosen baud rate is too low compared to the frequency and volume of data produced by the Arduino, the serial buffer may overflow, leading to delays or data loss. On the other hand, selecting a sufficiently high baud rate allows the system to transmit each line of acceleration data quickly enough to keep up with the sensor output, ensuring that all measurements are captured in real time. For example, at 9600~bps only around 960 bytes per second can be transmitted, which may not be adequate for high-frequency sampling, whereas at 115200~bps more than 11,000 bytes per second can be handled, providing ample capacity for continuous vibration monitoring. In this case, both devices can work well with a baud rate at 115200~bps.
+	
+	In summary, the flow of information can be described as follows: the ADXL335 breakout produces analog signals sending them to the Arduino UNO samples and digitizes them. Afterwards the data is transmitted through the serial interface to the Raspberry Pi which in turn requests, receives, and parses the acceleration values for further storage and analysis. This interaction ensures a continuous and reliable stream of vibration data, which is schematically represented in Figure~\ref{fig:System}.
+
 	
 	\begin{figure}[h]  
 		\centering  

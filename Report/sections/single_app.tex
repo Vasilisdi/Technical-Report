@@ -13,6 +13,58 @@
 
 \section{Tables}
 
+	\begin{table}[h]
+	\centering
+	\caption{Analog Pins (JANALOG)}
+	\label{table:JANALOG}
+	\begin{tabular}{|c|l|l|l|}
+		\hline
+		\textbf{Pin} & \textbf{Function} & \textbf{Type} & \textbf{Description} \\ \hline
+		1 & NC & NC & Not connected \\ \hline
+		2 & IOREF & IOREF & Reference for digital logic V (connected to 5V) \\ \hline
+		3 & Reset & Reset & Reset \\ \hline
+		4 & +3V3 & Power & +3.3V Power Rail \\ \hline
+		5 & +5V & Power & +5V Power Rail \\ \hline
+		6 & GND & Power & Ground \\ \hline
+		7 & GND & Power & Ground \\ \hline
+		8 & VIN & Power & Voltage Input \\ \hline
+		9 & A0 & Analog/GPIO & Analog input 0 / GPIO \\ \hline
+		10 & A1 & Analog/GPIO & Analog input 1 / GPIO \\ \hline
+		11 & A2 & Analog/GPIO & Analog input 2 / GPIO \\ \hline
+		12 & A3 & Analog/GPIO & Analog input 3 / GPIO \\ \hline
+		13 & A4/SDA & Analog input/I2C & Analog input 4 / I2C Data line \\ \hline
+		14 & A5/SCL & Analog input/I2C & Analog input 5 / I2C Clock line \\ \hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\caption{Digital Pins (JDIGITAL)}
+	\label{table:JDIGITAL}
+	\begin{tabular}{|c|l|l|l|}
+		\hline
+		\textbf{Pin} & \textbf{Function} & \textbf{Type} & \textbf{Description} \\ \hline
+		1 & D0 & Digital/GPIO & Digital pin 0 / GPIO \\ \hline
+		2 & D1 & Digital/GPIO & Digital pin 1 / GPIO \\ \hline
+		3 & D2 & Digital/GPIO & Digital pin 2 / GPIO \\ \hline
+		4 & D3 & Digital/GPIO & Digital pin 3 / GPIO \\ \hline
+		5 & D4 & Digital/GPIO & Digital pin 4 / GPIO \\ \hline
+		6 & D5 & Digital/GPIO & Digital pin 5 / GPIO \\ \hline
+		7 & D6 & Digital/GPIO & Digital pin 6 / GPIO \\ \hline
+		8 & D7 & Digital/GPIO & Digital pin 7 / GPIO \\ \hline
+		9 & D8 & Digital/GPIO & Digital pin 8 / GPIO \\ \hline
+		10 & D9 & Digital/GPIO & Digital pin 9 / GPIO \\ \hline
+		11 & SS & Digital & SPI Chip Select \\ \hline
+		12 & MOSI & Digital & SPI Main Out Secondary In \\ \hline
+		13 & MISO & Digital & SPI Main In Secondary Out \\ \hline
+		14 & SCK & Digital & SPI Serial Clock Output \\ \hline
+		15 & GND & Power & Ground \\ \hline
+		16 & AREF & Digital & Analog Reference Voltage \\ \hline
+		17 & A4/SD4 & Digital & Analog input 4 / I2C Data line (duplicated) \\ \hline
+		18 & A5/SD5 & Digital & Analog input 5 / I2C Clock line (duplicated) \\ \hline
+	\end{tabular}
+\end{table}
+
 \begin{table}[h!]
 	\centering
 	\caption{Complete GPIO Pinout for Raspberry Pi 4 Model B (Part 1/2)}
