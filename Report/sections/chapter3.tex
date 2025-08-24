@@ -334,3 +334,39 @@
 		\label{fig:System}  
 	\end{figure}
 }
+
+
+% ====== Section 3: Requirements ======  
+\section{System Requirements} 
+{ 
+	
+	
+	\subsection{Functional Requirements} 
+	{ 
+		In addition to the aforementioned design traits of the system as a whole, there is also some design requirements related to the measuring limits of the sensor and communication among different components.
+		
+		To begin with, the most commonly rotating speed of machinery goes up to 1500 [rpm] corresponds to 25 [Hz]. This relationship is defined by the following equation: 
+		
+		\begin{equation}
+			f \, [\mathrm{Hz}] = \frac{r \, [\mathrm{RPM}]}{60}
+		\end{equation}
+		
+		The aforementioned relationship entails that the rotational speed of a machine can be interpreted into frequency, which in turn is of great help when related to Fourier Transform applications.
+		
+		All in all, the functional requirements are highlighted hereunder:
+		\begin{itemize}  
+			\item \textbf{Frequency Range}: 0–300 Hz (covers common machine faults like imbalance, misalignment).  
+			\item \textbf{Real-Time Processing}: On-the-fly FFT computation for immediate fault detection.  
+			\item \textbf{Scalability}: Modular design for multi-sensor deployments.  
+		\end{itemize}  
+	}
+	
+	\subsection{Non-Functional Requirements} 
+	{ 
+		\begin{itemize}  
+			\item \textbf{Cost}: Minimize BOM cost (justifies Arduino + RPi4 over industrial PLCs).  
+			\item \textbf{Power}: Optimize for continuous operation (e.g., no active cooling).  
+			\item \textbf{Accuracy}: ADXL335’s ±3g range suffices for industrial vibrations (cite datasheet).  
+		\end{itemize}  
+	}
+}

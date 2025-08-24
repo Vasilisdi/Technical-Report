@@ -129,35 +129,59 @@
 \clearpage 
 
 
+\section{Algorithms}
+\subsection{Arduino Data Acquisition Algorithm}
+\label{subsec:arduino-algorithm}
 
+\noindent\textbf{Algorithm 1: Data Acquisition and Transmission System}
 
-
-
-\subsection{Αλγόριθμοι}
-Ακολουθεί ο Αλγόριθμος~\ref{alg1}, ο οποίος είναι μορφοποιημένος με τα πακέτα algorithm και algorithmic.
-
-\begin{algorithm}[htb]
-\caption{\ \ \ Probabilistic $k\theta NN$ Monitoring}
 \begin{algorithmic}[1]
-\begin{small}
-
-\STATE{\bf Procedure} {\em VerifyCandidate} (focal query point $q$, threshold $\theta$, object $o$, list of auxiliary objects $P$, distance $kMAXDIST$) 
-
-\IF { $\Phi(o, kMAXDIST) \geq \theta$ {\bf and} $L_2(q, o) \leq L_2(q, P.$top()) }
-
-\STATE {$P$.pop()};   \ \ \ \ \ \ \ \ {\em //Replace the most extreme element in $P$, since candidate $o$ ... }
-
-\STATE {$P$.push($o$)};  \ \ \ \ \ {\em //... has enough probability and has its mean closer to focal $q$ }
-
-\ENDIF
-
-\STATE {\bf End Procedure}
-
-
-\end{small}
+	\STATE \textbf{Initialization:}
+	\STATE $\text{numChannels} = 3$ \COMMENT{Number of analog channels}
+	\STATE $\text{analogPins} = [A0, A1, A2]$ \COMMENT{Analog input pins}
+	\STATE $\text{bufferSize} = 10$ \COMMENT{Buffer size per channel}
+	\STATE $\text{analogBuffer} = \text{array}[3][10]$ \COMMENT{Data storage array}
+	\STATE $\text{bufferIndex} = \text{array}[3]$ \COMMENT{Buffer indices array}
+	\STATE $\text{tempVal} = 0$ \COMMENT{Control variable}
+	
+	\STATE
+	\STATE Initialize serial communication at 115200 baud
+	\FOR{$i = 0$ to $\text{numChannels} - 1$}
+	\STATE $\text{bufferIndex}[i] \gets 0$ \COMMENT{Initialize buffer index}
+	\ENDFOR
+	
+	\STATE
+	\WHILE{true}
+	\STATE \textbf{Phase 1: Data Acquisition and Storage}
+	\FOR{$j = 0$ to $\text{bufferSize} - 1$}
+	\FOR{$i = 0$ to $\text{numChannels} - 1$}
+	\STATE $xRaw =\text{analogRead}(\text{analogPins}[i])$
+	\STATE $\text{analogBuffer}[i][j] = xRaw$
+	\ENDFOR
+	\ENDFOR
+	
+	\STATE
+	\STATE \textbf{Phase 2: Processing and Transmission}
+	\IF{$\text{tempVal} = 100$}
+	\STATE Execute calibration procedures
+	\STATE $\text{tempVal} = 0$
+	\ELSE
+	\FOR{$j = 0$ to $\text{bufferSize} - 1$}
+	\FOR{$i = 0$ to $\text{numChannels} - 1$}
+	\STATE $\text{Serial.print}(\text{analogBuffer}[i][j])$
+	\IF{$i < \text{numChannels} - 1$}
+	\STATE $\text{Serial.print}(" , ")$
+	\ENDIF
+	\ENDFOR
+	\STATE $\text{Serial.println}()$ \COMMENT{End of data line}
+	\ENDFOR
+	\STATE $\text{tempVal} = \text{tempVal} + 1$
+	\ENDIF
+	\ENDWHILE
 \end{algorithmic}
-\label{alg1}
-\end{algorithm}
+
+\clearpage 
+
 
 
 \subsection{Θεωρήματα, Πορίσματα, Ορισμοί, κλπ.}

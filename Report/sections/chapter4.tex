@@ -2,52 +2,83 @@
 \chapter{Implementation}
 \label{chap4}
 
-
-% ====== Section 3: Requirements ======  
-\section{System Requirements} 
-{ 
+\section{Implementation Introduction}
+{
+	The implementation of the aforementioned system concept requires a study of the fundamental limitations of its individual components.
 	
+	A primary potential bottleneck is the hardware serial transmit buffer of the Arduino Uno. For this project, the maximum capacity of the UART interconnection between the Arduino Uno and the Raspberry Pi 4 is a critical design parameter (the connection setup is detailed in Chapter \ref{chap3}). The Arduino's operation is defined by a batch-processing strategy: it must first read and store data from the ADXL335 accelerometer in its internal memory. Only after a predetermined amount of data is stored is the entire dataset transmitted to the Raspberry Pi 4. Figures \ref{fig:SetUp} and \ref{fig:System} provide a clear visualization of this dataflow.
 	
-	\subsection{Functional Requirements} 
-	{ 
-		The most commonly rotating speed of machinery goes up to 1500 [rpm] corresponds to 25 [Hz]. This relationship is defined by the following equation: 
-		
-		\begin{equation}
-			f \, [\mathrm{Hz}] = \frac{r \, [\mathrm{RPM}]}{60}
-		\end{equation}
-		
-		The aforementioned relationship entails that the rotational speed of a machine can be interpreted in frequency, which in turn is of great help when related to Fourier Transform applications.
-		
-		All in all, the functional requirements are highlighted hereunder:
-		\begin{itemize}  
-			\item \textbf{Frequency Range}: 0–300 Hz (covers common machine faults like imbalance, misalignment).  
-			\item \textbf{Real-Time Processing}: On-the-fly FFT computation for immediate fault detection.  
-			\item \textbf{Scalability}: Modular design for multi-sensor deployments.  
-		\end{itemize}  
-	}
+	Subsequently, the Raspberry Pi 4 receives, aggregates, and processes this dataset. Its computational role is to execute a Fast Fourier Transform (FFT) and calculate the signal magnitude for analysis, translating the real-world time-domain data into the frequency domain (see Chapter \ref{chap2}). And the processed results are sent to a database for storage and further use. 
 	
-	\subsection{Non-Functional Requirements} 
-	{ 
-		\begin{itemize}  
-			\item \textbf{Cost}: Minimize BOM cost (justifies Arduino + RPi4 over industrial PLCs).  
-			\item \textbf{Power}: Optimize for continuous operation (e.g., no active cooling).  
-			\item \textbf{Accuracy}: ADXL335’s ±3g range suffices for industrial vibrations (cite datasheet).  
-		\end{itemize}  
-	}
+	Following the frequency-domain analysis, the Raspberry Pi 4 executes the final stage of the data pipeline by transmitting the processed results to a cloud-based PostgreSQL database hosted on Supabase. This is achieved by leveraging Supabase's auto-generated RESTful API, which provides a secure and programmatic interface for data operations. The Pi utilizes HTTPS requests, specifically authenticated POST calls, to insert structured JSON payloads containing the computed FFT magnitudes and frequency bins directly into the designated tables within the Supabase schema. This serverless architecture eliminates the need for managing database infrastructure, while the built-in row-level security (RLS) ensures that data access is strictly governed by predefined policies. By interfacing with the Supabase API, the system ensures that analyzed sensor data is persistently stored in a scalable and readily queryable data store, facilitating further visualization, historical analysis, or integration with other applications within the Supabase ecosystem.
+	
+	More technical details on the aforementioned topics are briefly analyzed within the present chapter. 
 }
-
-
-
 
 % ====== Section 4: Software & Data Flow ======  
 \section{Software Architecture and Data Flow}
 
-\subsection{Signal Processing Pipeline} 
+\subsection{The Arduino UNO Algorithm} 
 {
-	The Arduino samples data at 600Hz, which is extremely high and constitutes a sufficient sample rate for this project. Additionally, another consideration is receiving data from the ADXL335 sensor breakout, which could potentially make this procedure slower. The highest data volume over a predefined time span achieved for this project is 300Hz.
+	The main focus of the Arduino UNO sketch is to implement a batched data processing strategy that enables sequential transmission of sensor data to the Raspberry Pi 4. This design methodology specifically addresses the memory constraints of the Arduino UNO by minimizing the instantaneous SRAM utilization through carefully sized data batching.
 	
-	In essence, a batch of data is received through this procedure by a Raspberry Pi 4, which in turn processes and analyzes these samples.
+	The Arduino UNO receives analog signals from the sensor breakout board through its integrated analog-to-digital converter (ADC), which features 10-bit resolution across six input channels. Each designated analog input pin (A0, A1, A2) continuously monitors voltage levels in the range of 0V to 5V, corresponding to the physical phenomena being measured by the sensors. The ADC performs successive approximation conversion at a sampling rate of approximately 10,000 samples per second, transforming continuous analog voltages into discrete digital values ranging from 0 (representing 0V) to 1023 (representing 5V). Each converted value is stored as a 16-bit signed integer (2 bytes) in memory, maintaining compatibility with the Arduino's architecture while preserving measurement precision.
+	
+	The data acquisition process follows a structured double-buffering approach where readings are temporarily stored in a two-dimensional array before processing and transmission. This architecture ensures temporal consistency between related sensor measurements while optimizing memory utilization through fixed-size allocation.
+	
+	A snippet of the Arduino UNO algorithm implementation follows hereunder (Algorithm \ref{alg:dataacq}):  
+	
+	\begin{algorithm}[H]
+		\caption{Snippet of Data Acquisition \& Transmission (see the whole code on Appendix Section \ref{subsec:arduino-algorithm})}
+		\label{alg:dataacq}
+		\begin{algorithmic}[1]
+			\REQUIRE $numChannels = 3$, $analogPins = [A0, A1, A2]$, $bufferSize = 10$
+			\ENSURE Serial transmission of analog data
+			\STATE Initialize $analogBuffer[numChannels][bufferSize]$, $tempVal \gets 0$
+			\WHILE{true}
+			\FOR{$j = 0$ to $bufferSize - 1$}
+			\FOR{$i = 0$ to $numChannels - 1$}
+			\STATE $analogBuffer[i][j] \gets \text{analogRead}(analogPins[i])$
+			\ENDFOR
+			\ENDFOR
+			
+			\IF{$tempVal = 100$}
+			\STATE $tempVal \gets 0$ \COMMENT{Calibration}
+			\ELSE
+			\FOR{$j = 0$ to $bufferSize - 1$}
+			\FOR{$i = 0$ to $numChannels - 1$}
+			\STATE \text{Serial.print}($analogBuffer[i][j]$)
+			\IF{$i < numChannels - 1$} \STATE \text{Serial.print}(" , ") \ENDIF
+			\ENDFOR
+			\STATE \text{Serial.println}()
+			\ENDFOR
+			\STATE $tempVal \gets tempVal + 1$
+			\ENDIF
+			\ENDWHILE
+		\end{algorithmic}
+	\end{algorithm}
+	
+
+	The memory requirement in this case can be estimated , combining all received data as analog signal by the sensor breakout: 
+	
+	\[
+	\text{Total Memory} = (\text{numChannels} \times \text{bufferSize} \times \text{sizeof(int)}) + \text{Overhead} = 3 \times 10 \times 2 = 60
+	\]
+	
+	The core data storage therefore occupies exactly 60 bytes for sensor readings. This buffer size was determined through extensive empirical testing and validation using methodical trial-and-error optimization. Increasing the buffer size beyond this optimal value consistently resulted in system instability and memory allocation failures, while smaller buffers reduced data throughput efficiency.
+	
+	Although 60 bytes appears minimal compared to the Arduino UNO's 2048 bytes of SRAM and 32 KB of flash memory (as extensively discussed in Chapter \ref{chap3}), several critical memory overhead factors must be considered. The hardware serial communication infrastructure requires 128 bytes of dedicated SRAM space, comprising dual 64-byte circular buffers for transmit (TX) and receive (RX) operations. Additional memory is consumed by program stack operations, interrupt service routines, and the Arduino core libraries, which typically utilize 200-300 bytes during normal operation.
+	
+	Furthermore, the script incorporates several control variables and system parameters that contribute to cumulative memory consumption. These include loop counters, temporary variables, and the program instruction pointer, which collectively add approximately 20-30 bytes of overhead. This memory fragmentation, combined with the inherent memory management characteristics of the AVR architecture, creates a persistent risk of stack-heap collisions and memory exhaustion scenarios. The implementation therefore employs conservative memory practices, including static allocation and avoidance of dynamic memory operations, to mitigate these risks and ensure system reliability during extended operation periods.
+	
+	The chosen architecture represents an optimal balance between data throughput requirements and memory constraints, ensuring reliable operation while maximizing the available resources for future expansions or additional functionality.
 }  
+
+
+\subsection{The Raspberry Pi 4 Algorithm} 
+{
+
+}
 
 \subsection{Scalability Considerations}
 {  
