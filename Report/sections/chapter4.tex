@@ -22,7 +22,7 @@
 {
 	The main focus of the Arduino UNO sketch is to implement a batched data processing strategy that enables sequential transmission of sensor data to the Raspberry Pi 4. This design methodology specifically addresses the memory constraints of the Arduino UNO by minimizing the instantaneous SRAM utilization through carefully sized data batching.
 	
-	The Arduino UNO receives analog signals from the sensor breakout board through its integrated analog-to-digital converter (ADC), which features 10-bit resolution across six input channels. Each designated analog input pin (A0, A1, A2) continuously monitors voltage levels in the range of 0V to 5V, corresponding to the physical phenomena being measured by the sensors. The ADC performs successive approximation conversion at a sampling rate of approximately 10,000 samples per second, transforming continuous analog voltages into discrete digital values ranging from 0 (representing 0V) to 1023 (representing 5V). Each converted value is stored as a 16-bit signed integer (2 bytes) in memory, maintaining compatibility with the Arduino's architecture while preserving measurement precision.
+	The Arduino UNO receives analog signals from the sensor breakout board through its integrated analog-to-digital converter (ADC), which features 10-bit resolution across six input channels. Each designated analog input pin (A0, A1, A2) continuously monitors voltage levels in the range of 0,V to 5,V, corresponding to the physical phenomena being measured by the sensors, which entails that the reading can be interpreted as g's or mm/s$^2$. The ADC performs successive approximation conversion at a sampling rate of approximately 10,000 samples per second, transforming continuous analog voltages into discrete digital values ranging from 0 (representing 0V) to 1023 (representing 5V). Each converted value is stored as a 16-bit signed integer (2 bytes) in memory, maintaining compatibility with the Arduino's architecture while preserving measurement precision.
 	
 	The data acquisition process follows a structured double-buffering approach where readings are temporarily stored in a two-dimensional array before processing and transmission. This architecture ensures temporal consistency between related sensor measurements while optimizing memory utilization through fixed-size allocation.
 	
@@ -72,13 +72,83 @@
 	Furthermore, the script incorporates several control variables and system parameters that contribute to cumulative memory consumption. These include loop counters, temporary variables, and the program instruction pointer, which collectively add approximately 20-30 bytes of overhead. This memory fragmentation, combined with the inherent memory management characteristics of the AVR architecture, creates a persistent risk of stack-heap collisions and memory exhaustion scenarios. The implementation therefore employs conservative memory practices, including static allocation and avoidance of dynamic memory operations, to mitigate these risks and ensure system reliability during extended operation periods.
 	
 	The chosen architecture represents an optimal balance between data throughput requirements and memory constraints, ensuring reliable operation while maximizing the available resources for future expansions or additional functionality.
+	
 }  
 
 
 \subsection{The Raspberry Pi 4 Algorithm} 
 {
-
+	While the Arduino UNO sketches seem to be quite straight forward and the only difficulty that had to be overcome was its memory limitations, the Raspberry Pi 4 algorithms are far more sophisticated. 
+	
+	An efficient way to organise the files of a project is the "src layout" \cite{srclayout}. A well-structured project layout, such as the src-based approach with clearly separated folders for source code, tests, configs, and scripts, is highly effective because it enforces organization and scalability as a project grows. By isolating source code under src/, you avoid common import conflicts and ensure your code behaves the same way in both development and production. 
+	
+	Configuration files and environment variables are separated from the core logic, which improves maintainability and allows developers to adapt the project across environments (local, staging, production) without modifying source code. This separation of concerns makes collaboration easier, onboarding smoother, and scaling more manageable as features and complexity increase.
+	
+	Within this setup, Poetry and .env files play crucial roles. Poetry simplifies dependency management by consolidating everything into a single pyproject.toml, handling versioning, virtual environments, and packaging in a reproducible way. This ensures consistency across machines and deployments, preventing “works on my machine” problems. On the other hand, .env files keep sensitive information (like API keys, database credentials, and tokens) out of the codebase, promoting security and flexibility. Paired with a .env.example, they also document required environment variables without leaking secrets. Together, Poetry and .env form the backbone of a professional, maintainable, and secure Python project setup.
+	
+	The srclayout project structure looks like this: 
+	\begin{verbatim}
+		vibration-monitoring-project/
+		├── .venv/                 # Python virtual environment
+		├── config/
+		│   └── config.yaml        # Application configuration
+		├── sourceCode/
+		│   ├── main.py            # Main application
+		│   ├── api.py             # API communication
+		│   ├── data_processing.py # Signal processing
+		│   ├── serial_communication.py # Serial communication
+		│   └── utils.py           # Utility functions
+		├── testing/
+		│   └── test_methods.py    # Test cases
+		├── poetry.lock            # Dependency lock
+		└── .env                   # Environment variables
+	\end{verbatim}
+	
+	An overview of the core processing workflow implemented in the project is presented in Algorithm \ref{alg:rpi-processing}, highlighting the principal computational processes and methodological practices employed. This snippet captures the essential data acquisition, processing, and transmission pipeline that forms the foundation of the vibration monitoring system.
+	
+	For a comprehensive examination of the complete project architecture, readers are directed to the Appendix section. Specifically, Section \ref{subsec:raspberrypi-algorithm} provides detailed algorithmic descriptions of all constituent scripts, including their functional specifications, inter-module communication protocols, and implementation details. The appendix offers complete visibility into the system's modular design, encompassing data acquisition, signal processing, API communication, and utility functions that collectively enable the real-time vibration monitoring capabilities.
+	
+	\begin{algorithm}[H]
+		\caption{Raspberry Pi Data Processing Pipeline}
+		\label{alg:rpi-processing}
+		\begin{algorithmic}[1]
+			\REQUIRE Serial port $port$, baud rate $baud\_rate$
+			\ENSURE Processed vibration analysis results
+			\STATE Initialize serial connection: $ser \gets setup\_serial\_connection(port, baud\_rate)$
+			\STATE $history \gets [~]$, $history_X \gets [~]$, $history_Y \gets [~]$, $history_Z \gets [~]$
+			\STATE $start\_time \gets current\_time()$, $time\_window \gets config['time\_window']$
+			
+			\WHILE{$current\_time() - start\_time < time\_window$}
+			\STATE $timestamp \gets current\_time()$
+			\STATE $x, y, z \gets read\_serial\_data(ser)$
+			\STATE $amplitude \gets calculate\_amplitude(x, y, z)$
+			\STATE Append values to $history$, $history_X$, $history_Y$, $history_Z$
+			\ENDWHILE
+			
+			\STATE $Fs \gets calculate\_sampling\_rate(timestamps)$
+			\STATE $L \gets Desired length$ \COMMENT{FFT points}
+			
+			\FOR{each $dataset$ in $[history, history_X, history_Y, history_Z]$}
+			\STATE $spectrum, frequencies \gets compute\_fft(dataset, Fs, L)$
+			\STATE $result \gets detect\_unbalancing(frequencies, rpm=1800, spectrum, threshold=0.1)$
+			\STATE Send results to API: $api.send\_measurement(...)$
+			\ENDFOR
+			
+			\RETURN Processing complete
+		\end{algorithmic}
+	\end{algorithm}
+	
+	The serial communication module, as previously highlighted in the system architecture, establishes a connection with the Arduino microcontroller at a specified baud rate, initializing the serial port with a timeout parameter to prevent blocking operations. Upon initialization, the Raspberry Pi transmits a trigger command ('rasp') to request data from the ADXL335 analog accelerometer, then enters a polling loop that waits until the Arduino responds with sensor readings. The received data string, containing three comma-separated acceleration values from the sensor's X, Y, and Z axes, is decoded from UTF-8 format, stripped of extraneous characters, and parsed into floating-point numerical values representing the triaxial acceleration measurements in g-forces, which are subsequently returned for further processing in the vibration monitoring pipeline, consistent with the data flow described in earlier sections.
+	
+	Moreover, the API communication for transmitting vibration data to the Supabase backend is implemented through a structured workflow that begins with authentication and configuration validation. Upon class instantiation, the system loads essential credentials including the API key and Supabase URLs from environment variables, performing rigorous validation to ensure all required parameters are present before initializing the HTTP headers with proper content type and authentication tokens. The communication process employs timezone-aware timestamp handling, converting UTC measurement timestamps to Athens time zone and formatting them according to ISO 8601 standards with millisecond precision to maintain temporal consistency across the distributed system.
+	
+	For each data transmission request, the system first resolves the sensor identifier by querying the Supabase database using the sensor name, establishing a relational link between the measurement data and the specific sensor entity. The payload construction encapsulates critical metadata including the sensor ID, precise time intervals, measurement coordinate (X, Y, Z, or magnitude), and the actual FFT-processed values array. The HTTP POST request is executed with proper error handling and comprehensive logging, featuring response validation that checks for empty or malformed JSON responses while maintaining robust exception handling for network failures or authentication errors. The implementation includes diagnostic logging at multiple stages, providing visibility into the payload structure, response status codes, and JSON content for debugging and monitoring purposes, ensuring reliable data transmission to the cloud-based storage infrastructure.
 }
+
+
+
+
+
 
 \subsection{Scalability Considerations}
 {  
@@ -104,31 +174,6 @@
 	\end{figure}  
 }
 
-\subsection{Arduino sketch}
-{
-	Elaboration on (including the whole code):
-	\begin{itemize}
-		\item Description of sketch and cpp files
-		\item elaborate on how it shares data via UART
-		\item Analyse the possibility of translating Voltage into g or m/s2
-	\end{itemize}
-}
-
-\subsection{Raspberry Pi coding}
-{
-	\textbf{Raspberry Pi 4}:  
-	\begin{itemize}  
-		\item Runs Python-based FFT (e.g., NumPy) and SQLite for local storage.  
-		\item WiFi/Bluetooth enables cloud integration (e.g., AWS IoT, InfluxDB).  
-	\end{itemize}
-	
-	Elaboration on (including some parts of the code):
-	\begin{itemize}
-		\item Description of the whole program
-		\item how it posts data via HTTP
-		\item Data stored on database , and database setup
-	\end{itemize}
-}
 
 \subsection{Vercel coding}
 {

@@ -182,16 +182,369 @@
 
 \clearpage 
 
+\subsection{Raspberry Pi Algorithms}
+\label{subsec:raspberrypi-algorithm}
+
+\noindent\textbf{Algorithm 1: main.py Implementation}
+
+\begin{algorithmic}[1]
+	\STATE $\text{from datetime import datetime, timedelta, timezone}$
+	\STATE $\text{from api import VibrationMonitoringAPI}$
+	\STATE $\text{from data\_processing import calculate\_amplitude, compute\_fft}$
+	\STATE $\text{from serial\_communication import setup\_serial\_connection, read\_serial\_data}$
+	\STATE $\text{from utils import get\_api\_key, load\_config}$
+	\STATE $\text{import numpy as np}$
+	
+	\STATE
+	\STATE $\text{\# Load configuration}$
+	\STATE $\text{config} = \text{load\_config}()$
+	
+	\STATE $\text{\# Load API key from environment variable}$
+	\STATE $\text{api\_key} = \text{get\_api\_key}()$
+	\IF{$\text{not api\_key}$}
+	\STATE $\text{raise ValueError("API key not found. Please set the API\_KEY environment variable.")}$
+	\ENDIF
+	
+	\STATE $\text{vibration\_api} = \text{VibrationMonitoringAPI}()$
+	\STATE $\text{baud\_rate} = \text{config}[\text{'serial'}][\text{'baud\_rate'}]$
+	\STATE $\text{port} = \text{config}[\text{'serial'}][\text{'port\_linux'}]$
+	\STATE $\text{\# port} = \text{config}[\text{'serial'}][\text{'port\_windows'}]$
+	
+	\STATE $\text{ser} = \text{setup\_serial\_connection}(\text{port}, \text{baud\_rate})$
+	
+	\STATE $\text{history} = [ ]$
+	\STATE $\text{history\_X} = [ ]$
+	\STATE $\text{history\_Y} = [ ]$
+	\STATE $\text{history\_Z} = [ ]$
+	\STATE $\text{time\_window} = \text{config}[\text{'time\_window'}]$
+	\STATE $\text{timestamps} = [ ]$
+	\STATE $\text{start\_time} = \text{datetime.now}(\text{timezone.utc})$
+	\STATE $\text{time\_delta} = \text{timedelta}(\text{seconds} = \text{time\_window})$
+	
+	\STATE
+	\STATE $\text{try:}$
+	\WHILE{$\text{datetime.now}(\text{timezone.utc}) - \text{start\_time} < \text{time\_delta}$}
+	\STATE $\text{timestamp} = \text{datetime.now}(\text{timezone.utc})$
+	\STATE $\text{timestamps.append}(\text{timestamp.timestamp}())$
+	\STATE $\text{col\_1}, \text{col\_2}, \text{col\_3} = \text{read\_serial\_data}(\text{ser})$
+	\STATE $\text{amplitude} = \text{calculate\_amplitude}(\text{col\_1}, \text{col\_2}, \text{col\_3})$
+	\STATE $\text{history.append}(\text{amplitude})$
+	\STATE $\text{history\_X.append}(\text{col\_1})$
+	\STATE $\text{history\_Y.append}(\text{col\_2})$
+	\STATE $\text{history\_Z.append}(\text{col\_3})$
+	\ENDWHILE
+	
+	\STATE $\text{\# Calculate the actual sampling rate}$
+	\STATE $\text{time\_diffs} = \text{np.diff}(\text{timestamps})$
+	\STATE $\text{Fs} = 1 / \text{np.mean}(\text{time\_diffs})$
+	\STATE $\text{L} = 1000$ $\text{\# number of FFT points}$
+	
+	\FOR{$i = 0$ $\text{\textbf{to}}$ $3$}
+	\STATE $\text{values}, \text{f} = \text{compute\_fft}(\text{data}, \text{Fs}, \text{L})$
+	\STATE $\text{titles} = [$
+	\STATE \hspace{0.5cm} $\text{"Single-Sided Amplitude Spectrum of sqrt(X(t)\^{}2 + Y(t)\^{}2 + Z(t)\^{}2)"},$
+	\STATE \hspace{0.5cm} $\text{"Single-Sided Amplitude Spectrum of X(t)"},$
+	\STATE \hspace{0.5cm} $\text{"Single-Sided Amplitude Spectrum of Y(t)"},$
+	\STATE \hspace{0.5cm} $\text{"Single-Sided Amplitude Spectrum of Z(t)"}$
+	\STATE $]$
+	\STATE $\text{ylabels} = [\text{"|P1(f)|"}, \text{"|P1X(f)|"}, \text{"|P1Y(f)|"}, \text{"|P1Z(f)|"}]$
+	\STATE $\text{coordinate} = [\text{"Magnitude"}, \text{"X"}, \text{"Y"}, \text{"Z"}]$
+	\STATE $\text{api} = \text{VibrationMonitoringAPI}()$
+	\STATE $\text{status\_code} = \text{api.send\_measurement}(\text{"Test"}, \text{coordinate}[i], \text{values.tolist}(), \text{start\_time}, \text{timestamp})$
+	\ENDFOR
+	
+	\STATE $\text{except KeyboardInterrupt:}$
+	\STATE \hspace{0.5cm} $\text{ser.close}()$
+\end{algorithmic}
+
+\clearpage
 
 
-\subsection{Θεωρήματα, Πορίσματα, Ορισμοί, κλπ.}
+\noindent\textbf{Algorithm 2: api.py Implementation}
 
-Ακολουθεί παράδειγμα θεωρήματος από την ιστοσελίδα  {\small\url{https://www.overleaf.com/learn/latex/Theorems_and_proofs}}
+\begin{algorithmic}[1]
+	\STATE $\text{import requests}$
+	\STATE $\text{import json}$
+	\STATE $\text{import logging}$
+	\STATE $\text{from utils import load\_config, get\_api\_key, get\_supabase\_url\_posting, get\_supabase\_url\_selecting}$
+	\STATE $\text{from datetime import datetime, timezone}$
+	\STATE $\text{from zoneinfo import ZoneInfo}$
+	\STATE $\text{config} = \text{load\_config}()$
+	
+	\STATE
+	\STATE $\text{class VibrationMonitoringAPI:}$
+	\STATE \hspace{0.5cm} $\text{def \_\_init\_\_(self):}$
+	\STATE \hspace{1.0cm} $\text{\# Load API key and Supabase URL using the helper functions}$
+	\STATE \hspace{1.0cm} $\text{self.api\_key} = \text{get\_api\_key}()$
+	\STATE \hspace{1.0cm} $\text{self.purl} = \text{get\_supabase\_url\_posting}()$
+	\STATE \hspace{1.0cm} $\text{self.surl} = \text{get\_supabase\_url\_selecting}()$
+	
+	\STATE \hspace{1.0cm} $\text{\# Ensure both the API key and Supabase URL are available}$
+	\STATE \hspace{1.0cm} $\text{if not self.api\_key:}$
+	\STATE \hspace{1.5cm} $\text{logging.error("API Key is missing.")}$
+	\STATE \hspace{1.5cm} $\text{raise ValueError("API Key is required for the API.")}$
+	\STATE \hspace{1.0cm} $\text{if not self.purl:}$
+	\STATE \hspace{1.5cm} $\text{logging.error("Supabase URL is missing.")}$
+	\STATE \hspace{1.5cm} $\text{raise ValueError("Supabase URL is required for the API.")}$
+	\STATE \hspace{1.0cm} $\text{if not self.surl:}$
+	\STATE \hspace{1.5cm} $\text{logging.error("Supabase URL is missing.")}$
+	\STATE \hspace{1.5cm} $\text{raise ValueError("Supabase URL is required for the API.")}$
+	
+	\STATE \hspace{1.0cm} $\text{\# Initialize headers using the loaded API key}$
+	\STATE \hspace{1.0cm} $\text{self.headers} = \{$
+	\STATE \hspace{1.5cm} $\text{'accept': 'application/json'},$
+	\STATE \hspace{1.5cm} $\text{'apikey': self.api\_key},$
+	\STATE \hspace{1.5cm} $\text{'Content-Type': 'application/json'}$
+	\STATE \hspace{1.0cm} $\}$
+	
+	\STATE \hspace{1.0cm} $\text{\# Define the Athens time zone using ZoneInfo}$
+	\STATE \hspace{1.0cm} $\text{self.athens\_tz} = \text{ZoneInfo}('Europe/Athens')$
+	\STATE \hspace{0.5cm} $\text{def get\_time(self, start\_measurement, end\_measurement):}$
+	\STATE \hspace{1.0cm} $\text{\# Convert the start and end times to Athens time zone}$
+	\STATE \hspace{1.0cm} $\text{start\_measurement\_athens} = \text{start\_measurement.astimezone}(\text{self.athens\_tz})$
+	\STATE \hspace{1.0cm} $\text{end\_measurement\_athens} = \text{end\_measurement.astimezone}(\text{self.athens\_tz})$
+	
+	\STATE \hspace{1.0cm} $\text{\# Format the timestamps in the required format with Athens time zone}$
+	\STATE \hspace{1.0cm} $\text{start\_measurement\_str} = \text{start\_measurement\_athens.strftime}('\%Y-\%m-\%dT\%H:\%M:\%S.\%f')[:-3] + 'Z'$
+	\STATE \hspace{1.0cm} $\text{end\_measurement\_str} = \text{end\_measurement\_athens.strftime}('\%Y-\%m-\%dT\%H:\%M:\%S.\%f')[:-3] + 'Z'$
+	\STATE \hspace{1.0cm} $\text{return start\_measurement\_str, end\_measurement\_str}$ $\text{\# end\_measurement is now is not specified}$
+	
+	\STATE
+	\STATE \hspace{0.5cm} $\text{def send\_measurement(self, sensor\_name, coordinate, values, start\_measurement} = \text{datetime.now}(\text{timezone.utc}), \text{end\_measurement} = \text{datetime.now}(\text{timezone.utc})):$
+	\STATE \hspace{1.0cm} $\text{start\_measurement\_str, end\_measurement\_str} = \text{self.get\_time}(\text{start\_measurement}, \text{end\_measurement})$
+	
+	\STATE \hspace{1.0cm} $\text{\# Lookup sensor\_id from sensor\_name}$
+	\STATE \hspace{1.0cm} $\text{sensor\_id} = \text{self.get\_sensor\_id}(\text{sensor\_name})$
+	\STATE \hspace{1.0cm} $\text{if not sensor\_id:}$
+	\STATE \hspace{1.5cm} $\text{logging.error(f"Sensor with name '\{sensor\_name\}' not found.")}$
+	\STATE \hspace{1.5cm} $\text{return None}$
+	
+	\STATE \hspace{1.0cm} $\text{payload} = \{$
+	\STATE \hspace{1.5cm} $\text{"sensor\_id": sensor\_id},$
+	\STATE \hspace{1.5cm} $\text{"startMeasurement": start\_measurement\_str},$
+	\STATE \hspace{1.5cm} $\text{"endMeasurement": end\_measurement\_str},$
+	\STATE \hspace{1.5cm} $\text{"coordinate": coordinate},$
+	\STATE \hspace{1.5cm} $\text{"values": values}$
+	\STATE \hspace{1.0cm} $\}$
+	
+	\STATE \hspace{1.0cm} $\text{response} = \text{requests.post}(\text{self.purl}, \text{headers} = \text{self.headers}, \text{data} = \text{json.dumps}(\text{payload}))$
+	
+	\STATE \hspace{1.0cm} $\text{\# Log the response status and data}$
+	\STATE \hspace{1.0cm} $\text{logging.info(f"API Response Status Code: \{response.status\_code\}")}$
+	
+	\STATE \hspace{1.0cm} $\text{\#Check if response has content before parsing JSON}$
+	\STATE \hspace{1.0cm} $\text{if response.text.strip():}$ $\text{\# Ensure response is not empty}$
+	\STATE \hspace{1.5cm} $\text{try:}$
+	\STATE \hspace{2.0cm} $\text{logging.info(f"API Response JSON: " + str(response.json()))}$
+\STATE \hspace{1.5cm} $\text{except requests.exceptions.JSONDecodeError:}$
+\STATE \hspace{2.0cm} $\text{logging.warning("API Response is not JSON (empty or invalid format).")}$
+\STATE \hspace{1.0cm} $\text{else:}$
+\STATE \hspace{1.5cm} $\text{logging.info("API Response is empty (no JSON returned).")}$
 
-\begin{theorem}
-Let $f$ be a function whose derivative exists in every point, then $f$ 
-is a continuous function.
-\end{theorem}
+\STATE \hspace{1.0cm} $\text{return response.status\_code}$
+
+\STATE
+\STATE \hspace{0.5cm} $\text{\# New method to get sensor\_id from sensor\_name}$
+\STATE \hspace{0.5cm} $\text{def get\_sensor\_id(self, sensor\_name):}$
+\STATE \hspace{1.0cm} $\text{query\_url} = \text{f"\{"self.surl"\}?sensor\_name=eq.\{sensor\_name\}"}$
+\STATE \hspace{1.0cm} $\text{response} = \text{requests.get}(\text{query\_url}, \text{headers} = \text{self.headers})$
+\STATE \hspace{1.0cm} $\text{if response.status\_code} == 200:$
+\STATE \hspace{1.5cm} $\text{data} = \text{response.json}()$
+\STATE \hspace{1.5cm} $\text{if data:}$
+\STATE \hspace{2.0cm} $\text{return data[0]['id']}$
+\STATE \hspace{1.0cm} $\text{else:}$
+\STATE \hspace{1.5cm} $\text{logging.error(f"Failed to fetch sensor\_id for sensor\_name '\{sensor\_name\}': \{response.status\_code\} - \{response.text\}")}$
+\STATE \hspace{1.0cm} $\text{return None}$
+\end{algorithmic}
+
+\clearpage
+
+
+
+
+\noindent\textbf{Algorithm 3: data\_processing.py Implementation}
+
+\begin{algorithmic}[1]
+	\STATE $\text{import numpy as np}$
+	\STATE $\text{import matplotlib.pyplot as plt}$
+	\STATE $\text{import math}$
+	\STATE $\text{import scipy.signal as signal}$
+	
+	\STATE
+	\STATE $\text{def calculate\_amplitude(col\_1, col\_2, col\_3):}$
+	\STATE \hspace{0.5cm} $\text{return math.sqrt(col\_1**2 + col\_2**2 + col\_3**2)}$
+	
+	\STATE
+	\STATE $\text{def compute\_fft(data, Fs, L):}$
+	\STATE \hspace{0.5cm} $\text{fft\_result} = \text{np.fft.fft}(\text{data}, \text{L})$
+	\STATE \hspace{0.5cm} $\text{P2} = \text{np.abs}(\text{fft\_result}[1:] / \text{L})$
+	\STATE \hspace{0.5cm} $\text{P1} = \text{P2}[: \text{L} // 2]$
+	\STATE \hspace{0.5cm} $\text{P1}[1:-1] = 2 * \text{P1}[1:-1]$
+	\STATE \hspace{0.5cm} $\text{return P1}, \text{Fs} / \text{L} * \text{np.arange}(1, \text{L} // 2 + 1)$
+	
+	\STATE
+	\STATE $\text{def compute\_envelope(data):}$
+	\STATE \hspace{0.5cm} $\text{analytic\_signal} = \text{signal.hilbert}(\text{data})$
+	\STATE \hspace{0.5cm} $\text{envelope} = \text{np.abs}(\text{analytic\_signal})$
+	\STATE \hspace{0.5cm} $\text{return envelope}$
+	
+	\STATE
+	\STATE $\text{def plot\_fft(P1, f, title, ylabel):}$
+	\STATE \hspace{0.5cm} $\text{plt.figure}()$
+	\STATE \hspace{0.5cm} $\text{plt.plot}(\text{f}, \text{P1}, \text{linewidth} = 3)$
+	\STATE \hspace{0.5cm} $\text{plt.title}(\text{title})$
+	\STATE \hspace{0.5cm} $\text{plt.xlabel}("f (Hz)")$
+	\STATE \hspace{0.5cm} $\text{plt.ylabel}(\text{ylabel})$
+	\STATE \hspace{0.5cm} $\text{plt.show}()$
+	
+	\STATE
+	\STATE $\text{def unbalancing(frequency, rpm, spectrum, threshold):}$
+	\STATE \hspace{0.5cm} $\text{\#index = f.index(rpm) to be used in main.py}$
+	\STATE \hspace{0.5cm} $\text{index} = \text{np.where}((\text{frequency} > 0.999 * \text{rpm}) \& (\text{frequency} < 1.001 * \text{rpm}))$
+	\STATE \hspace{0.5cm} $\text{\#print(index)}$
+	\STATE \hspace{0.5cm} $\text{frq} = \text{frequency}[\text{index}]$
+	\STATE \hspace{0.5cm} $\text{amplitude} = \text{spectrum}[\text{index}]$
+	\STATE \hspace{0.5cm} $\text{if amplitude} > \text{threshold}:$
+	\STATE \hspace{1.0cm} $\text{status} = \text{'Shaft needs to be balanced'}$
+	\STATE \hspace{0.5cm} $\text{else:}$
+	\STATE \hspace{1.0cm} $\text{status} = \text{'Balancing is ok'}$
+	\STATE \hspace{0.5cm} $\text{return f"RPM: \{frq\}, Amplitude: \{amplitude\}, Status: \{status\}"}$
+\end{algorithmic}
+
+\clearpage
+
+
+\noindent\textbf{Algorithm 4: serial\_communication.py Implementation}
+
+\begin{algorithmic}[1]
+	\STATE $\text{import serial}$
+	\STATE $\text{import time}$
+	
+	\STATE
+	\STATE $\text{def setup\_serial\_connection(port, baud\_rate):}$
+	\STATE \hspace{0.5cm} $\text{ser} = \text{serial.Serial}(\text{port}, \text{baud\_rate}, \text{timeout} = 1.0)$
+	\STATE \hspace{0.5cm} $\text{time.sleep}(1)$
+	\STATE \hspace{0.5cm} $\text{ser.reset\_input\_buffer}()$
+	\STATE \hspace{0.5cm} $\text{return ser}$
+	
+	\STATE
+	\STATE $\text{def read\_serial\_data(ser):}$
+	\STATE \hspace{0.5cm} $\text{ser.write}('rasp \textbackslash n'.encode())$
+	\STATE \hspace{0.5cm} $\text{while ser.in\_waiting} <= 0:$
+	\STATE \hspace{1.0cm} $\text{time.sleep}(0.001)$
+	\STATE \hspace{0.5cm} $\text{response} = \text{ser.readline}().decode('utf-8').rstrip()$
+	\STATE \hspace{0.5cm} $\text{col\_1}, \text{col\_2}, \text{col\_3} = \text{map}(\text{float}, \text{response.split}(','))$
+	\STATE \hspace{0.5cm} $\text{return col\_1}, \text{col\_2}, \text{col\_3}$
+\end{algorithmic}
+
+\clearpage
+
+
+\noindent\textbf{Algorithm 5: utils.py Implementation}
+
+\begin{algorithmic}[1]
+	\STATE $\text{import os}$
+	\STATE $\text{import yaml}$
+	\STATE $\text{import logging}$
+	\STATE $\text{from pathlib import Path}$
+	\STATE $\text{from dotenv import load\_dotenv}$
+	
+	\STATE
+	\STATE $\text{\# Configure logging with timestamps}$
+	\STATE $\text{logging.basicConfig}($
+	\STATE \hspace{0.5cm} $\text{level} = \text{logging.INFO},$
+	\STATE \hspace{0.5cm} $\text{format} = "\%(asctime)s - \%(levelname)s - \%(message)s",$
+	\STATE $)$
+	
+	\STATE
+	\STATE $\text{def load\_env\_variables():}$
+	\STATE \hspace{0.5cm} $\text{"Load environment variables from .env file."}$
+	\STATE \hspace{0.5cm} $\text{load\_dotenv}()$
+	
+	\STATE
+	\STATE $\text{def load\_config(config\_path} = \text{None):}$
+	\STATE \hspace{0.5cm} $\text{"Load YAML configuration file."}$
+	\STATE \hspace{0.5cm} $\text{if config\_path is None:}$
+	\STATE \hspace{1.0cm} $\text{config\_path} = \text{Path}(\text{\_\_file\_\_}).\text{resolve}().\text{parent}.\text{parent} / 'config' / 'config.yaml'$
+	\STATE \hspace{0.5cm} $\text{else:}$
+	\STATE \hspace{1.0cm} $\text{config\_path} = \text{Path}(\text{config\_path}).\text{resolve}()$
+	
+	\STATE \hspace{0.5cm} $\text{logging.info(f"Loading config from: \{config\_path\}")}$
+	
+	\STATE \hspace{0.5cm} $\text{\# Check if file exists}$
+	\STATE \hspace{0.5cm} $\text{if not config\_path.is\_file():}$
+	\STATE \hspace{1.0cm} $\text{raise FileNotFoundError(f"Config file not found at: \{config\_path\}")}$
+	
+	\STATE \hspace{0.5cm} $\text{try:}$
+	\STATE \hspace{1.0cm} $\text{with config\_path.open}('r') \text{ as file}:$
+	\STATE \hspace{1.5cm} $\text{\# More readable pathlib usage}$
+	\STATE \hspace{1.5cm} $\text{config} = \text{yaml.safe\_load}(\text{file})$
+	\STATE \hspace{0.5cm} $\text{except yaml.YAMLError as e:}$
+	\STATE \hspace{1.0cm} $\text{raise ValueError(f"Error parsing YAML file at \{config\_path\}: \{e\}")}$
+	\STATE \hspace{0.5cm} $\text{except Exception as e:}$
+	\STATE \hspace{1.0cm} $\text{raise RuntimeError(f"Unexpected error loading config: \{e\}")}$
+	
+	\STATE \hspace{0.5cm} $\text{return config}$
+	
+	\STATE
+	\STATE $\text{def get\_api\_key():}$
+	\STATE \hspace{0.5cm} $\text{"Retrieve API key from environment variables."}$
+	\STATE \hspace{0.5cm} $\text{load\_env\_variables()}()$ $\text{\# Ensure environment variables are loaded}$
+	\STATE \hspace{0.5cm} $\text{api\_key} = \text{os.getenv}('API\_KEY')$
+	\STATE \hspace{0.5cm} $\text{if not api\_key:}$
+	\STATE \hspace{1.0cm} $\text{logging.warning("API\_KEY is not set in the environment.")}$
+	\STATE \hspace{1.0cm} $\text{return None}$ $\text{\# Return None instead of raising an error}$
+	\STATE \hspace{0.5cm} $\text{return api\_key}$
+	
+	\STATE
+	\STATE $\text{def get\_supabase\_url\_posting():}$
+	\STATE \hspace{0.5cm} $\text{"Retrieve Supabase URL from environment variables."}$
+	\STATE \hspace{0.5cm} $\text{load\_env\_variables()}()$ $\text{\# Ensure environment variables are loaded}$
+	\STATE \hspace{0.5cm} $\text{purl} = \text{os.getenv}('SUPABASE\_URL\_FOR\_POSTING')$
+	\STATE \hspace{0.5cm} $\text{if not purl:}$
+	\STATE \hspace{1.0cm} $\text{logging.warning("SUPABASE\_URL is not set in the environment.")}$
+	\STATE \hspace{1.0cm} $\text{return None}$ $\text{\# Return None if SUPABASE\_URL is not set}$
+	\STATE \hspace{0.5cm} $\text{return purl}$
+	
+	\STATE
+	\STATE $\text{def get\_supabase\_url\_selecting():}$
+	\STATE \hspace{0.5cm} $\text{"Retrieve Supabase URL from environment variables."}$
+	\STATE \hspace{0.5cm} $\text{load\_env\_variables()}()$ $\text{\# Ensure environment variables are loaded}$
+	\STATE \hspace{0.5cm} $\text{surl} = \text{os.getenv}('SUPABASE\_URL\_FOR\_SELECTING')$
+	\STATE \hspace{0.5cm} $\text{if not surl:}$
+	\STATE \hspace{1.0cm} $\text{logging.warning("SUPABASE\_URL is not set in the environment.")}$
+	\STATE \hspace{1.0cm} $\text{return None}$ $\text{\# Return None if SUPABASE\_URL is not set}$
+	\STATE \hspace{0.5cm} $\text{return surl}$
+\end{algorithmic}
+
+\clearpage
+
+
+
+\noindent\textbf{Algorithm 6: config.yaml Implementation}
+
+\begin{algorithmic}[1]
+	\STATE $\text{serial:}$
+	\STATE \hspace{0.5cm} $\text{\# This applies in the case of Linux OS}$
+	\STATE \hspace{0.5cm} $\text{port\_linux: "/dev/ttyACM0"}$
+	\STATE \hspace{0.5cm} $\text{\# This applies in the case of Windows OS}$
+	\STATE \hspace{0.5cm} $\text{port\_windows: "COM3"}$
+	\STATE \hspace{0.5cm} $\text{baud\_rate: 115200}$
+	\STATE $\text{time\_window: 30}$
+	\STATE $\text{\# user defined}$
+	\STATE $\text{rpm: 300}$
+	\STATE $\text{bpfi: 3.4}$
+	\STATE $\text{bpfo: 2}$
+	\STATE $\text{ftf: 10}$
+	\STATE $\text{bsf: 5}$
+	\STATE $\text{threshold: 5}$
+\end{algorithmic}
+
+\clearpage
+
+
+
+
 
 
 
