@@ -12,6 +12,24 @@
 	
 	Following the frequency-domain analysis, the Raspberry Pi 4 executes the final stage of the data pipeline by transmitting the processed results to a cloud-based PostgreSQL database hosted on Supabase. This is achieved by leveraging Supabase's auto-generated RESTful API, which provides a secure and programmatic interface for data operations. The Pi utilizes HTTPS requests, specifically authenticated POST calls, to insert structured JSON payloads containing the computed FFT magnitudes and frequency bins directly into the designated tables within the Supabase schema. This serverless architecture eliminates the need for managing database infrastructure, while the built-in row-level security (RLS) ensures that data access is strictly governed by predefined policies. By interfacing with the Supabase API, the system ensures that analyzed sensor data is persistently stored in a scalable and readily queryable data store, facilitating further visualization, historical analysis, or integration with other applications within the Supabase ecosystem.
 	
+	A flowchart that illustrates a brief dataflow is depicted on Figure \ref{fig:Flowchart}.
+	
+	\begin{figure}[h]  
+		\centering  
+		\begin{tikzpicture}[node distance=1.5cm]  
+			\node (sensor) [draw, rectangle] {ADXL335};  
+			\node (arduino) [draw, rectangle, below of=sensor] {Arduino};  
+			\node (rpi) [draw, rectangle, below of=arduino] {Raspberry Pi 4};  
+			\node (cloud) [draw, rectangle, below of=rpi] {Cloud DB};  
+			
+			\draw[->] (sensor) -- node[right] {Analog (0–300Hz)} (arduino);  
+			\draw[->] (arduino) -- node[right] {UART (600SPS)} (rpi);  
+			\draw[->] (rpi) -- node[right] {WiFi/HTTP} (cloud);  
+		\end{tikzpicture}  
+		\caption{End-to-end data flow with protocols}  
+		\label{fig:Flowchart}  
+	\end{figure}  
+	
 	More technical details on the aforementioned topics are briefly analyzed within the present chapter. 
 }
 
@@ -23,10 +41,6 @@
 	The main focus of the Arduino UNO sketch is to implement a batched data processing strategy that enables sequential transmission of sensor data to the Raspberry Pi 4. This design methodology specifically addresses the memory constraints of the Arduino UNO by minimizing the instantaneous SRAM utilization through carefully sized data batching.
 	
 	The Arduino UNO receives analog signals from the sensor breakout board through its integrated analog-to-digital converter (ADC), which features 10-bit resolution across six input channels. Each designated analog input pin (A0, A1, A2) continuously monitors voltage levels in the range of 0,V to 5,V, corresponding to the physical phenomena being measured by the sensors, which entails that the reading can be interpreted as g's or mm/s$^2$. The ADC performs successive approximation conversion at a sampling rate of approximately 10,000 samples per second, transforming continuous analog voltages into discrete digital values ranging from 0 (representing 0V) to 1023 (representing 5V). Each converted value is stored as a 16-bit signed integer (2 bytes) in memory, maintaining compatibility with the Arduino's architecture while preserving measurement precision.
-	
-	The data acquisition process follows a structured double-buffering approach where readings are temporarily stored in a two-dimensional array before processing and transmission. This architecture ensures temporal consistency between related sensor measurements while optimizing memory utilization through fixed-size allocation.
-	
-	A snippet of the Arduino UNO algorithm implementation follows hereunder (Algorithm \ref{alg:dataacq}):  
 	
 	\begin{algorithm}[H]
 		\caption{Snippet of Data Acquisition \& Transmission (see the whole code on Appendix Section \ref{subsec:arduino-algorithm})}
@@ -58,6 +72,9 @@
 		\end{algorithmic}
 	\end{algorithm}
 	
+	The data acquisition process follows a structured double-buffering approach where readings are temporarily stored in a two-dimensional array before processing and transmission. This architecture ensures temporal consistency between related sensor measurements while optimizing memory utilization through fixed-size allocation.
+	
+	A snippet of the Arduino UNO algorithm implementation follows hereunder (Algorithm \ref{alg:dataacq}):  
 
 	The memory requirement in this case can be estimated , combining all received data as analog signal by the sensor breakout: 
 	
@@ -104,10 +121,6 @@
 		└── .env                   # Environment variables
 	\end{verbatim}
 	
-	An overview of the core processing workflow implemented in the project is presented in Algorithm \ref{alg:rpi-processing}, highlighting the principal computational processes and methodological practices employed. This snippet captures the essential data acquisition, processing, and transmission pipeline that forms the foundation of the vibration monitoring system.
-	
-	For a comprehensive examination of the complete project architecture, readers are directed to the Appendix section. Specifically, Section \ref{subsec:raspberrypi-algorithm} provides detailed algorithmic descriptions of all constituent scripts, including their functional specifications, inter-module communication protocols, and implementation details. The appendix offers complete visibility into the system's modular design, encompassing data acquisition, signal processing, API communication, and utility functions that collectively enable the real-time vibration monitoring capabilities.
-	
 	\begin{algorithm}[H]
 		\caption{Raspberry Pi Data Processing Pipeline}
 		\label{alg:rpi-processing}
@@ -137,51 +150,97 @@
 			\RETURN Processing complete
 		\end{algorithmic}
 	\end{algorithm}
+
+	An overview of the core processing workflow implemented in the project is presented in Algorithm \ref{alg:rpi-processing}, highlighting the principal computational processes and methodological practices employed. This snippet captures the essential data acquisition, processing, and transmission pipeline that forms the foundation of the vibration monitoring system.
 	
-	The serial communication module, as previously highlighted in the system architecture, establishes a connection with the Arduino microcontroller at a specified baud rate, initializing the serial port with a timeout parameter to prevent blocking operations. Upon initialization, the Raspberry Pi transmits a trigger command ('rasp') to request data from the ADXL335 analog accelerometer, then enters a polling loop that waits until the Arduino responds with sensor readings. The received data string, containing three comma-separated acceleration values from the sensor's X, Y, and Z axes, is decoded from UTF-8 format, stripped of extraneous characters, and parsed into floating-point numerical values representing the triaxial acceleration measurements in g-forces, which are subsequently returned for further processing in the vibration monitoring pipeline, consistent with the data flow described in earlier sections.
+	For a comprehensive examination of the complete project architecture, readers are directed to the Appendix section. Specifically, Section \ref{subsec:raspberrypi-algorithm} provides detailed algorithmic descriptions of all constituent scripts, including their functional specifications, inter-module communication protocols, and implementation details. The appendix offers complete visibility into the system's modular design, encompassing data acquisition, signal processing, API communication, and utility functions that collectively enable the real-time vibration monitoring capabilities.
 	
-	Moreover, the API communication for transmitting vibration data to the Supabase backend is implemented through a structured workflow that begins with authentication and configuration validation. Upon class instantiation, the system loads essential credentials including the API key and Supabase URLs from environment variables, performing rigorous validation to ensure all required parameters are present before initializing the HTTP headers with proper content type and authentication tokens. The communication process employs timezone-aware timestamp handling, converting UTC measurement timestamps to Athens time zone and formatting them according to ISO 8601 standards with millisecond precision to maintain temporal consistency across the distributed system.
+	The serial communication module, as previously highlighted in the system architecture, establishes a connection with the Arduino microcontroller at a specified baud rate, initializing the serial port with a timeout parameter to prevent blocking operations. 
 	
+	Specifically, the data received by Arduino UNO are getting analyzed. The sensors yields the 3-axis readings (X, Y and Z), when the whole dataset, for a predetermined time-window is received by Raspberry Pi, the amplitude of the 3-axis readings is calculated and afterwards frequency domain data are extracted.
+	
+	Upon initialization, the Raspberry Pi waits until the Arduino Uno shares the sensor readings. The received data string, containing three comma-separated acceleration values from the sensor's X, Y, and Z axes, is decoded from UTF-8 format, stripped of extraneous characters, and parsed into floating-point numerical values representing the triaxial acceleration measurements in g-forces, which are subsequently returned for further processing in the vibration monitoring pipeline, consistent with the data flow described in earlier sections.
+	
+	Moreover, the API communication for transmitting vibration data to the Supabase backend is implemented through a structured workflow that begins with authentication and configuration validation. Upon class instantiation, the system employs the requests.post() method to transmit JSON-formatted vibration data to the Supabase REST API endpoint, ensuring secure communication through properly configured HTTP headers containing authentication tokens and content type specifications.
+	
+	The requests.post() command functions as the core mechanism for data transmission, operating as an HTTP client that serializes the vibration data payload into JSON format and dispatches it via POST request to the designated Supabase endpoint. This method automatically handles connection management, timeout protocols, and response processing while incorporating the pre-configured headers containing the essential API key for authentication. The implementation includes robust error handling that captures potential exceptions such as connection failures, timeout errors, or invalid response formats, while also validating the HTTP status codes returned by the server to ensure successful data ingestion. The method returns a response object containing the server's status code and optional response data, which the system then processes through comprehensive logging mechanisms for both debugging and operational monitoring purposes.
+
 	For each data transmission request, the system first resolves the sensor identifier by querying the Supabase database using the sensor name, establishing a relational link between the measurement data and the specific sensor entity. The payload construction encapsulates critical metadata including the sensor ID, precise time intervals, measurement coordinate (X, Y, Z, or magnitude), and the actual FFT-processed values array. The HTTP POST request is executed with proper error handling and comprehensive logging, featuring response validation that checks for empty or malformed JSON responses while maintaining robust exception handling for network failures or authentication errors. The implementation includes diagnostic logging at multiple stages, providing visibility into the payload structure, response status codes, and JSON content for debugging and monitoring purposes, ensuring reliable data transmission to the cloud-based storage infrastructure.
 }
 
 
 
 
-
-
-\subsection{Scalability Considerations}
-{  
-	\begin{itemize}  
-		\item \textbf{Multi-Threading}: RPi4 handles concurrent sensor inputs (e.g., 4x Arduino nodes).  
-		\item \textbf{Data Compression}: FFT bin reduction (0–300Hz only) minimizes cloud costs.  
-	\end{itemize}  
-	
-	\begin{figure}[h]  
-		\centering  
-		\begin{tikzpicture}[node distance=1.5cm]  
-			\node (sensor) [draw, rectangle] {ADXL335};  
-			\node (arduino) [draw, rectangle, below of=sensor] {Arduino};  
-			\node (rpi) [draw, rectangle, below of=arduino] {Raspberry Pi 4};  
-			\node (cloud) [draw, rectangle, below of=rpi] {Cloud DB};  
-			
-			\draw[->] (sensor) -- node[right] {Analog (0–300Hz)} (arduino);  
-			\draw[->] (arduino) -- node[right] {UART (600SPS)} (rpi);  
-			\draw[->] (rpi) -- node[right] {WiFi/HTTP} (cloud);  
-		\end{tikzpicture}  
-		\caption{End-to-end data flow with protocols}  
-		\label{fig:Flowchart}  
-	\end{figure}  
-}
-
-
 \subsection{Vercel coding}
 {
-	Elaboration on (including some parts of the code):
-	\begin{itemize}
-		\item page file that prints data
-		\item how it is coupled with supabase
-	\end{itemize}
+	After sending all data to Supabase, you can deploy this Vercel-friendly application that visualizes your sensor measurements. The project structure is optimized for Next.js with TypeScript and includes all necessary configuration files. When you deploy this application to Vercel, you'll receive a unique URL that you can share with specific email addresses.
+	
+	The application features a web page that automatically fetches measurement data from your Supabase database through an API endpoint and displays it in interactive charts. When users access the shared link, the code executes and renders two types of diagrams: one combined chart showing X, Y, and Z axis readings as separate colored lines, and another chart displaying magnitude values if available.
+	
+	The visualization includes timestamps aligned with your measurement data, responsive design that works on different screen sizes, and interactive elements like tooltips that show exact values when hovering over data points. The charts are built with Recharts library and provide a clear graphical representation of your sensor's time-series data.
+	
+	You can control access by configuring Vercel's authentication settings to restrict the deployment URL to only specific email addresses, ensuring your sensor data remains private while being easily accessible to authorized viewers.
+	
+	\begin{verbatim}
+		my-nextjs-project/
+		├── .next/
+		├── node_modules/
+		├── public/
+		├── src/
+		│ └── app/
+		│ | └──api/
+		│ |	│ └── route.ts
+		│ |	├── fonts/
+		│ |	├── lib/
+		│ | | └── supabase.ts
+		│ | ├── favicon.ico
+		│ | ├── globals.css
+		│ | ├── layout.tsx
+		│ | └── page.tsx
+		├── .env.local
+		├── .eslintrc.json
+		├── tsconfig.json
+		├── package.json
+		├── package-lock.json
+		├── next.config.ts
+		├── next-env.d.ts
+		├── tailwind.config.ts
+		├── postcss.config.js						
+	\end{verbatim}
+	
+	The most important algorithm that is being called is the page.tsx component, which serves as the main data visualization dashboard that fetches sensor measurements from the Supabase database through the API endpoint, processes the time-series data, and renders interactive charts displaying X, Y, Z axis readings along with magnitude values using the Recharts library for comprehensive sensor data analysis and monitoring.
+	
+	This algorithm implements the core functionality of different end points. It fetches, processes and renders charts. More details on this can be looked upon the algorithms of the Subsection \ref{subsec:vercel}, while a snippet yields some intuition into the aforementioned practice (see Algorithm \ref{alg:vercel}).
+
+	\begin{algorithm}[H]
+		\caption{Sensor Data Visualization Algorithm}
+		\label{alg:vercel}
+		\begin{algorithmic}[1]
+			\STATE \textbf{Import} React, Recharts components
+			\STATE \textbf{Define} Measurement type structure
+			
+			\STATE
+			\STATE \textbf{Function} Home():
+			\STATE \hspace{0.5cm} Initialize state for measurements and error
+			\STATE \hspace{0.5cm} Fetch data from API endpoint on component mount
+			\STATE \hspace{0.5cm} Handle errors and loading states
+			\STATE \hspace{0.5cm} Transform timestamp data for visualization
+			\STATE \hspace{0.5cm} Combine X, Y, Z coordinate data streams
+			\STATE \hspace{0.5cm} Render interactive charts using Recharts
+			\STATE \textbf{End Function}
+			
+			\STATE
+			\STATE \textbf{API Function} GET():
+			\STATE \hspace{0.5cm} Query Supabase database for measurements
+			\STATE \hspace{0.5cm} Return data as JSON response
+			\STATE \hspace{0.5cm} Handle database errors appropriately
+			\STATE \textbf{End Function}
+		\end{algorithmic}
+	\end{algorithm}
+	
+	The component serves as the primary user interface for accessing and interpreting the collected sensor measurements, making it the central algorithm in the data visualization pipeline.
+	
+	This software runs in real time keeping track of all measurements of the actual mechanism. It stores the measurements of the first run as a healthy-reference point and every other measurement will be compared to that healthy-state reference dataset. These historical data can be critical so as to locate the critical frequencies and any potential peaks magnitude increase.
 }
 
 

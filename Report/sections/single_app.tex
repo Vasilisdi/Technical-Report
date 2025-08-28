@@ -544,7 +544,146 @@
 
 
 
+\subsection{Vercel Webpage Implementation}
+\label{subsec:vercel}
+
+\noindent\textbf{Data Visualization Dashboard Implementation for Sensor Measurements}
+
+\begin{algorithmic}[1]
+	\STATE $\text{import React, { useEffect, useState } from 'react'}$
+	\STATE $\text{import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'}$
+	
+	\STATE $\text{type Measurement = {}}$
+	\STATE $\text{}$
+	\STATE \hspace{0.5cm} $\text{id: string;}$
+	\STATE \hspace{0.5cm} $\text{port\_windows: "COM3"}$
+	\STATE \hspace{0.5cm} $\text{startMeasurement: string;}$
+	\STATE \hspace{0.5cm} $\text{endMeasurement: string;}$
+	\STATE \hspace{0.5cm} $\text{coordinate: string;}$
+	\STATE \hspace{0.5cm} $\text{values: number[];}$
+
+	
+	\STATE
+	\STATE $\text{export default function Home() {}}$
+	\STATE \hspace{0.5cm} $\text{const [measurements, setMeasurements] = useState<Measurement[]>([])}$
+	\STATE \hspace{0.5cm} $\text{const [error, setError] = useState<string | null>(null)}$
+		
+	\STATE
+	\STATE \hspace{0.5cm} $\text{useEffect(() => {}}$
+	\STATE \hspace{1.0cm} $\text{const fetchData = async () => {}}$
+	\STATE \hspace{1.5cm} $\text{try {}}$
+	\STATE \hspace{2.0cm} $\text{const res = await fetch('/api/measurements')}$
+	\STATE \hspace{2.0cm} $\text{if (!res.ok) {}}$
+	\STATE \hspace{2.5cm} $\text{throw new Error('Error fetching data')}$
+	\STATE \hspace{2.0cm} $\text{const data: Measurement[] = await res.json()}$
+	\STATE \hspace{2.0cm} $\text{setMeasurements(data)}$
+	\STATE \hspace{1.5cm} $\text{} catch (err) {}$
+	\STATE \hspace{2.0cm} $\text{setError((err as Error).message)}$
+			
+	\STATE \hspace{1.0cm} $\text{fetchData()}$
+
+		
+	\STATE
+	\STATE \hspace{0.5cm} $\text{if (error) {}}$
+	\STATE \hspace{1.0cm} $\text{return <div>Error: {error}</div>}$
+		
+	\STATE
+	\STATE \hspace{0.5cm} $\text{const transformData = (measurement: Measurement) => {}}$
+	\STATE \hspace{1.0cm} $\text{const start = new Date(measurement.startMeasurement)}$
+	\STATE \hspace{1.0cm} $\text{const end = new Date(measurement.endMeasurement)}$
+	\STATE \hspace{1.0cm} $\text{const duration = end.getTime() - start.getTime()}$
+	\STATE \hspace{1.0cm} $\text{const timeStep = duration / measurement.values.length}$
+			
+	\STATE \hspace{1.0cm} $\text{return measurement.values.map((value, index) => ({}}$
+	\STATE \hspace{1.5cm} $\text{time: new Date(start.getTime() + timeStep * index),}$
+	\STATE \hspace{1.5cm} $\text{value,}$
+		
+		\STATE
+		\STATE \hspace{0.5cm} $\text{const xAxisMeasurement = measurements.find(m => m.coordinate === 'X')}$
+		\STATE \hspace{0.5cm} $\text{const yAxisMeasurement = measurements.find(m => m.coordinate === 'Y')}$
+		\STATE \hspace{0.5cm} $\text{const zAxisMeasurement = measurements.find(m => m.coordinate === 'Z')}$
+		\STATE \hspace{0.5cm} $\text{const magnitudeMeasurement = measurements.find(m => m.coordinate === 'Magnitude')}$
+		
+		\STATE
+		\STATE \hspace{0.5cm} $\text{const combineData = () => {}}$
+			\STATE \hspace{1.0cm} $\text{if (!xAxisMeasurement || !yAxisMeasurement || !zAxisMeasurement) return []}$
+			
+			\STATE \hspace{1.0cm} $\text{const xData = transformData(xAxisMeasurement)}$
+			\STATE \hspace{1.0cm} $\text{const yData = transformData(yAxisMeasurement)}$
+			\STATE \hspace{1.0cm} $\text{const zData = transformData(zAxisMeasurement)}$
+			
+			\STATE \hspace{1.0cm} $\text{const combinedData = xData.map((xItem, index) => {}}$
+				\STATE \hspace{1.5cm} $\text{const yItem = yData[index]}$
+				\STATE \hspace{1.5cm} $\text{const zItem = zData[index]}$
+				\STATE \hspace{1.5cm} $\text{return {}}$
+					\STATE \hspace{2.0cm} $\text{time: xItem.time,}$
+					\STATE \hspace{2.0cm} $\text{x: xItem.value,}$
+					\STATE \hspace{2.0cm} $\text{y: yItem.value,}$
+					\STATE \hspace{2.0cm} $\text{z: zItem.value,}$
+			
+			\STATE \hspace{1.0cm} $\text{return combinedData}$
+		
+		\STATE
+		\STATE \hspace{0.5cm} $\text{return (}$
+		\STATE \hspace{1.0cm} $\text{<div>}$
+		\STATE \hspace{1.5cm} $\text{<h1>Measurements</h1>}$
+		\STATE \hspace{1.5cm} $\text{{measurements.length === 0 ? (}}$
+			\STATE \hspace{2.0cm} $\text{<p>No measurements found</p>}$
+			\STATE \hspace{1.5cm} $\text{) : (}$
+			\STATE \hspace{2.0cm} $\text{<>}$
+			\STATE \hspace{2.5cm} $\text{<ResponsiveContainer width="100\%" height={400}>}$
+			\STATE \hspace{3.0cm} $\text{<LineChart data={combineData()}>}$
+			\STATE \hspace{3.5cm} $\text{<CartesianGrid strokeDasharray="3 3" />}$
+			\STATE \hspace{3.5cm} $\text{<XAxis dataKey="time" />}$
+			\STATE \hspace{3.5cm} $\text{<YAxis />}$
+			\STATE \hspace{3.5cm} $\text{<Tooltip />}$
+			\STATE \hspace{3.5cm} $\text{<Legend />}$
+			\STATE \hspace{3.5cm} $\text{<Line type="monotone" dataKey="x" stroke="8884d8" name="X Axis" />}$
+			\STATE \hspace{3.5cm} $\text{<Line type="monotone" dataKey="y" stroke="82ca9d" name="Y Axis" />}$
+			\STATE \hspace{3.5cm} $\text{<Line type="monotone" dataKey="z" stroke="ff7300" name="Z Axis" />}$
+			\STATE \hspace{3.0cm} $\text{</LineChart>}$
+			\STATE \hspace{2.5cm} $\text{</ResponsiveContainer>}$
+			\STATE \hspace{2.5cm} $\text{magnitudeMeasurement }$
+			\STATE \hspace{3.0cm} $\text{<ResponsiveContainer width="100\%" height={400}>}$
+			\STATE \hspace{3.5cm} $\text{<LineChart data={transformData(magnitudeMeasurement)}>}$
+			\STATE \hspace{4.0cm} $\text{<CartesianGrid strokeDasharray="3 3" />}$
+			\STATE \hspace{4.0cm} $\text{<XAxis dataKey="time" />}$
+			\STATE \hspace{4.0cm} $\text{<YAxis />}$
+			\STATE \hspace{4.0cm} $\text{<Tooltip />}$
+			\STATE \hspace{4.0cm} $\text{<Legend />}$
+			\STATE \hspace{4.0cm} $\text{<Line type="monotone" dataKey="value" stroke="0000FF" name="Magnitude" />}$
+			\STATE \hspace{3.5cm} $\text{</LineChart>}$
+			\STATE \hspace{3.0cm} $\text{</ResponsiveContainer>}$
+			
+			\STATE \hspace{2.0cm} $\text{</>}$
+			
+		\STATE \hspace{1.0cm} $\text{</div>}$
+
+\end{algorithmic}
+
+\clearpage
 
 
+
+\noindent\textbf{Auxiliary Vercel Algorithm}
+
+\begin{algorithmic}[1]
+	\STATE \textbf{Import} supabaseAdmin from '../../lib/supabase'
+	\STATE
+	\STATE \textbf{Function} GET():
+	\STATE \hspace{0.5cm} \textbf{Try:}
+	\STATE \hspace{1.0cm} Log "Fetching data from Supabase..."
+	\STATE \hspace{1.0cm} Query measurements table using supabaseAdmin
+	\STATE \hspace{1.0cm} \textbf{If} error occurs:
+	\STATE \hspace{1.5cm} Log error details
+	\STATE \hspace{1.5cm} Return error response with status 500
+	\STATE \hspace{1.0cm} Log fetched data
+	\STATE \hspace{1.0cm} Return JSON response with data
+	\STATE \hspace{0.5cm} \textbf{Catch} error:
+	\STATE \hspace{1.0cm} Log unexpected error
+	\STATE \hspace{1.0cm} Extract error message
+	\STATE \hspace{1.0cm} Return error response with status 500
+	\STATE \textbf{End Function}
+\end{algorithmic}
 
 
