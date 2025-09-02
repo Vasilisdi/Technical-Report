@@ -166,20 +166,50 @@
 	The requests.post() command functions as the core mechanism for data transmission, operating as an HTTP client that serializes the vibration data payload into JSON format and dispatches it via POST request to the designated Supabase endpoint. This method automatically handles connection management, timeout protocols, and response processing while incorporating the pre-configured headers containing the essential API key for authentication. The implementation includes robust error handling that captures potential exceptions such as connection failures, timeout errors, or invalid response formats, while also validating the HTTP status codes returned by the server to ensure successful data ingestion. The method returns a response object containing the server's status code and optional response data, which the system then processes through comprehensive logging mechanisms for both debugging and operational monitoring purposes.
 
 	For each data transmission request, the system first resolves the sensor identifier by querying the Supabase database using the sensor name, establishing a relational link between the measurement data and the specific sensor entity. The payload construction encapsulates critical metadata including the sensor ID, precise time intervals, measurement coordinate (X, Y, Z, or magnitude), and the actual FFT-processed values array. The HTTP POST request is executed with proper error handling and comprehensive logging, featuring response validation that checks for empty or malformed JSON responses while maintaining robust exception handling for network failures or authentication errors. The implementation includes diagnostic logging at multiple stages, providing visibility into the payload structure, response status codes, and JSON content for debugging and monitoring purposes, ensuring reliable data transmission to the cloud-based storage infrastructure.
+	
+	Moreover it is worth it mentioning that the development and testing environment spanned multiple hardware platforms, utilizing Poetry for consistent dependency management across all systems:
+	
+	\begin{itemize}
+		\item \textbf{Raspberry Pi devices}: Model 4B (4GB RAM) running Raspberry Pi OS
+		\item \textbf{Testing PCs}: Fedora 40 and Windows 11 systems
+	\end{itemize}
+	
+	Poetry ensured identical dependency versions across all platforms through the \texttt{pyproject.toml} specification. Key packages maintained consistency included:
+	
+	\begin{itemize}
+		\item \textbf{pyserial} v3.5: Uniform serial communication across platforms
+		\item \textbf{numpy} v1.24.3: Consistent numerical computation
+		\item \textbf{requests} v2.28.2: Standardized HTTP client functionality
+		\item \textbf{python-dotenv} v1.0.0: Uniform environment variable handling
+	\end{itemize}
+	
+	The cross-platform approach provided several advantages:
+	\begin{itemize}
+		\item Development flexibility across Windows and Linux environments
+		\item Consistent behavior between development and deployment on Raspberry Pi
+		\item Simplified testing across multiple operating systems
+		\item Streamlined collaboration through version-locked dependencies
+	\end{itemize}
+	
+	Testing covered all platform combinations to ensure compatibility and consistent performance across different devices. The environment successfully supported the complete development lifecycle from initial coding to final deployment on production hardware.
 }
 
 
 
 
-\subsection{Vercel coding}
+\subsection{Vercel Implementation and Supabase Integration}
 {
+	\label{subsec:vercelsec}
+	
 	After sending all data to Supabase, you can deploy this Vercel-friendly application that visualizes your sensor measurements. The project structure is optimized for Next.js with TypeScript and includes all necessary configuration files. When you deploy this application to Vercel, you'll receive a unique URL that you can share with specific email addresses.
 	
 	The application features a web page that automatically fetches measurement data from your Supabase database through an API endpoint and displays it in interactive charts. When users access the shared link, the code executes and renders two types of diagrams: one combined chart showing X, Y, and Z axis readings as separate colored lines, and another chart displaying magnitude values if available.
 	
 	The visualization includes timestamps aligned with your measurement data, responsive design that works on different screen sizes, and interactive elements like tooltips that show exact values when hovering over data points. The charts are built with Recharts library and provide a clear graphical representation of your sensor's time-series data.
 	
-	You can control access by configuring Vercel's authentication settings to restrict the deployment URL to only specific email addresses, ensuring your sensor data remains private while being easily accessible to authorized viewers.
+	The access control can be manipulated by configuring Vercel's authentication settings to restrict the deployment URL to only specific email addresses, ensuring your sensor data remains private while being easily accessible to authorized viewers.
+	
+	These packages enabled secure communication with the Supabase backend while maintaining optimal performance in the Vercel environment. The application structure was organized as follows:
 	
 	\begin{verbatim}
 		my-nextjs-project/
@@ -237,6 +267,13 @@
 			\STATE \textbf{End Function}
 		\end{algorithmic}
 	\end{algorithm}
+	
+	The Vercel deployment platform was utilized to host a Next.js application that provides real-time visualization of sensor measurements. The implementation required several Supabase integration packages to ensure secure and efficient data handling:
+	
+	\begin{itemize}
+		\item \texttt{@supabase/supabase-js}: The official JavaScript client for Supabase services (database, authentication, storage)
+		\item \texttt{@supabase/ssr}: Server-side rendering support for Next.js applications (replacing the deprecated \texttt{@supabase/auth-helpers-nextjs})
+	\end{itemize}
 	
 	The component serves as the primary user interface for accessing and interpreting the collected sensor measurements, making it the central algorithm in the data visualization pipeline.
 	

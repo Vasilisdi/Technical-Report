@@ -126,6 +126,25 @@
 \end{tabular}
 \end{table}
 
+
+
+\begin{table}[h!]
+	\centering
+	\caption{Router and Network Configuration Specifications}
+	\label{tab:router_specs}
+	\begin{tabular}{|c|l|l|p{3cm}|}
+		\hline
+		\textbf{\#} & \textbf{Property} & \textbf{Value} & \textbf{Description} \\ \hline
+		1 & Router IP (Gateway) & 192.168.2.1 & Local private IP address serving as network gateway \\ \hline
+		2 & Operating Band & 2.4 GHz & Longer range frequency, suitable for IoT applications \\ \hline
+		3 & Channel & 11 & Optimized channel selection to minimize interference \\ \hline
+		4 & Security Protocol & WPA2-Personal (AES/CCMP) & Enterprise-grade encryption for data protection \\ \hline
+		5 & Signal Strength (RSSI) & 93\% / -42 dBm & Excellent connection quality with minimal packet loss \\ \hline
+		6 & Link Speed & 130 Mbps & More than adequate bandwidth for sensor data transmission \\ \hline
+		7 & Internet Bandwidth & 10 Mbps & Sufficient for external data transmission requirements \\ \hline
+	\end{tabular}
+\end{table}
+
 \clearpage 
 
 
@@ -541,6 +560,85 @@
 \end{algorithmic}
 
 \clearpage
+
+
+
+
+\noindent\textbf{Algorithm 7: Testing Results}
+
+\begin{algorithmic}[1]
+	\STATE $\text{import time}$
+	\STATE $\text{import numpy as np}$
+	\STATE $\text{from sourceCode.utils import loadconfig}$
+	\STATE $\text{from sourceCode.dataprocessing import computeenvelope, computefft, calculateamplitude, plotfft, unbalancing}$
+	\STATE $\text{from sourceCode.serialcommunication import setupserialconnection, readserialdata}$
+	
+	\STATE
+	\STATE $\text{config = loadconfig()}$
+	
+	\STATE
+	\STATE $\text{baudrate = config['serial']['baudrate']}$
+	\STATE $\text{port = config['serial']['portwindows']}$
+	\STATE $\text{rpm = config['rpm']}$
+	\STATE $\text{threshold = config['threshold']}$
+	\STATE $\text{ser = setupserialconnection(port, baudrate)}$
+	
+	\STATE
+	\STATE $\text{time.sleep(1)}$
+	\STATE $\text{ser.resetinputbuffer}$
+	
+	\STATE
+	\STATE $\text{history = []}$
+	\STATE $\text{historyX = []}$
+	\STATE $\text{historyY = []}$
+	\STATE $\text{historyZ = []}$
+	\STATE $\text{timewindow = config['timewindow']}$
+	\STATE $\text{timestamps = []}$
+	\STATE $\text{starttime = time.time()}$
+	
+	\STATE
+	\STATE $\text{try:}$
+	\STATE \hspace{0.5cm} $\text{while time.time() - starttime < timewindow:}$
+	\STATE \hspace{1.0cm} $\text{timestamp = time.time()}$
+	\STATE \hspace{1.0cm} $\text{timestamps.append(timestamp)}$
+	\STATE \hspace{1.0cm} $\text{col1, col2, col3 = readserialdata(ser)}$
+	\STATE \hspace{1.0cm} $\text{amplitude = calculateamplitude(col1, col2, col3)}$
+	\STATE \hspace{1.0cm} $\text{history.append(amplitude)}$
+	\STATE \hspace{1.0cm} $\text{historyX.append(col1)}$
+	\STATE \hspace{1.0cm} $\text{historyY.append(col2)}$
+	\STATE \hspace{1.0cm} $\text{historyZ.append(col3)}$
+	
+	\STATE
+	\STATE \hspace{0.5cm} $\text{timediffs = np.diff(timestamps)}$
+	\STATE \hspace{0.5cm} $\text{Fs = 1 / np.mean(timediffs)}$
+	
+	\STATE
+	\STATE \hspace{0.5cm} $\text{L = 1000}$
+	\STATE \hspace{0.5cm} $\text{ylabels = ["|P1(f)|", "|P1X(f)|", "|P1Y(f)|", "|P1Z(f)|"]}$
+	
+	\STATE
+	\STATE \hspace{0.5cm} $\text{for i, data in enumerate([history, historyX, historyY, historyZ]):}$
+	\STATE \hspace{1.0cm} $\text{P1, f = computefft(data, Fs, L)}$
+	\STATE \hspace{1.0cm} $\text{titles = [}$
+	\STATE \hspace{1.5cm} $\text{"Single-Sided Amplitude Spectrum of resultant acceleration",}$
+	\STATE \hspace{1.5cm} $\text{"Single-Sided Amplitude Spectrum of X-axis",}$
+	\STATE \hspace{1.5cm} $\text{"Single-Sided Amplitude Spectrum of Y-axis",}$
+	\STATE \hspace{1.5cm} $\text{"Single-Sided Amplitude Spectrum of Z-axis"}$
+	\STATE \hspace{1.0cm} $\text{]}$
+	\STATE \hspace{1.0cm} $\text{print(unbalancing(f, rpm, P1, threshold))}$
+	\STATE \hspace{1.0cm} $\text{plotfft(P1, f, titles[i], ylabels[i])}$
+	
+	\STATE
+	\STATE \hspace{0.5cm} $\text{for i, data in enumerate([history, historyX, historyY, historyZ]):}$
+	\STATE \hspace{1.0cm} $\text{Envelope = computeenvelope(data)}$
+	
+	\STATE
+	\STATE $\text{except KeyboardInterrupt:}$
+	\STATE \hspace{0.5cm} $\text{ser.close()}$
+\end{algorithmic}
+
+\clearpage
+
 
 
 

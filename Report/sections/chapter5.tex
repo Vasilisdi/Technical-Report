@@ -3,22 +3,53 @@
 
 \section{Introduction}
 {
-	Comprehensive testing protocols were implemented to validate system functionality and reliability across all components. This entails that performance metrics are being tracked so as to figure out what the potential delays and software malfunctions could be. 
+	First and foremost, comprehensive testing protocols were implemented to validate system functionality and reliability across all components. Performance metrics were tracked to identify potential delays, data loss, or software malfunctions.  
 	
-	In Chapter \ref{chap4} it has been articulated that there is always the apprehension that there might be some data jam or lack because data are being sent via APIs or serial communication. In addition to this, there might be caused some delay due to the fact that the data being sent from Arduino to Raspberry are sent in batch. This leads to the need of tracking the testing time as well. 
+	As previously discussed in Chapter \ref{chap4}, concerns regarding data transmission integrity were addressed. The Arduino UNO's hardware architecture imposes specific constraints on data handling capabilities, with its 64-byte serial buffers limiting maximum sustainable throughput to approximately 600 samples per second when transmitting three-axis acceleration data. This necessitated careful design of the communication protocol to prevent buffer overflows while maintaining real-time monitoring capabilities.
 }
 
 \section{System Verification and Validation}
 {
+	The system was tested across all stages of data transmission, with careful consideration of the Arduino's operational limits. Sensor readings were first collected by the Arduino, which processed the raw signals from each axis and calculated the amplitude. The Arduino successfully managed the incoming sensor data without loss or timing issues, operating well within its 64-byte buffer constraints at the configured 115200 baud rate.
+	
+	Subsequently, the Arduino transmitted these batches to the Raspberry Pi via serial communication using an optimized request-response protocol. In this synchronous communication pattern, the Arduino sends exactly one line of three comma-separated acceleration values at a time, effectively preventing buffer overflows while ensuring data integrity. The Raspberry Pi efficiently received, buffered, and organized the incoming data, demonstrating that the system could handle the expected data rate of approximately 600 samples per second without data loss.
+	
+	\begin{figure}[h]  
+		\centering  
+		\includegraphics[width=\linewidth]{figures/data transmitting.png}  
+		\caption{Transmitting system operational validation.}  
+		\label{fig:datatransmitting}  
+	\end{figure}
+	
+	Finally, the Raspberry Pi transmitted the data to the Supabase API. By comparing the readings collected on the Raspberry Pi with the data successfully posted to Supabase, it was confirmed that the entire pipeline—from sensor to cloud—worked reliably. The main limitation observed was internet speed; however, the Wi-Fi link itself was more than sufficient to handle local transfers without delay.
+	
+	Overall, each component of the system—from sensor to Arduino, Arduino to Raspberry Pi, and Raspberry Pi to Supabase—was capable of managing the data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second. This is also illustrated in Figure \ref{fig:datatransmitting}, where the raw data from the Arduino is 20,684, the data received by the Raspberry Pi is also 20,684, and the processed data of length 500 has been received by Supabase. This can be easily validated using the `values` column.
+	
+	The Arduino reads three analog channels and sends the data to the Raspberry Pi via serial communication at 115,200 baud. Each reading from a channel is converted to a number (0–1023) and sent as a line of text with comma separators and a newline. Considering the text format and separators, each line is approximately 16–18 bytes.
+	
+	With a buffer of 10 samples per channel, a full buffer send is roughly 180 bytes. At 115,200 baud, the serial connection can transmit about 11,520 bytes per second, which allows approximately 64 buffer sends per second. This corresponds to roughly 640 samples per second per channel.
+	
+	Over a 30-second measurement window, the Raspberry Pi is expected to receive about 19,200 samples per channel, or roughly 57,600 samples total across the three channels. The actual measured data of 20,684 samples per channel closely matches this estimate, confirming that the system reliably handles the expected data rate without loss.
+	
+	Although verification of the data transmitted from the Arduino to the Raspberry Pi and ultimately posted to a Vercel dashboard was the most crucial part of this project, there is always the possibility of issues in other sections, such as Vercel’s data reception. For this reason, the amount of data received and posted by Vercel was also checked, and it was validated that the entire list of 500 data points was properly read.
+	
+	The whole system was further checked for performance using cronjob commands, performing recursive data reading over an entire day. No temperature or similar failures of the electronics, microcomputer, or microcontroller were detected, confirming that the system operated reliably.
+	
 	
 }
+
 
 \section{Data Depiction and Visualization}
 {
+	Prior to the system verification described in the previous section, testing was conducted using a simplified testing algorithm related to the main algorithm. These implementations can be found in Appendix \ref{subsec:raspberrypi-algorithm} (Algorithm 1 and Algorithm 7).
 	
+	This algorithm focused on initial results visualization, demonstrating that both raw time-domain data and frequency-domain data could be successfully processed and simulated within the Python interface.
+	
+	Visualization tools and charts were employed to depict the transmitted sensor data, enabling analysis of trends, amplitudes, and anomalies over time. This section illustrates how the system ensures data is accurately captured and displayed for further processing within the Arduino's data handling capabilities.
 }
+
 
 \subsection{Healthy Reference Storage Test}
 {
-	
+	Test cases were performed to verify the storage and retrieval of healthy reference data within the Arduino's serial communication limits. The sensor-to-Arduino and Arduino-to-Raspberry Pi pathways successfully managed all expected data without loss or delay, operating within the 600 samples per second constraint and ensuring that the reference dataset remained complete and accurate for validation purposes. The system demonstrated consistent performance across multiple test runs, confirming that the Arduino's buffer management and communication protocol effectively prevented data congestion while maintaining the required sampling rate for vibration monitoring applications.
 }
