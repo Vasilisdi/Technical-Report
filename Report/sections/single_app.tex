@@ -643,121 +643,89 @@
 
 
 \subsection{Vercel Webpage Implementation}
-\label{subsec:vercel}
+\label{subsec:vercel_frequency}
 
-\noindent\textbf{Data Visualization Dashboard Implementation for Sensor Measurements}
+\noindent\textbf{Vibration Frequency Data Visualization Dashboard Implementation}
 
 \begin{algorithmic}[1]
-	\STATE $\text{import React, { useEffect, useState } from 'react'}$
-	\STATE $\text{import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'}$
+	\STATE \texttt{'use client';}
+	\STATE \texttt{import \{ useEffect, useState \} from 'react'}
+	\STATE \texttt{import \{ LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer \} from 'recharts'}
+
+	\STATE \texttt{type Measurement = \{}
+	\STATE \hspace{0.5cm} \texttt{id: string;}
+	\STATE \hspace{0.5cm} \texttt{startMeasurement: string;}
+	\STATE \hspace{0.5cm} \texttt{endMeasurement: string;}
+	\STATE \hspace{0.5cm} \texttt{coordinate: string;}
+	\STATE \hspace{0.5cm} \texttt{values: number[];}
+	\STATE \hspace{0.5cm} \texttt{frequencies: number[];}
+
+	\STATE \texttt{export default function Home() \{}
+	\STATE \hspace{0.5cm} \texttt{const [measurements, setMeasurements] = useState<Measurement[]>([]);}
+	\STATE \hspace{0.5cm} \texttt{const [error, setError] = useState<string | null>(null);}
 	
-	\STATE $\text{type Measurement = {}}$
-	\STATE $\text{}$
-	\STATE \hspace{0.5cm} $\text{id: string;}$
-	\STATE \hspace{0.5cm} $\text{port\_windows: "COM3"}$
-	\STATE \hspace{0.5cm} $\text{startMeasurement: string;}$
-	\STATE \hspace{0.5cm} $\text{endMeasurement: string;}$
-	\STATE \hspace{0.5cm} $\text{coordinate: string;}$
-	\STATE \hspace{0.5cm} $\text{values: number[];}$
+	\STATE
+	\STATE \hspace{0.5cm} \texttt{useEffect(() => \{}
+	\STATE \hspace{1.0cm} \texttt{const fetchData = async () => \{}
+	\STATE \hspace{1.5cm} \texttt{try}
+	\STATE \hspace{2.0cm} \texttt{const res = await fetch('/api/measurements');}
+	\STATE \hspace{2.0cm} \texttt{if (!res.ok) throw new Error('Error fetching data');}
+	\STATE \hspace{2.0cm} \texttt{const data: Measurement[] = await res.json();}
+	\STATE \hspace{2.0cm} \texttt{setMeasurements(data);}
+	\STATE \hspace{1.5cm} \texttt{\} catch (err) \{}
+	\STATE \hspace{2.0cm} \texttt{setError((err as Error).message);}
+	\STATE \hspace{1.0cm} \texttt{fetchData();}
 
+	\STATE \hspace{0.5cm} \texttt{if (error) return <div>Error: \{error\}</div>; }
+	\STATE \hspace{0.5cm} \texttt{function getHealthyAndCurrent(measurements: Measurement[]) \{}
+	\STATE \hspace{1.0cm} \texttt{const grouped: Record<string, \{ healthy?: Measurement; current?: Measurement \}> = \{\};}
+	\STATE \hspace{1.0cm} \texttt{for (const m of measurements) \{}
+	\STATE \hspace{1.5cm} \texttt{const coord = m.coordinate;}
+	\STATE \hspace{1.5cm} \texttt{if (!grouped[coord]) grouped[coord] = \{ healthy: m, current: m \};}
+	\STATE \hspace{1.5cm} \texttt{else \{}
+	\STATE \hspace{2.0cm} \texttt{if (new Date(m.startMeasurement).getTime() < new Date(grouped[coord].healthy!.startMeasurement).getTime()) grouped[coord].healthy = m;}
+	\STATE \hspace{2.0cm} \texttt{if (new Date(m.endMeasurement).getTime() > new Date(grouped[coord].current!.endMeasurement).getTime()) grouped[coord].current = m;}
+	\STATE \hspace{1.5cm} \texttt{\}}
+	\STATE \hspace{1.0cm} \texttt{\}}
+	\STATE \hspace{1.0cm} \texttt{return grouped;}
+	\STATE \hspace{0.5cm} \texttt{\}}
 	
 	\STATE
-	\STATE $\text{export default function Home() {}}$
-	\STATE \hspace{0.5cm} $\text{const [measurements, setMeasurements] = useState<Measurement[]>([])}$
-	\STATE \hspace{0.5cm} $\text{const [error, setError] = useState<string | null>(null)}$
-		
+	\STATE \hspace{0.5cm} \texttt{const grouped = getHealthyAndCurrent(measurements);}
 	\STATE
-	\STATE \hspace{0.5cm} $\text{useEffect(() => {}}$
-	\STATE \hspace{1.0cm} $\text{const fetchData = async () => {}}$
-	\STATE \hspace{1.5cm} $\text{try {}}$
-	\STATE \hspace{2.0cm} $\text{const res = await fetch('/api/measurements')}$
-	\STATE \hspace{2.0cm} $\text{if (!res.ok) {}}$
-	\STATE \hspace{2.5cm} $\text{throw new Error('Error fetching data')}$
-	\STATE \hspace{2.0cm} $\text{const data: Measurement[] = await res.json()}$
-	\STATE \hspace{2.0cm} $\text{setMeasurements(data)}$
-	\STATE \hspace{1.5cm} $\text{} catch (err) {}$
-	\STATE \hspace{2.0cm} $\text{setError((err as Error).message)}$
-			
-	\STATE \hspace{1.0cm} $\text{fetchData()}$
-
-		
+	\STATE \hspace{0.5cm} \texttt{const combineData = (healthy?: Measurement, current?: Measurement) => \{}
+	\STATE \hspace{1.0cm} \texttt{if (!healthy and !current) return [];}
+	\STATE \hspace{1.0cm} \texttt{const length = healthy ? healthy.values.length : current!.values.length;}
+	\STATE \hspace{1.0cm} \texttt{const combined: \{ frequency: number; healthyValue?: number; currentValue?: number \}[] = [];}
+	\STATE \hspace{1.0cm} \texttt{for (let i = 0; i < length; i++) \{}
+	\STATE \hspace{1.5cm} \texttt{combined.push(\{}
+	\STATE \hspace{2.0cm} \texttt{frequency: healthy?.frequencies[i] ?? current!.frequencies[i],}
+	\STATE \hspace{2.0cm} \texttt{healthyValue: healthy?.values[i],}
+	\STATE \hspace{2.0cm} \texttt{currentValue: current?.values[i]}
+	\STATE \hspace{1.5cm} \texttt{\});}
+	\STATE \hspace{1.0cm} \texttt{\}}
+	\STATE \hspace{1.0cm} \texttt{return combined;}
+	\STATE \hspace{0.5cm} \texttt{\};}
+	
 	\STATE
-	\STATE \hspace{0.5cm} $\text{if (error) {}}$
-	\STATE \hspace{1.0cm} $\text{return <div>Error: {error}</div>}$
-		
+	\STATE \hspace{0.5cm} \texttt{const xData = combineData(grouped.X?.healthy, grouped.X?.current);}
+	\STATE \hspace{0.5cm} \texttt{const yData = combineData(grouped.Y?.healthy, grouped.Y?.current);}
+	\STATE \hspace{0.5cm} \texttt{const zData = combineData(grouped.Z?.healthy, grouped.Z?.current);}
+	\STATE \hspace{0.5cm} \texttt{const magnitudeData = combineData(grouped.Magnitude?.healthy, grouped.Magnitude?.current);}
+	
 	\STATE
-	\STATE \hspace{0.5cm} $\text{const transformData = (measurement: Measurement) => {}}$
-	\STATE \hspace{1.0cm} $\text{const start = new Date(measurement.startMeasurement)}$
-	\STATE \hspace{1.0cm} $\text{const end = new Date(measurement.endMeasurement)}$
-	\STATE \hspace{1.0cm} $\text{const duration = end.getTime() - start.getTime()}$
-	\STATE \hspace{1.0cm} $\text{const timeStep = duration / measurement.values.length}$
-			
-	\STATE \hspace{1.0cm} $\text{return measurement.values.map((value, index) => ({}}$
-	\STATE \hspace{1.5cm} $\text{time: new Date(start.getTime() + timeStep * index),}$
-	\STATE \hspace{1.5cm} $\text{value,}$
-		
-		\STATE
-		\STATE \hspace{0.5cm} $\text{const xAxisMeasurement = measurements.find(m => m.coordinate === 'X')}$
-		\STATE \hspace{0.5cm} $\text{const yAxisMeasurement = measurements.find(m => m.coordinate === 'Y')}$
-		\STATE \hspace{0.5cm} $\text{const zAxisMeasurement = measurements.find(m => m.coordinate === 'Z')}$
-		\STATE \hspace{0.5cm} $\text{const magnitudeMeasurement = measurements.find(m => m.coordinate === 'Magnitude')}$
-		
-		\STATE
-		\STATE \hspace{0.5cm} $\text{const combineData = () => {}}$
-			\STATE \hspace{1.0cm} $\text{if (!xAxisMeasurement || !yAxisMeasurement || !zAxisMeasurement) return []}$
-			
-			\STATE \hspace{1.0cm} $\text{const xData = transformData(xAxisMeasurement)}$
-			\STATE \hspace{1.0cm} $\text{const yData = transformData(yAxisMeasurement)}$
-			\STATE \hspace{1.0cm} $\text{const zData = transformData(zAxisMeasurement)}$
-			
-			\STATE \hspace{1.0cm} $\text{const combinedData = xData.map((xItem, index) => {}}$
-				\STATE \hspace{1.5cm} $\text{const yItem = yData[index]}$
-				\STATE \hspace{1.5cm} $\text{const zItem = zData[index]}$
-				\STATE \hspace{1.5cm} $\text{return {}}$
-					\STATE \hspace{2.0cm} $\text{time: xItem.time,}$
-					\STATE \hspace{2.0cm} $\text{x: xItem.value,}$
-					\STATE \hspace{2.0cm} $\text{y: yItem.value,}$
-					\STATE \hspace{2.0cm} $\text{z: zItem.value,}$
-			
-			\STATE \hspace{1.0cm} $\text{return combinedData}$
-		
-		\STATE
-		\STATE \hspace{0.5cm} $\text{return (}$
-		\STATE \hspace{1.0cm} $\text{<div>}$
-		\STATE \hspace{1.5cm} $\text{<h1>Measurements</h1>}$
-		\STATE \hspace{1.5cm} $\text{{measurements.length === 0 ? (}}$
-			\STATE \hspace{2.0cm} $\text{<p>No measurements found</p>}$
-			\STATE \hspace{1.5cm} $\text{) : (}$
-			\STATE \hspace{2.0cm} $\text{<>}$
-			\STATE \hspace{2.5cm} $\text{<ResponsiveContainer width="100\%" height={400}>}$
-			\STATE \hspace{3.0cm} $\text{<LineChart data={combineData()}>}$
-			\STATE \hspace{3.5cm} $\text{<CartesianGrid strokeDasharray="3 3" />}$
-			\STATE \hspace{3.5cm} $\text{<XAxis dataKey="time" />}$
-			\STATE \hspace{3.5cm} $\text{<YAxis />}$
-			\STATE \hspace{3.5cm} $\text{<Tooltip />}$
-			\STATE \hspace{3.5cm} $\text{<Legend />}$
-			\STATE \hspace{3.5cm} $\text{<Line type="monotone" dataKey="x" stroke="8884d8" name="X Axis" />}$
-			\STATE \hspace{3.5cm} $\text{<Line type="monotone" dataKey="y" stroke="82ca9d" name="Y Axis" />}$
-			\STATE \hspace{3.5cm} $\text{<Line type="monotone" dataKey="z" stroke="ff7300" name="Z Axis" />}$
-			\STATE \hspace{3.0cm} $\text{</LineChart>}$
-			\STATE \hspace{2.5cm} $\text{</ResponsiveContainer>}$
-			\STATE \hspace{2.5cm} $\text{magnitudeMeasurement }$
-			\STATE \hspace{3.0cm} $\text{<ResponsiveContainer width="100\%" height={400}>}$
-			\STATE \hspace{3.5cm} $\text{<LineChart data={transformData(magnitudeMeasurement)}>}$
-			\STATE \hspace{4.0cm} $\text{<CartesianGrid strokeDasharray="3 3" />}$
-			\STATE \hspace{4.0cm} $\text{<XAxis dataKey="time" />}$
-			\STATE \hspace{4.0cm} $\text{<YAxis />}$
-			\STATE \hspace{4.0cm} $\text{<Tooltip />}$
-			\STATE \hspace{4.0cm} $\text{<Legend />}$
-			\STATE \hspace{4.0cm} $\text{<Line type="monotone" dataKey="value" stroke="0000FF" name="Magnitude" />}$
-			\STATE \hspace{3.5cm} $\text{</LineChart>}$
-			\STATE \hspace{3.0cm} $\text{</ResponsiveContainer>}$
-			
-			\STATE \hspace{2.0cm} $\text{</>}$
-			
-		\STATE \hspace{1.0cm} $\text{</div>}$
-
+	\STATE \hspace{0.5cm} \texttt{return (}
+	\STATE \hspace{1.0cm} \texttt{<div>}
+	\STATE \hspace{1.5cm} \texttt{<h1>Vibration Frequency Dashboard</h1>}
+	\STATE \hspace{1.5cm} \texttt{\{measurements.length === 0 ? <p>Loading measurements...</p> : <>\}}
+	\STATE \hspace{2.0cm} \texttt{/* X Axis */} 
+	\STATE \hspace{2.0cm} \texttt{<h2>X Axis</h2>}
+	\STATE \hspace{2.0cm} \texttt{<ResponsiveContainer width="100per cent" height={700}><LineChart data={xData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="frequency" label=\{\{ value: 'Frequency (Hz)', position: 'insideBottom', offset: -5 \}\} /><YAxis label=\{\{ value: 'Amplitude', angle: -90, position: 'insideLeft' \}\} /><Tooltip /><Legend /><Line type="monotone" dataKey="healthyValue" stroke="8884d8" name="Healthy State" strokeWidth={3}/><Line type="monotone" dataKey="currentValue" stroke="82ca9d" name="Current State" /></LineChart></ResponsiveContainer>}
+	\STATE \hspace{1.5cm} \texttt{/* Y, Z, Magnitude axes follow the same pattern as X Axis */}
+	\STATE \hspace{1.0cm} \texttt{</> \}}
+	\STATE \hspace{1.0cm} \texttt{</div>);}
 \end{algorithmic}
+
 
 \clearpage
 

@@ -37,6 +37,7 @@
 \section{Software Architecture and Data Flow}
 
 \subsection{The Arduino UNO Algorithm} 
+\label{subsec:arduino}
 {
 	The main focus of the Arduino UNO sketch is to implement a batched data processing strategy that enables sequential transmission of sensor data to the Raspberry Pi 4. This design methodology specifically addresses the memory constraints of the Arduino UNO by minimizing the instantaneous SRAM utilization through carefully sized data batching.
 	
@@ -89,6 +90,29 @@
 	Furthermore, the script incorporates several control variables and system parameters that contribute to cumulative memory consumption. These include loop counters, temporary variables, and the program instruction pointer, which collectively add approximately 20-30 bytes of overhead. This memory fragmentation, combined with the inherent memory management characteristics of the AVR architecture, creates a persistent risk of stack-heap collisions and memory exhaustion scenarios. The implementation therefore employs conservative memory practices, including static allocation and avoidance of dynamic memory operations, to mitigate these risks and ensure system reliability during extended operation periods.
 	
 	The chosen architecture represents an optimal balance between data throughput requirements and memory constraints, ensuring reliable operation while maximizing the available resources for future expansions or additional functionality.
+	
+	The FFT is applied to the acceleration data collected from the Arduino to analyze its frequency content. The data from all three axes (X, Y, Z) and the combined amplitude are transformed from the time domain to the frequency domain. The actual sampling rate \(F_s\) is calculated from the timestamps of the collected data, and the FFT is performed using a configurable number of points \(L\). The result is a single-sided amplitude spectrum for each signal. A larger \(F_s\) increases the maximum measurable frequency, while a larger \(L\) improves frequency resolution. The detailed steps of this process are summarized in Algorithm~\ref{alg:fft-processing}.
+	
+	\begin{algorithm}[H]
+		\caption{FFT Processing of Arduino Sensor Data}
+		\label{alg:fft-processing}
+		\begin{algorithmic}[1]
+			\REQUIRE Time-domain sensor data for X, Y, Z axes and combined amplitude, measurement timestamps, FFT length $L$
+			\ENSURE Single-sided amplitude spectrum $P1$ and frequency vector $f$ for each signal
+			
+			\STATE Compute differences between successive timestamps
+			\STATE Calculate sampling rate: $F_s \gets 1 / \text{average(time differences)}$
+			\STATE Choose number of FFT points $L$
+			\FOR{each signal in [Amplitude, X, Y, Z]}
+			\STATE Compute FFT of the signal with length $L$
+			\STATE Compute magnitude and normalize by $L$
+			\STATE Keep first half of the FFT (single-sided spectrum)
+			\STATE Multiply all values except first and last by 2 to conserve energy
+			\STATE Generate frequency vector: $f \gets F_s / L \times$ bin indices
+			\ENDFOR
+		\end{algorithmic}
+	\end{algorithm}
+	
 	
 }  
 
@@ -201,11 +225,14 @@
 {
 	\label{subsec:vercelsec}
 	
-	After sending all data to Supabase, you can deploy this Vercel-friendly application that visualizes your sensor measurements. The project structure is optimized for Next.js with TypeScript and includes all necessary configuration files. When you deploy this application to Vercel, you'll receive a unique URL that you can share with specific email addresses.
+	After sending all data to Supabase, you can deploy this Next.Js-friendly application that visualizes your sensor measurements. The project structure is optimized for Next.js with TypeScript and includes all necessary configuration files. When you deploy this application to Vercel, you'll receive a unique URL that you can share with specific email addresses.
 	
-	The application features a web page that automatically fetches measurement data from your Supabase database through an API endpoint and displays it in interactive charts. When users access the shared link, the code executes and renders two types of diagrams: one combined chart showing X, Y, and Z axis readings as separate colored lines, and another chart displaying magnitude values if available.
+	Vercel is an online platform for hosting web applications and can be used to create dynamic pages that fetch and display real-time data. In your project, Vercel hosts a Next.js dashboard that retrieves sensor measurements from a Supabase API. Using classic client-side rendering (CSR), your React component calls fetch('/api/measurements') on the client, awaits the data, and then uses it to create plots. The charts are rendered only after the data arrives, allowing users to see the most recent measurements dynamically without requiring a page rebuild.
 	
-	The visualization includes timestamps aligned with your measurement data, responsive design that works on different screen sizes, and interactive elements like tooltips that show exact values when hovering over data points. The charts are built with Recharts library and provide a clear graphical representation of your sensor's time-series data.
+	
+	The dashboard is designed to compare current sensor readings with a stored healthy baseline for each machinery coordinate (X, Y, Z, Magnitude). The earliest measurement for each coordinate is considered the healthy state, while the latest measurement is treated as the current state. The data is processed in the client by grouping measurements and combining the healthy and current values for each frequency point, producing arrays that are then used for plotting. This structure allows for a clear visual comparison of baseline versus current vibration data for each axis.
+		
+	Each plot displays two lines on the same chart: one representing the healthy baseline and the other representing the current measurements. This enables users to immediately identify deviations or anomalies in the machinery’s performance. The system can be enhanced with deviation highlighting, real-time updates via Supabase Realtime, or server-side preprocessing for large datasets. Overall, this approach creates a fully dynamic, interactive monitoring dashboard hosted on Vercel that provides immediate visual feedback on machinery health.
 	
 	The access control can be manipulated by configuring Vercel's authentication settings to restrict the deployment URL to only specific email addresses, ensuring your sensor data remains private while being easily accessible to authorized viewers.
 	
@@ -241,7 +268,7 @@
 	The most important algorithm that is being called is the page.tsx component, which serves as the main data visualization dashboard that fetches sensor measurements from the Supabase database through the API endpoint, processes the time-series data, and renders interactive charts displaying X, Y, Z axis readings along with magnitude values using the Recharts library for comprehensive sensor data analysis and monitoring.
 	
 	This algorithm implements the core functionality of different end points. It fetches, processes and renders charts. More details on this can be looked upon the algorithms of the Subsection \ref{subsec:vercel}, while a snippet yields some intuition into the aforementioned practice (see Algorithm \ref{alg:vercel}).
-
+	
 	\begin{algorithm}[H]
 		\caption{Sensor Data Visualization Algorithm}
 		\label{alg:vercel}
@@ -254,9 +281,8 @@
 			\STATE \hspace{0.5cm} Initialize state for measurements and error
 			\STATE \hspace{0.5cm} Fetch data from API endpoint on component mount
 			\STATE \hspace{0.5cm} Handle errors and loading states
-			\STATE \hspace{0.5cm} Transform timestamp data for visualization
-			\STATE \hspace{0.5cm} Combine X, Y, Z coordinate data streams
-			\STATE \hspace{0.5cm} Render interactive charts using Recharts
+			\STATE \hspace{0.5cm} Combine X, Y, Z coordinate data of reference and current state
+			\STATE \hspace{0.5cm} Render interactive charts using Recharts of X , Y , Z and their magnitude separately
 			\STATE \textbf{End Function}
 			
 			\STATE
@@ -278,6 +304,9 @@
 	The component serves as the primary user interface for accessing and interpreting the collected sensor measurements, making it the central algorithm in the data visualization pipeline.
 	
 	This software runs in real time keeping track of all measurements of the actual mechanism. It stores the measurements of the first run as a healthy-reference point and every other measurement will be compared to that healthy-state reference dataset. These historical data can be critical so as to locate the critical frequencies and any potential peaks magnitude increase.
+
+	
+
 }
 
 

@@ -5,14 +5,47 @@
 {
 	First and foremost, comprehensive testing protocols were implemented to validate system functionality and reliability across all components. Performance metrics were tracked to identify potential delays, data loss, or software malfunctions.  
 	
-	As previously discussed in Chapter \ref{chap4}, concerns regarding data transmission integrity were addressed. The Arduino UNO's hardware architecture imposes specific constraints on data handling capabilities, with its 64-byte serial buffers limiting maximum sustainable throughput to approximately 600 samples per second when transmitting three-axis acceleration data. This necessitated careful design of the communication protocol to prevent buffer overflows while maintaining real-time monitoring capabilities.
+	As previously discussed in Chapter \ref{chap4}, concerns regarding data receiving and  transmission integrity were addressed. The Arduino UNO's hardware architecture imposes specific constraints on data handling capabilities, with its 64-byte serial buffers limiting maximum amount of data input to approximately 600 samples (considering the set-up and the implementation of this very project, which ensues that this is the estimated amount of data based on the dataset format) per second when transmitting three-axis acceleration data. This necessitated careful design of the communication protocol to prevent buffer overflows while maintaining real-time monitoring capabilities.
+	
+	In addition, further investigation is carried out considering the Raspberry Pi data handling capacity, since the latter one has to receive, store, process and post data, which activity is far more demanding.
+	
+	For testing and deployment, the Raspberry Pi 4 maintained a continuous connection to a host PC within the same local network. This configuration utilized the Raspbian operating system—a lightweight, Debian-based Linux distribution optimized for embedded systems—running on the Raspberry Pi. Communication between the host PC and Raspberry Pi was established through SSH (Secure Shell protocol), which provided secure remote access and full terminal control over the Raspberry Pi. This setup enabled real-time monitoring, debugging, and management of the data acquisition processes without requiring direct physical access to the embedded system.   
 }
 
 \section{System Verification and Validation}
+
+\subsection{Arduino to Raspberry Pi Data Transmission}
 {
 	The system was tested across all stages of data transmission, with careful consideration of the Arduino's operational limits. Sensor readings were first collected by the Arduino, which processed the raw signals from each axis and calculated the amplitude. The Arduino successfully managed the incoming sensor data without loss or timing issues, operating well within its 64-byte buffer constraints at the configured 115200 baud rate.
 	
+	The Arduino's competency in receiving and transmitting data can be evaluated using Algorithm 7: "Testing Results" in the Appendix (see Section \ref{subsec:raspberrypi-algorithm}). This algorithm allows us to measure the effective sampling performance of the Arduino under typical operating conditions.
+	
+	The sampling rate of the Arduino reflects its ability to acquire data from sensors. As discussed in Chapter \ref{chap4}, memory and processing limitations make data handling complex. In our experiments, the sampling rate \(F_s\) was calculated from the timestamps of acquired data by taking the average interval between successive samples and inverting it. This produced an average sampling rate of approximately 700 Hz, reflecting the Arduino's hardware capabilities.
+	
+	When performing a Fast Fourier Transform (FFT) on the acquired data, the frequency resolution depends on both the sampling rate \(F_s\) and the number of FFT points \(L\):
+	
+	\[
+	\Delta f = \frac{F_s}{L}
+	\]
+	
+	The Arduino reads three analog channels and sends the data to the Raspberry Pi via serial communication at 115,200 baud. Each reading from a channel is converted to a number (0–1023) and sent as a line of text with comma separators and a newline.
+	
+	With a buffer of 10 samples per channel, a full buffer send is roughly 180 bytes. At 115,200 baud, the serial connection can transmit about 11,520 bytes per second, which allows approximately 64 buffer sends per second. This corresponds to roughly 640 samples per second per channel.
+	
+	A larger \(F_s\) increases the maximum measurable frequency, while a larger \(L\) improves frequency resolution. The limitation that we encountered here is the upper limit of 350 Hz in the frequency domain results, while the sampling rate is 700 Hz.
+	
+	Over a 30-second measurement window, the Raspberry Pi is expected to receive about 19,200 samples per channel, or roughly 57,600 samples total across the three channels. The actual measured data of 20,684 samples per channel closely matches this estimate, confirming that the system reliably handles the expected data rate without loss. It can be concluded here that no matter the amount of data received, the implementation described in Section \ref{subsec:arduino} ensures proper handling.
+	
 	Subsequently, the Arduino transmitted these batches to the Raspberry Pi via serial communication using an optimized request-response protocol. In this synchronous communication pattern, the Arduino sends exactly one line of three comma-separated acceleration values at a time, effectively preventing buffer overflows while ensuring data integrity. The Raspberry Pi efficiently received, buffered, and organized the incoming data, demonstrating that the system could handle the expected data rate of approximately 600 samples per second without data loss.
+	
+	It is worth noting that even when the reading window is increased, the Arduino handles data transmission efficiently, as it communicates readings through the serial port in batches of 10 values.
+}
+
+\subsection{Raspberry Pi to Supabase and System Performance}
+{
+	Finally, the Raspberry Pi transmitted the data to the Supabase API. By comparing the readings collected on the Raspberry Pi with the data successfully posted to Supabase, it was confirmed that the entire pipeline—from sensor to cloud—worked reliably. The main limitation observed was internet speed; however, the Wi-Fi link itself was more than sufficient to handle local transfers without delay.
+	
+	Overall, each component of the system—from sensor to Arduino, Arduino to Raspberry Pi, and Raspberry Pi to Supabase—was capable of managing the data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second. This is also illustrated in Figure \ref{fig:datatransmitting}, where the raw data from the Arduino is 20,684, the data received by the Raspberry Pi is also 20,684, and the processed data of length 500 has been received by Supabase. This can be easily validated using the `values` column.
 	
 	\begin{figure}[h]  
 		\centering  
@@ -21,35 +54,85 @@
 		\label{fig:datatransmitting}  
 	\end{figure}
 	
-	Finally, the Raspberry Pi transmitted the data to the Supabase API. By comparing the readings collected on the Raspberry Pi with the data successfully posted to Supabase, it was confirmed that the entire pipeline—from sensor to cloud—worked reliably. The main limitation observed was internet speed; however, the Wi-Fi link itself was more than sufficient to handle local transfers without delay.
-	
-	Overall, each component of the system—from sensor to Arduino, Arduino to Raspberry Pi, and Raspberry Pi to Supabase—was capable of managing the data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second. This is also illustrated in Figure \ref{fig:datatransmitting}, where the raw data from the Arduino is 20,684, the data received by the Raspberry Pi is also 20,684, and the processed data of length 500 has been received by Supabase. This can be easily validated using the `values` column.
-	
-	The Arduino reads three analog channels and sends the data to the Raspberry Pi via serial communication at 115,200 baud. Each reading from a channel is converted to a number (0–1023) and sent as a line of text with comma separators and a newline. Considering the text format and separators, each line is approximately 16–18 bytes.
-	
-	With a buffer of 10 samples per channel, a full buffer send is roughly 180 bytes. At 115,200 baud, the serial connection can transmit about 11,520 bytes per second, which allows approximately 64 buffer sends per second. This corresponds to roughly 640 samples per second per channel.
-	
-	Over a 30-second measurement window, the Raspberry Pi is expected to receive about 19,200 samples per channel, or roughly 57,600 samples total across the three channels. The actual measured data of 20,684 samples per channel closely matches this estimate, confirming that the system reliably handles the expected data rate without loss.
-	
 	Although verification of the data transmitted from the Arduino to the Raspberry Pi and ultimately posted to a Vercel dashboard was the most crucial part of this project, there is always the possibility of issues in other sections, such as Vercel’s data reception. For this reason, the amount of data received and posted by Vercel was also checked, and it was validated that the entire list of 500 data points was properly read.
 	
+	The following tables relate to the performance of the Raspberry Pi, which can handle even larger amounts of data:
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{|c|c|}
+			\hline
+			\textbf{FFT Points} & \textbf{Runtime (s)} \\
+			\hline
+			250   & 36 \\
+			500   & 39 \\
+			750   & 41 \\
+			1000  & 43 \\
+			1500  & 43 \\
+			2500  & 44 \\
+			\hline
+		\end{tabular}
+		\caption{Runtime Raspberry Pi performance for different FFT output lengths}
+		\label{tab:fft_runtime}
+	\end{table}
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{|c|c|c|}
+			\hline
+			\textbf{Time Window (s)} & \textbf{Rows of Raw Data} & \textbf{Runtime (s)} \\
+			\hline
+			30   & 20,684  & 40  \\
+			60   & 41,433  & 68  \\
+			120  & 82,933  & 131 \\
+			\hline
+		\end{tabular}
+		\caption{Runtime Raspberry Pi performance for different time windows}
+		\label{tab:timewindow_runtime}
+	\end{table}
+	
 	The whole system was further checked for performance using cronjob commands, performing recursive data reading over an entire day. No temperature or similar failures of the electronics, microcomputer, or microcontroller were detected, confirming that the system operated reliably.
-	
-	
 }
+
 
 
 \section{Data Depiction and Visualization}
 {
-	Prior to the system verification described in the previous section, testing was conducted using a simplified testing algorithm related to the main algorithm. These implementations can be found in Appendix \ref{subsec:raspberrypi-algorithm} (Algorithm 1 and Algorithm 7).
+	Prior to the system verification described in the previous section, testing was conducted using a simplified algorithm derived from the main implementation. These preliminary implementations can be found in Appendix \ref{subsec:raspberrypi-algorithm} (Algorithm 1 and Algorithm 7).
 	
-	This algorithm focused on initial results visualization, demonstrating that both raw time-domain data and frequency-domain data could be successfully processed and simulated within the Python interface.
+	The purpose of this algorithm was to validate initial data visualization, demonstrating that both raw time-domain signals and frequency-domain data could be successfully processed and simulated within the Python interface. This approach proved efficient during testing, as it enabled rapid verification of expected patterns. In particular, the frequency spectra produced by the FFT could be readily compared with patterns described in the relevant literature, serving as an early confirmation of correct signal behavior.
 	
-	Visualization tools and charts were employed to depict the transmitted sensor data, enabling analysis of trends, amplitudes, and anomalies over time. This section illustrates how the system ensures data is accurately captured and displayed for further processing within the Arduino's data handling capabilities.
-}
-
-
-\subsection{Healthy Reference Storage Test}
-{
-	Test cases were performed to verify the storage and retrieval of healthy reference data within the Arduino's serial communication limits. The sensor-to-Arduino and Arduino-to-Raspberry Pi pathways successfully managed all expected data without loss or delay, operating within the 600 samples per second constraint and ensuring that the reference dataset remained complete and accurate for validation purposes. The system demonstrated consistent performance across multiple test runs, confirming that the Arduino's buffer management and communication protocol effectively prevented data congestion while maintaining the required sampling rate for vibration monitoring applications.
+	For the Vercel-based interface, visualization tools and interactive charts were employed to depict the transmitted sensor data, supporting the analysis of amplitudes, frequency trends, and potential anomalies over time. Upon accessing the deployed webpage, the dashboard dynamically retrieves sensor data from Supabase, compares the current measurements against stored healthy baseline data, and plots both datasets on the same charts. This comparative visualization enables users to identify deviations at a glance, making the dashboard an effective, real-time monitoring tool deployed efficiently on Vercel.
+	
+	The following figures illustrate the deployed Vercel-based dashboard used for vibration data monitoring. The interface presents a series of interactive plots that allow comparison between the stored healthy baseline state of the machinery and the latest current measurements retrieved from Supabase. Each chart provides a clear visual distinction between the two states, enabling the detection of deviations across the X, Y, and Z axes as well as the overall vibration magnitude. By scrolling through the interface, the user can review each coordinate in detail, observing the amplitude-frequency relationships that characterize both normal and potentially anomalous machine conditions.
+	
+	It must also be noted that on each plot two lines are depicted: the blue line corresponds to the healthy state reference, while the green line illustrates the current state of the machinery.
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.7\linewidth]{figures/vercelimage1.png}
+		\caption{Visualization of the X-axis vibration data. The initial view of the Vercel dashboard shows the dynamically loaded measurement data from Supabase, where the healthy baseline (blue) is compared against the current state (green).}
+		\label{fig:vercel1}
+	\end{figure}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.7\linewidth]{figures/vercelimage2.png}
+		\caption{Visualization of the Y-axis vibration data. The chart compares the healthy baseline spectrum (blue reference) with the current sensor measurements (green), enabling the detection of frequency-domain deviations.}
+		\label{fig:vercel2}
+	\end{figure}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.7\linewidth]{figures/vercelimage3.png}
+		\caption{Visualization of the Z-axis vibration data. Similar to the X- and Y-axis plots, the frequency response is depicted with both the healthy baseline (blue) and current state (green), highlighting differences between conditions.}
+		\label{fig:vercel3}
+	\end{figure}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.7\linewidth]{figures/vercelimage4.png}
+		\caption{Visualization of the overall vibration magnitude. This chart combines all three coordinate axes into a single representation, showing the total vibration energy with the healthy baseline (blue) compared against the current state (green).}
+		\label{fig:vercel4}
+	\end{figure}
 }

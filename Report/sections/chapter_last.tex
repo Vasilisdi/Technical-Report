@@ -1,22 +1,35 @@
 \chapter{Conclusions}
 \label{chap_last}
-Εδώ εξηγούμε ότι θα συνοψίσουμε την μελέτη που εκπονήθηκε στα πλαίσια της διπλωματικής.
 {
-\begin{itemize}
-\item summarize how it decides if a bearing is defective
-\item how it collects data
-\item how data is analysed and at what stages it is analysed
-\end{itemize}
-}
+This research has successfully designed, implemented, and validated a complete end-to-end system for machine condition monitoring with a specific focus on bearing defect detection through vibration analysis. The implemented solution effectively integrates hardware components including Arduino UNO, ADXL335 sensor, and Raspberry Pi 4 with software protocols and cloud services such as Supabase and Vercel, creating a reliable pipeline for data acquisition, processing, transmission, and visualization.
+
+The fault identification methodology is based on comparative frequency analysis, where vibration spectra from operational machinery are compared against pre-established healthy baseline spectra. The system processes raw time-domain data through Fast Fourier Transform to generate frequency spectra, which are then visually presented on an interactive Vercel dashboard. The simultaneous display of both healthy baseline and current operational data across X, Y, Z axes and magnitude enables immediate visual identification of potential anomalies.
+
+Data acquisition initiates at the sensor level with the ADXL335 accelerometer mounted on the target machinery and connected to the Arduino UNO microcontroller. The Arduino performs analog-to-digital conversion of triaxial acceleration signals and calculates the resultant magnitude. To address the inherent hardware limitations of the Arduino's 64-byte serial buffer, a sophisticated request-response protocol was developed and implemented. This protocol ensures the Arduino accumulates data in batches of 10 samples per axis and transmits comma-separated data lines containing X, Y, Z, and magnitude values only upon receiving explicit requests from the Raspberry Pi, maintaining a consistent sampling rate of approximately 700 Hz without data loss.
+
+The analytical process is distributed across multiple stages within the system architecture. Initial preprocessing occurs on the Arduino, where raw analog signals are converted to digital acceleration values and magnitude calculations are performed. Primary processing takes place on the Raspberry Pi, where time-domain data undergoes Fast Fourier Transformation to produce frequency-domain spectra essential for bearing fault diagnosis. The processed frequency data is subsequently structured and transmitted to Supabase, which serves as the central data repository for both historical baseline information and current measurements. The final analytical stage occurs on the Vercel dashboard, where frequency spectra are retrieved and presented through interactive visualizations. Although the current implementation requires human interpretation of spectral deviations, the infrastructure supports complete real-time data synchronization and availability.
 
 \section{Summary and Conclusions}
-Εδώ συνοψίζουμε τα αποτελέσματα της διπλωματικής και περιγράφουμε τα συμπεράσματα που προέκυψαν, αρνητικά και θετικά. Επιβεβαιώνουμε την συνεισφορά της διπλωματικής στα προβλήματα που αναφέραμε στην εισαγωγή.
-{
 
-}
+This research has successfully achieved its primary objective of developing and validating a proof-of-concept condition monitoring system utilizing affordable, commercially available components. The implemented solution demonstrates that effective condition monitoring can be accomplished without relying on expensive proprietary systems, thereby significantly reducing the barriers to implementation for predictive maintenance applications. The system design effectively addresses critical embedded constraints, particularly the Arduino's limited buffer capacity, through an innovative communication protocol that ensures data integrity despite hardware limitations. Validation testing confirmed the system's operational reliability, with the Raspberry Pi consistently receiving and processing exactly 20,684 samples per channel during 30-second measurement windows. The deployment of a dynamic, real-time dashboard on Vercel provides an effective interface for operational monitoring and comparative analysis.
+
+Several limitations and challenges were identified during system development and validation. The analytical upper frequency boundary is constrained by the Arduino's effective sampling rate, in accordance with Nyquist theorem requirements. The current system implementation necessitates human intervention for visual spectrum comparison and fault interpretation, introducing subjectivity and limiting scalability. Additionally, the comparative analysis methodology requires the availability of a verified healthy baseline spectrum for each specific machine under monitoring. This threshold is in essence the first run readings or the healthy state readings.
+
+It is also worth stressing that despite the limitations of the Arduino UNO R3 and Raspberry Pi 4, all potential bugs and system malfunctions have been overcome. This ensues that the way the whole project set-up was designed lead to great results and no issues during the operation simulation were noticed.
+
+In conclusion, this thesis establishes that cost-effective IoT-based solutions can provide viable and efficient vibration-based fault detection capabilities. The research contributes a validated architectural blueprint for constructing such systems, addressing practical challenges related to data handling, serial communication, and full-stack deployment. The resulting implementation provides a solid foundation for developing automated, real-time condition monitoring solutions for industrial applications.
 
 \section{Future Research}
-Εδώ δίνουμε ιδέες για επέκταση της διπλωματικής.
-{
 
+The research presented in this thesis provides a comprehensive foundation for vibration data acquisition and visualization, yet the current dependence on visual comparison by human operators for identifying faults at characteristic frequencies represents a significant limitation. This manual interpretation approach introduces subjectivity, requires substantial time investment, and proves impractical for monitoring multiple machines simultaneously. Consequently, the most critical and logical progression for future research involves transitioning from a visualization platform to an automated diagnostic system.
+
+The highest priority for subsequent investigation involves implementing automated fault detection and diagnosis through machine learning methodologies. This direction would require developing advanced feature extraction techniques to automatically identify key characteristics within frequency spectrum data, including amplitudes at specific characteristic fault frequencies—such as Ball Pass Frequency Outer race (BPFO), Ball Pass Frequency Inner race (BPFI), Ball Spin Frequency (BSF), and Fundamental Train Frequency (FTF)—as well as statistical features such as kurtosis, skewness, and root mean square values.
+
+Further research should explore edge computing optimization to support on-device machine learning inference and reduce operational latency. Future work could migrate processing capabilities to more powerful microcontroller units such as the Arduino Nano 33 BLE Sense, featuring a Cortex-M4F processor with hardware floating-point unit support. This architectural enhancement would enable complete Fast Fourier Transform and fault diagnosis pipelines to execute directly on edge devices, communicating only essential alerts and summary data to cloud services, thereby significantly improving system responsiveness and reliability.
+
+Enhanced real-time capabilities and automated alerting mechanisms represent another promising research direction. Integrating Supabase's real-time functionality would enable instantaneous dashboard updates, while advanced alert systems could trigger automated notifications through email, SMS, or API calls to maintenance management systems immediately upon fault detection, effectively transforming the platform from a monitoring tool into a proactive maintenance alert system.
+
+System expansion through multi-sensor data fusion would further improve diagnostic accuracy. Incorporating additional sensors for temperature monitoring and acoustic emission detection would enable the collection of multi-modal data streams. Sophisticated artificial intelligence models could then fuse these diverse data sources to provide more comprehensive and reliable machine health assessments while reducing false positive rates.
+
+Finally, long-term validation through industrial deployment remains essential for practical system evaluation. Extended operational deployment in authentic industrial environments would facilitate the collection of validated fault datasets, enable continuous refinement of machine learning models, and provide crucial evidence regarding the system's economic value and reliability within actual predictive maintenance schedules. This transition from laboratory validation to industrial implementation represents the necessary evolution from proof-of-concept to practical tooling for industry applications.
 }
