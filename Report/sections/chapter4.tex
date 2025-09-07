@@ -222,9 +222,8 @@
 
 
 \subsection{Vercel Implementation and Supabase Integration}
-{
 	\label{subsec:vercelsec}
-	
+{
 	After sending all data to Supabase, you can deploy this Next.Js-friendly application that visualizes your sensor measurements. The project structure is optimized for Next.js with TypeScript and includes all necessary configuration files. When you deploy this application to Vercel, you'll receive a unique URL that you can share with specific email addresses.
 	
 	Vercel is an online platform for hosting web applications and can be used to create dynamic pages that fetch and display real-time data. In your project, Vercel hosts a Next.js dashboard that retrieves sensor measurements from a Supabase API. Using classic client-side rendering (CSR), your React component calls fetch('/api/measurements') on the client, awaits the data, and then uses it to create plots. The charts are rendered only after the data arrives, allowing users to see the most recent measurements dynamically without requiring a page rebuild.
@@ -294,19 +293,38 @@
 		\end{algorithmic}
 	\end{algorithm}
 	
-	The Vercel deployment platform was utilized to host a Next.js application that provides real-time visualization of sensor measurements. The implementation required several Supabase integration packages to ensure secure and efficient data handling:
+	The Vercel deployment platform was utilized to host a Next.js application that provides real-time visualization of sensor measurements. Next.js provides the /api directory, allowing you to write server-side code (like route.ts) alongside your React components. The implementation required several Supabase integration packages to ensure secure and efficient data handling:
 	
 	\begin{itemize}
 		\item \texttt{@supabase/supabase-js}: The official JavaScript client for Supabase services (database, authentication, storage)
 		\item \texttt{@supabase/ssr}: Server-side rendering support for Next.js applications (replacing the deprecated \texttt{@supabase/auth-helpers-nextjs})
 	\end{itemize}
 	
-	The component serves as the primary user interface for accessing and interpreting the collected sensor measurements, making it the central algorithm in the data visualization pipeline.
+	The React component serves as the primary user interface for accessing and interpreting the collected sensor measurements, forming the core of the data visualization pipeline. The page.tsx file defines both the UI structure and client-side logic, demonstrating the use of React for the frontend implementation.
 	
-	This software runs in real time keeping track of all measurements of the actual mechanism. It stores the measurements of the first run as a healthy-reference point and every other measurement will be compared to that healthy-state reference dataset. These historical data can be critical so as to locate the critical frequencies and any potential peaks magnitude increase.
-
+	This software runs in real-time keeping track of all measurements of the actual mechanism. It stores the measurements of the first run as a healthy-reference point and every other measurement will be compared to that healthy-state reference dataset. These historical data can be critical so as to locate the critical frequencies and any potential peaks magnitude increase.
 	
+	In summary, the presentation layer—implemented as a React application—consumes data via a dedicated RESTful API endpoint deployed on Vercel. This endpoint is granted  direct database access by handling authentication and attains data-fetching utilizing the Supabase backend. This architecture successfully facilitates the visualization of real-time sensor data on a dynamic webpage. The complete system data flow, from physical vibration to cloud-based visualization, is illustrated in Figure \ref{fig:dataflow}.
+	
+	\begin{figure}[h]  
+		\centering  
+		\begin{tikzpicture}[node distance=1.5cm]  
+			\node (sensor) [draw, rectangle] {ADXL335};  
+			\node (arduino) [draw, rectangle, below of=sensor] {Arduino};  
+			\node (rpi) [draw, rectangle, below of=arduino] {Raspberry Pi 4};  
+			\node (supabase) [draw, rectangle, below of=rpi] {Supabase};  
+			\node (vercel) [draw, rectangle, below of=supabase] {Vercel API};  
+			\node (react) [draw, rectangle, below of=vercel] {React App};  
+			
+			\draw[->] (sensor) -- node[right] {Analog (0-3.3V)} (arduino);  
+			\draw[->] (arduino) -- node[right] {Serial Data} (rpi);  
+			\draw[->] (rpi) -- node[right] {HTTP POST} (supabase);  
+			\draw[->] (supabase) -- node[right] {SQL Query} (vercel);  
+			\draw[->] (vercel) -- node[right, pos=0.3] {HTTP GET and JSON Response} (react);
+		\end{tikzpicture}  
+		\caption{Complete system architecture and data flow from physical sensor to web visualization dashboard}  
+		\label{fig:dataflow}  
+	\end{figure}
 
 }
-
 

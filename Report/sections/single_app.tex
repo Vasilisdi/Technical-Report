@@ -1,6 +1,6 @@
 % Μεμονωμένο Παράρτημα 
 % ορίζεται ο τίτλος του παραρτήματος
-\edef\chaptertitle{Τίτλος Παραρτήματος}
+\edef\chaptertitle{Tables and Algorithms}
 \label{appendix}
 
 % Μην τροποποιήσετε τις ακόλουθες εντολές
@@ -643,9 +643,9 @@
 
 
 \subsection{Vercel Webpage Implementation}
-\label{subsec:vercel_frequency}
+\label{subsec:vercel}
 
-\noindent\textbf{Vibration Frequency Data Visualization Dashboard Implementation}
+\noindent\textbf{Vibration Frequency Data Visualization Dashboard Implementation - React Frontend}
 
 \begin{algorithmic}[1]
 	\STATE \texttt{'use client';}
@@ -731,25 +731,28 @@
 
 
 
-\noindent\textbf{Auxiliary Vercel Algorithm}
+\noindent\textbf{Supabase Data Retrieval API Endpoint - Vercel API endpoint}
 
 \begin{algorithmic}[1]
-	\STATE \textbf{Import} supabaseAdmin from '../../lib/supabase'
-	\STATE
-	\STATE \textbf{Function} GET():
-	\STATE \hspace{0.5cm} \textbf{Try:}
-	\STATE \hspace{1.0cm} Log "Fetching data from Supabase..."
-	\STATE \hspace{1.0cm} Query measurements table using supabaseAdmin
-	\STATE \hspace{1.0cm} \textbf{If} error occurs:
-	\STATE \hspace{1.5cm} Log error details
-	\STATE \hspace{1.5cm} Return error response with status 500
-	\STATE \hspace{1.0cm} Log fetched data
-	\STATE \hspace{1.0cm} Return JSON response with data
-	\STATE \hspace{0.5cm} \textbf{Catch} error:
-	\STATE \hspace{1.0cm} Log unexpected error
-	\STATE \hspace{1.0cm} Extract error message
-	\STATE \hspace{1.0cm} Return error response with status 500
-	\STATE \textbf{End Function}
+	\STATE \texttt{import \{ supabaseAdmin \} from '../../lib/supabase';}
+	\STATE \texttt{export async function GET() \{}
+	\STATE \hspace{0.5cm} \texttt{try \{}
+	\STATE \hspace{1.0cm} \texttt{console.log("Fetching data from Supabase...");}
+	\STATE \hspace{1.0cm} \texttt{const \{ data, error \} = await supabaseAdmin}
+	\STATE \hspace{1.5cm} \texttt{.from('measurements')}
+	\STATE \hspace{1.5cm} \texttt{.select('*');}
+	\STATE \hspace{1.0cm} \texttt{if (error) \{}
+	\STATE \hspace{1.5cm} \texttt{console.error("Error fetching measurements:", error);}
+	\STATE \hspace{1.5cm} \texttt{return new Response("Error fetching measurements: " + error.message, \{ status: 500 \});}
+	\STATE \hspace{1.0cm} \texttt{\}}
+	\STATE \hspace{1.0cm} \texttt{console.log("Fetched data:", data);}
+	\STATE \hspace{1.0cm} \texttt{return new Response(JSON.stringify(data)}
+	\STATE \hspace{1.5cm} \texttt{headers: \{ "Content-Type": "application/json" \},}
+	\STATE \hspace{1.0cm} \texttt{\});}
+	\STATE \hspace{0.5cm} \texttt{\} catch (err) \{}
+	\STATE \hspace{1.0cm} \texttt{console.error("Unexpected error:", err);}
+	\STATE \hspace{1.0cm} \texttt{// Cast err to Error type to access message}
+	\STATE \hspace{1.0cm} \texttt{const errorMessage = err instanceof Error ? err.message : "Unknown error";}
+	\STATE \hspace{1.0cm} \texttt{return new Response("Unexpected error: " + errorMessage, \{ status: 500 \});}
+	\STATE \hspace{0.5cm} \texttt{\}}
 \end{algorithmic}
-
-
