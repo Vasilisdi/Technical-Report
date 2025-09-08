@@ -86,18 +86,21 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
 	\section{Background}
 	
+	\subsection{Fast-Fourier Transform}
+	\begin{frame}{FFT}
+		\begin{figure}[h]
+			\centering
+			\includegraphics[width=1\linewidth]{images/FFT.png}
+			\caption{Conversion of the time-domain signal into its frequency-domain power representation using the FFT.}
+			\label{fig:FFT}
+		\end{figure}
+	\end{frame}
 	
-	\subsection{Model Background}
-	\begin{frame}{Equipment Operational Anomalies}
+	
+	\subsection{Fault Detection}
+	\begin{frame}{Machinery Fault Tree Analysis}
 	\begin{figure}[h]
 		\centering
 		\resizebox{\columnwidth}{!}{
@@ -131,12 +134,6 @@
 	
 	
 
-
-
-
-
-	
-	
 	\section{Engineering and Design}
 	\begin{frame}
 		\frametitle{System Architecture and Dataflow}
@@ -177,268 +174,147 @@
 	\end{frame}	
 	
 	
+	\begin{frame}{System boundaries}
+		\begin{itemize}[<+-| alert@+>]
+			\item The ADXL335 measurement range is $\pm 3\,g$.
+			\item The Arduino UNO R3 sampling rate is 700 [Hz].
+			\item Flash memory and SRAM limitations require data to be transmitted in batches.
+			\item The frequency-domain analysis is limited to 350 Hz (Nyquist limit).
+			\item The measurement time window determines the total number of samples collected.
+		\end{itemize}
+	\end{frame}
 	
 	
 	
-	
-	
-
+		
+		
 	\section{Implementation}
-	\subsection{Fault Type Classification}
-	\begin{frame}{Fault Type Classification}
-	\begin{figure}[h]
-		\centering
-		\resizebox{\columnwidth}{!}{
-			\begin{tikzpicture}
-				\node (box1) [draw, rectangle] at (0,0) {filtering and decimation};
-				\node (box2) [draw, rectangle, below of=box1, node distance=1cm] {windowing and FFT};
-				\node (box3) [draw, rectangle, below of=box2, node distance=1cm] {tone detection, interpolation and model parameter estimation};
-				\node (box4) [draw, rectangle, below of=box3, node distance=1cm] {fault detection};
-				\node (box5) [draw, rectangle, below of=box4, node distance=1cm] {BPFO and BPFI check};
-				\node (box6) [draw, rectangle, below of=box5, node distance=1cm] {unbalancing, misalignment and looseness check};
-				
-				% Arrows
-				\draw[->] (box1) -- (box2);
-				\draw[->] (box2) -- (box3);
-				\draw[->] (box3) -- (box4);
-				\draw[->] (box4) -- (box5);
-				\draw[->] (box5) -- (box6);
-			\end{tikzpicture}
-		}
-		\caption{The series of checks carried out by the algorithm}
-		\label{fig:checks}
-	\end{figure}	
-	\end{frame}
-	
-	\subsection{Power Spectrum Density calculation}
-	\begin{frame}{Power Spectrum Density calculation}
-	Power Spectrum Density Threshold Calculation:
-	
-	\[
-	\text{PSD} = \frac{(\text{Power Spectrum})^2}{\Delta f \times \text{Noise Power Bandwidth of Window}}
-	\]
-	Where: 
-	\begin{itemize}
-		\item Power spectrum is calculated by taking the average of the magnitude squared of multiple frequency spectra \[ PS = \frac{2 \times \text{X}^2}{N^2} \]
-		\item \[ \Delta f  = \frac{f_{s}}{N} \] is the frequency resolution 
-		\item Noise Power Bandwidth of Window is a correction factor for the rectangular window
-	\end{itemize}
-	\end{frame}
-	
-	\begin{frame}{Power Spectrum Density calculation}
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=0.3\linewidth]{images/PSDCombinedloaded.png}
-		\caption{Combination of all the aforementioned faults (inner case, outer case and bearing ball fault) \cite{Azeem2019}.}
-		\label{fig:PSDCombinedloaded}
-	\end{figure}
-	\end{frame}
-	
-	\subsection{Dynamic signal stability analysis}
-	\begin{frame}{Dynamic signal stability analysis}
-	\begin{figure}[h]
-		\centering
-		\resizebox{\columnwidth}{!}{
-			\begin{tikzpicture}
-				\node (box1) [draw, rectangle] at (0,0) {Dynamic Time Warping (DTW) calculation};
-				\node (box2) [draw, rectangle, below of=box1, node distance=1cm] {Direct Matching Points (DMP)};
-				\node (box3) [draw, rectangle, below of=box2, node distance=1cm] {Stability $\delta_P$ calculation};
-				\node (box4) [draw, rectangle, below of=box3, node distance=1cm] {Probability Density Function (PDF) for all stability measures calculation};
-				
-				
-				% Arrows
-				\draw[->] (box1) -- (box2);
-				\draw[->] (box2) -- (box3);
-				\draw[->] (box3) -- (box4);
-				
-			\end{tikzpicture}
-		}
-		\caption{The series of checks carried out by the algorithm}
-		\label{fig:stabilityprocessflowdiagram}
-	\end{figure}
-	\end{frame}
-	
-	\subsection{Vibration Spectrum and phase analysis}
-	\begin{frame}{ Vibration Spectrum and phase analysis}
-	\begin{figure}[h]
-		\centering
-		\resizebox{\columnwidth}{!}{
-			\begin{tikzpicture}
-				\node (box1) [draw, rectangle] at (0,0) {Data Collection in Time Domain};
-				\node (box2) [draw, rectangle, below of=box1, node distance=1cm] {Transformation to Frequency Domain using FFT};
-				\node (box3) [draw, rectangle, below of=box2, node distance=1cm] {Phase Analysis on the acceleration spectrum};
-				\node (box4) [draw, rectangle, below of=box3, node distance=1cm] {1X Rotational Speed Analysis using Velocity Spectrum};
-				
-				
-				% Arrows
-				\draw[->] (box1) -- (box2);
-				\draw[->] (box2) -- (box3);
-				\draw[->] (box3) -- (box4);
-				
-			\end{tikzpicture}
-		}
-		\caption{The series of checks carried out by the algorithm}
-		\label{fig:specandphase}
-	\end{figure}
-	\end{frame}
-	
-	
-	
-	
-	
-	\subsection{Incipient SVM on time-domain}
-		\begin{frame}{Incipient SVM Fault Detection Model and Anomaly Detection Model on time-domain dataset}	
+	\subsection{Arduino UNO Algorithm}
+	\begin{frame}{Arduino UNO Algorithm}
 		\begin{figure}[h]
 			\centering
-			\resizebox{\columnwidth}{!}{
-				\begin{tikzpicture}
-					\node (box1) [draw, rectangle] at (0,0) {100 captures of normal operating conditions - training dataset};
-					\node (box2) [draw, rectangle, below of=box1, node distance=1cm] {Actual data collection - test dataset};
-					\node (box3) [draw, rectangle, below of=box2, node distance=1cm] {Calculation of Gaussian Distribution Parameters $\sigma$ , $\mu$};
-					\node (box4) [draw, rectangle, below of=box3, node distance=1cm] {Kurtosis - K, NGS - $\gamma$ calculation and selection of the optimal threshold - $\epsilon$};
-					\node (box5) [draw, rectangle, below of=box4, node distance=1cm] {Anomaly detection};
-					\node (box6) [draw, rectangle, below of=box5, node distance=1cm] {SVM clustering};
-					
-					% Arrows
-					\draw[->] (box1) -- (box2);
-					\draw[->] (box2) -- (box3);
-					\draw[->] (box3) -- (box4);
-					\draw[->] (box4) -- (box5);
-					\draw[->] (box5) -- (box6);
-				\end{tikzpicture}
-			}
-			\caption{Incipient SVM Model}
-			\label{fig:svm}
-		\end{figure}	
+			\begin{tikzpicture}[node distance=1.4cm, font=\footnotesize]
+				
+				% Nodes with rectangles
+				\node (sensor) [draw, rectangle] {AnalogRead() from ADXL335};
+				\node (buffer) [draw, rectangle, below of=sensor] {Store in Batch Buffer (3$\times$10 samples = 60B)};
+				\node (send) [draw, rectangle, below of=buffer] {Send Batch via Serial to Raspberry Pi};
+				\node (loop) [draw, rectangle, below of=send] {Repeat Acquisition};
+				
+				% Arrows
+				\draw[->] (sensor) -- (buffer);
+				\draw[->] (buffer) -- (send);
+				\draw[->] (send) -- (loop);
+				
+			\end{tikzpicture}
+			\caption{The Arduino UNO Algorithm.}
+			\label{fig:arduino_algorithm}
+		\end{figure}
+	\end{frame}
+	
+	\subsection{Raspberry Pi Algorithm} 
+	\begin{frame}{Raspberry Pi Algorithm}
+		\begin{figure}
+			\centering
+			\begin{tikzpicture}[node distance=0.8cm, font=\footnotesize]
+				
+				% Nodes with rectangles
+				\node (wait) [draw, rectangle] {Wait for Arduino data};
+				\node (parse) [draw, rectangle, below of=wait] {Parse serial data into X, Y, Z};
+				\node (amplitude) [draw, rectangle, below of=parse] {Calculate amplitude from 3-axis readings};
+				\node (fft) [draw, rectangle, below of=amplitude] {Compute FFT for each dataset};
+				\node (api) [draw, rectangle, below of=fft] {Send results via HTTP POST to Supabase};
+				\node (loop) [draw, rectangle, below of=api] {Repeat acquisition and processing};
+				
+				% Arrows
+				\draw[->] (wait) -- (parse);
+				\draw[->] (parse) -- (amplitude);
+				\draw[->] (amplitude) -- (fft);
+				\draw[->] (fft) -- (api);
+				\draw[->] (api) -- (loop);
+				
+			\end{tikzpicture}
+			\caption{The Raspberry Pi 4 Algorithm: serial data reception, FFT processing, and cloud transmission.}
+			\label{fig:rpi_algorithm}
+		\end{figure}
+	\end{frame}
+	
+	\subsection{Vercel Implementation and Supabase Integration}
+	\begin{frame}{Vercel and Supabase Algorithmic Flow}
+		\begin{figure}
+			\centering
+			\begin{tikzpicture}[node distance=1cm, font=\footnotesize]
+				
+				% Nodes
+				\node (request) [draw, rectangle, align=center, minimum width=3.5cm] 
+				{React frontend requests vibration data via Next.js API endpoint};
+				
+				\node (api) [draw, rectangle, below of=request, align=center, minimum width=3.5cm] 
+				{Next.js API receives request Uses Supabase credentials Queries database};
+				
+				\node (json) [draw, rectangle, below of=api, align=center, minimum width=3.5cm] 
+				{Next.js API returns JSON response containing X, Y, Z, Magnitude measurements};
+				
+				\node (store) [draw, rectangle, below of=json, align=center, minimum width=3.5cm] 
+				{React stores JSON data in local state};
+				
+				\node (process) [draw, rectangle, below of=store, align=center, minimum width=3.5cm] 
+				{Extracts healthy vs current measurements  Combines frequency and amplitude arrays};
+				
+				\node (plot) [draw, rectangle, below of=process, align=center, minimum width=3.5cm] 
+				{Generates dynamic plots using Recharts Updates plots on new data};
+				
+				% Arrows
+				\draw[->] (request) -- (api);
+				\draw[->] (api) -- (json);
+				\draw[->] (json) -- (store);
+				\draw[->] (store) -- (process);
+				\draw[->] (process) -- (plot);
+				
+			\end{tikzpicture}
+			\caption{Flow diagram of the Vercel and Supabase algorithm: from frontend request to dynamic visualization.}
+			\label{fig:vercel_flow_diagram}
+		\end{figure}
 	\end{frame}
 
+	
+	
 
-	\subsection{Incipient fault detection with one-class v-SVM algorithm}
-	\begin{frame}{Incipient fault detection with one-class v-SVM algorithm}	
-	\begin{figure}[h]
-		\centering
-		\resizebox{\columnwidth}{!}{
-			\begin{tikzpicture}
-				\node (box1) [draw, rectangle] at (0,0) {raw vibration data collection};
-				\node (box2) [draw, rectangle, below of=box1, node distance=1cm] {FFT execution - power spectrum extraction};
-				\node (box3) [draw, rectangle, below of=box2, node distance=1cm] {Spectrum split into 200 Hz sub-bands and energy calculation};
-				\node (box4) [draw, rectangle, below of=box3, node distance=1cm] {Detection of changes in the conditions of the machinery - v-SVM};
-				\node (box5) [draw, rectangle, below of=box4, node distance=1cm] {Selection of the fault frequency sub-bands of the power spectrum - Sensitivity Test};
-				\node (box6) [draw, rectangle, below of=box5, node distance=1cm] {Extraction of characteristics of abnormal sub-band signal - Envelope Analysis};
-				
-				% Arrows
-				\draw[->] (box1) -- (box2);
-				\draw[->] (box2) -- (box3);
-				\draw[->] (box3) -- (box4);
-				\draw[->] (box4) -- (box5);
-				\draw[->] (box5) -- (box6);
-			\end{tikzpicture}
-		}
-		\caption{Architecture of anomaly detection frequency sub-band \cite{Francos2013}}
-		\label{fig:v-svm}
-	\end{figure}
-	\end{frame}
-	
-	
-	\subsection{Real-time fault detection set-up with SVM algorithm}
-	\begin{frame}{Real-time fault detection set-up with SVM algorithm}	
-	\begin{figure}[h]
-		\centering
-		\resizebox{\columnwidth}{!}{
-			\begin{tikzpicture}
-				\node (box1) [draw, rectangle] at (0,0) {Sensors};
-				\node (box2) [draw, rectangle, below of=box1, node distance=1cm] {Data collection micro-controller - ESP8266};
-				\node (box3) [draw, rectangle, below of=box2, node distance=1cm] {Data analysis computer- Raspberry Pi 4}; 
-				
-				% Arrows
-				\draw[->] (box1) -- (box2);
-				\draw[->] (box2) -- (box3);
-				
-			\end{tikzpicture}
-		}
-		\caption{Architecture of anomaly detection frequency sub-band \cite{Raman2023}}
-		\label{fig:sensors}
-	\end{figure}
-	\end{frame}
-	
-	
-	
-	\subsection{Backpropagation Neural Network}
-	\begin{frame}{Backpropagation Neural Network}	
-	\begin{figure}[h]
-		\centering
-		\resizebox{\columnwidth}{!}{
-			\begin{tikzpicture}
-				\node (box1) [draw, rectangle] at (0,0) {Set a desired MSE value and comparison};
-				\node (box2) [draw, rectangle, below of=box1, node distance=1cm] {1000 input data from accelerometer-X and 1000 input data from accelerometer-Y};
-				\node (box3) [draw, rectangle, below of=box2, node distance=1cm] {Neural network using backpropagation process}; 
-				\node (box4) [draw, rectangle, below of=box3, node distance=1cm] {Save and display error weight};
-				\node (box5) [draw, rectangle, below of=box4, node distance=1cm] {Tweaking learning rate, Momentum and number of hidden layers};
-				\node (box6) [draw, rectangle, below of=box5, node distance=1cm] {Testing};
-				
-				% Arrows
-				\draw[->] (box1) -- (box2);
-				\draw[->] (box2) -- (box3);
-				\draw[->] (box3) -- (box4);
-				\draw[->] (box4) -- (box5);
-				\draw[->] (box5) -- (box6);
-			\end{tikzpicture}
-		}
-		\caption{Flowchart for the Backpropagation-Neural Network (B-NN) training and testing \cite{Kuspijani2020}.}
-		\label{fig:BNNflowchart}
-	\end{figure}
-	\end{frame}
-	
-	
 	
 	\section{Results}
-	\begin{frame}
-		\begin{itemize}
-			\item \textbf{Vibration Analysis Techniques:} Wide variety including time-domain and frequency-domain analysis.
-			
-			\item \textbf{Fault Detection Algorithms:} Use parameters or thresholds for classification, highly effective for assessing machinery health. Dynamic signal stability analysis is a standout tool.
-			
-			\item \textbf{Machine Learning Anomaly Detection:} Can be combined with root algorithms, focus on continuous monitoring and past data analysis in specific application contexts.
+	\begin{frame}{System Verification and Validation}
+		\begin{itemize}[<+-| alert@+>]
+			\item End-to-end checks were performed across the entire system: data acquisition from ADXL335 sensors via Arduino UNO, serial transmission to Raspberry Pi 4, processing and posting to Supabase, and frontend visualization in Vercel/React.
+			\item Stress tests confirmed reliable operation under expected data loads.
+			\item Verified no data loss, correct timing, and accurate real-time plotting.
+			\item System performance validated for FFT processing, transmission rates, and visualization updates.
 		\end{itemize}
 	\end{frame}
 	
+	\begin{frame}{System Verification and Validation}
+		\begin{figure}[h]
+			\centering
+			\includegraphics[width=0.7\linewidth]{images/vercelimage4.png}
+			\caption{Visualization of the overall vibration magnitude. This chart combines all three coordinate axes into a single representation, showing the total vibration energy with the healthy baseline (blue) compared against the current state (green).}
+			\label{fig:vercel4}
+		\end{figure}
+	\end{frame}
 	
-
+	
+	
+	
+	
 	\section{Conclusions}
-	\begin{frame}
-		\begin{itemize}
-			\item \textbf{Vibration Analysis Techniques:} Wide variety including time-domain and frequency-domain analysis.
-			
-			\item \textbf{Fault Detection Algorithms:} Use parameters or thresholds for classification, highly effective for assessing machinery health. Dynamic signal stability analysis is a standout tool.
-			
-			\item \textbf{Machine Learning Anomaly Detection:} Can be combined with root algorithms, focus on continuous monitoring and past data analysis in specific application contexts.
+	\begin{frame}{System Overview and Achievements}
+		\begin{itemize}[<+-| alert@+>]
+			\item Developed and validated an end-to-end condition monitoring system for bearing fault detection using vibration analysis.
+			\item Integrated hardware (ADXL335, Arduino UNO, Raspberry Pi 4) with cloud services (Supabase, Vercel) for data acquisition, processing, and visualization.
+			\item FFT-based comparative analysis of X, Y, Z axes and magnitude against healthy baselines for fault identification.
+			\item Arduino collects and transmits triaxial acceleration in batches at 700 [Hz] sampling rate without loss; Raspberry Pi converts to frequency-domain and posts to Supabase.
+			\item Vercel dashboard visualizes frequency spectra interactively for real-time monitoring.
 		\end{itemize}
 	\end{frame}
-	
-	
-	
-	
-	
-	
-%	
-%	
-%	
-%	\section{References}
-%	
-%	\begin{frame}[allowframebreaks]
-%		\renewcommand{\refname}{References} 
-%		\bibliographystyle{ieeetr}
-%		\bibliography{references}
-%		\nocite{*} % used here because no citation happens in slides
-%		% if there are too many try use：
-%		% \tiny\bibliographystyle{alpha}
-%	\end{frame}
-%	
-%	
-%	\begin{frame}
-%		\begin{center}
-%			{\Huge\calligra Thank You}
-%		\end{center}
-%	\end{frame}
+
+
 	
 \end{document}
