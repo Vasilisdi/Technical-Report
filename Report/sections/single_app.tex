@@ -247,10 +247,10 @@
 	\STATE $\text{timestamps.append}(\text{timestamp.timestamp}())$
 	\STATE $\text{col\_1}, \text{col\_2}, \text{col\_3} = \text{read\_serial\_data}(\text{ser})$
 	\STATE $\text{amplitude} = \text{calculate\_amplitude}(\text{col\_1}, \text{col\_2}, \text{col\_3})$
-	\STATE $\text{history.append}(\text{amplitude})$
-	\STATE $\text{history\_X.append}(\text{col\_1})$
-	\STATE $\text{history\_Y.append}(\text{col\_2})$
-	\STATE $\text{history\_Z.append}(\text{col\_3})$
+	\STATE $\text{history.append}(((\text{amplitude} * (5 / 1023)) - 2.5) / 0.3)$
+	\STATE $\text{history\_X.append}(((\text{col\_1} * (5 / 1023)) - 2.5) / 0.3)$
+	\STATE $\text{history\_Y.append}(((\text{col\_2} * (5 / 1023)) - 2.5) / 0.3)$
+	\STATE $\text{history\_Z.append}(((\text{col\_3} * (5 / 1023)) - 2.5) / 0.3)$
 	\ENDWHILE
 	
 	\STATE $\text{\# Calculate the actual sampling rate}$

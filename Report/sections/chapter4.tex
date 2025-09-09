@@ -159,6 +159,7 @@
 			\STATE $timestamp \gets current\_time()$
 			\STATE $x, y, z \gets read\_serial\_data(ser)$
 			\STATE $amplitude \gets calculate\_amplitude(x, y, z)$
+			\STATE Convert the 10-bit ADC value to voltage, then get acceleration in \(g\).
 			\STATE Append values to $history$, $history_X$, $history_Y$, $history_Z$
 			\ENDWHILE
 			
@@ -185,12 +186,39 @@
 	
 	Upon initialization, the Raspberry Pi waits until the Arduino Uno shares the sensor readings. The received data string, containing three comma-separated acceleration values from the sensor's X, Y, and Z axes, is decoded from UTF-8 format, stripped of extraneous characters, and parsed into floating-point numerical values representing the triaxial acceleration measurements in g-forces, which are subsequently returned for further processing in the vibration monitoring pipeline, consistent with the data flow described in earlier sections.
 	
+	When the ADXL335 is powered with a 5\,V supply, each axis outputs an analog voltage centered at about 
+	\(2.5\,\text{V}\) when experiencing \(0\,g\) (no acceleration). The sensitivity in this case is approximately 
+	\(300\,\text{mV}/g\), meaning the output shifts by \(0.3\,\text{V}\) for every \(\pm 1\,g\) of acceleration 
+	along that axis. To read this with a 10-bit ADC (0--1023 counts at 5\,V reference), you first convert the raw 
+	ADC value to voltage as
+	
+	\[
+	V = \text{raw} \times \frac{5.0}{1023.0}.
+	\]
+	
+	Then, subtract the zero-g bias (\(2.5\,\text{V}\)) and divide by the sensitivity (\(0.300\)) to convert to g-units:
+	
+	\[
+	a_g = \frac{V - 2.5}{0.300}.
+	\]
+	
+	This procedure should be repeated for the \(X\), \(Y\), and \(Z\) axes, after which you may optionally compute 
+	the vector magnitude to determine total acceleration:
+	
+	\[
+	|a| = \sqrt{a_x^2 + a_y^2 + a_z^2}.
+	\]
+	
+	After this the Fast-Fourier-Transform is taking place. When performing an FFT on accelerometer data, the constant component caused by sensor orientation appears only at 0 Hz (the DC component). By ignoring this 0 Hz peak, the FFT reflects solely the dynamic vibrations of the system, meaning the amplitudes at non-zero frequencies correspond to the actual mechanical motion rather than the static effect of gravity. As a result, even if the time-domain signal has a significant constant offset due to tilt, the vibration magnitudes extracted from the frequency domain remain small and accurately represent only the true oscillatory behavior of the component.
+	
 	Moreover, the API communication for transmitting vibration data to the Supabase backend is implemented through a structured workflow that begins with authentication and configuration validation. Upon class instantiation, the system employs the requests.post() method to transmit JSON-formatted vibration data to the Supabase REST API endpoint, ensuring secure communication through properly configured HTTP headers containing authentication tokens and content type specifications.
 	
 	The requests.post() command functions as the core mechanism for data transmission, operating as an HTTP client that serializes the vibration data payload into JSON format and dispatches it via POST request to the designated Supabase endpoint. This method automatically handles connection management, timeout protocols, and response processing while incorporating the pre-configured headers containing the essential API key for authentication. The implementation includes robust error handling that captures potential exceptions such as connection failures, timeout errors, or invalid response formats, while also validating the HTTP status codes returned by the server to ensure successful data ingestion. The method returns a response object containing the server's status code and optional response data, which the system then processes through comprehensive logging mechanisms for both debugging and operational monitoring purposes.
 
 	For each data transmission request, the system first resolves the sensor identifier by querying the Supabase database using the sensor name, establishing a relational link between the measurement data and the specific sensor entity. The payload construction encapsulates critical metadata including the sensor ID, precise time intervals, measurement coordinate (X, Y, Z, or magnitude), and the actual FFT-processed values array. The HTTP POST request is executed with proper error handling and comprehensive logging, featuring response validation that checks for empty or malformed JSON responses while maintaining robust exception handling for network failures or authentication errors. The implementation includes diagnostic logging at multiple stages, providing visibility into the payload structure, response status codes, and JSON content for debugging and monitoring purposes, ensuring reliable data transmission to the cloud-based storage infrastructure.
 	
+	In the frequency-domain power spectrum, a threshold of $1\,g$ is set as a warning line. Any spectral component exceeding this level may indicate abnormal vibrations or potential mechanical issues.
+		
 	Moreover it is worth it mentioning that the development and testing environment spanned multiple hardware platforms, utilizing Poetry for consistent dependency management across all systems:
 	
 	\begin{itemize}
@@ -225,6 +253,9 @@
 	\label{subsec:vercelsec}
 {
 	After sending all data to Supabase, you can deploy this Next.Js-friendly application that visualizes your sensor measurements. The project structure is optimized for Next.js with TypeScript and includes all necessary configuration files. When you deploy this application to Vercel, you'll receive a unique URL that you can share with specific email addresses.
+	
+	Once the Next.js application is deployed on Vercel, the web page becomes accessible from any remote device 
+	using the assigned Vercel domain (e.g., \texttt{https://yourproject.vercel.app}). When a user opens this page, the frontend code hosted on Vercel executes in the browser and communicates directly with the Supabase API  using the project URL and the public \texttt{anon} key. Supabase then applies the defined Row Level Security (RLS) policies to determine which data can be returned. As a result, users can view the permitted Supabase results on the web page from any location, making the system fully accessible online.
 	
 	Vercel is an online platform for hosting web applications and can be used to create dynamic pages that fetch and display real-time data. In your project, Vercel hosts a Next.js dashboard that retrieves sensor measurements from a Supabase API. Using classic client-side rendering (CSR), your React component calls fetch('/api/measurements') on the client, awaits the data, and then uses it to create plots. The charts are rendered only after the data arrives, allowing users to see the most recent measurements dynamically without requiring a page rebuild.
 	
