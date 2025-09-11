@@ -1,11 +1,18 @@
 % Αγγλική Περίληψη
 
 \begin{abstracteng}\setlanguage{american}
-The abstract includes the scientific area and the purpose - subject of the thesis, the methodology, the main steps followed and the main results obtained. The total extent of the abstract will be up to one page. finding and conclusions to be highlighted.
-
-A thesis written in english should include an english and a greek abstract.
-
-\vspace*{\fill}
-\noindent{\large\bf{Keywords:}}\\ 
-term, term, $\dots$, term
+	
+	This thesis addresses the design of a predictive maintenance apparatus, contributing to the data acquisition and analysis. The scientific area of the thesis encompasses mechanical fault diagnosis, vibration analysis and Internet of Thing (IoT) technologies.
+	
+	The main challenge is the development of a low-cost and best value for money set-up that has the capacity to analyze the acceleration data created by some machine. Its ultimate objective is to predict misalignments, bearing failures and other defects, providing the maintenance personnel readings, metrics and historical data that can by analyzed and conclude what action needs to be taken.
+	
+	The methodology is centered on a model-based approach, utilizing a triple-axis analog accelerometer (ADXL335) for data acquisition. Vibration signals are captured in the time-domain and processed using the Fast Fourier Transform (FFT) algorithm to generate frequency spectra. The frequency spectra illustrate a healthy state of the machine and a theshold line at 1g indicating that there is some concerning defect.
+	
+	The main steps involved the design and integration of a hardware setup featuring an Arduino microcontroller for sensor data collection and a Raspberry Pi microcomputer for data processing and analysis. Communication between these components was established via a UART protocol. The developed system successfully demonstrated the ability to collect high-fidelity vibration data, perform spectral analysis, and illustrate frequency data.
+	
+	The main results confirm the viability of using low-cost, off-the-shelf components to create an effective predictive maintenance tool. The conclusions highlight the critical role of FFT-based spectral analysis in mechanical diagnostics and the potential of IoT technologies to reinforce the preventive maintenance strategies for a wider range of industrial applications.
+	
+	\vspace*{\fill}
+	\noindent{\large\bf{Keywords:}}\
+	Predictive Maintenance, Accelerometer, Vibration Analysis, Fast Fourier Transform (FFT), Internet of Things (IoT)
 \end{abstracteng}

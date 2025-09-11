@@ -151,6 +151,7 @@
 		\begin{algorithmic}[1]
 			\REQUIRE Serial port $port$, baud rate $baud\_rate$
 			\ENSURE Processed vibration analysis results
+			\STATE $analogReference(EXTERNAL)$
 			\STATE Initialize serial connection: $ser \gets setup\_serial\_connection(port, baud\_rate)$
 			\STATE $history \gets [~]$, $history_X \gets [~]$, $history_Y \gets [~]$, $history_Z \gets [~]$
 			\STATE $start\_time \gets current\_time()$, $time\_window \gets config['time\_window']$
@@ -186,20 +187,20 @@
 	
 	Upon initialization, the Raspberry Pi waits until the Arduino Uno shares the sensor readings. The received data string, containing three comma-separated acceleration values from the sensor's X, Y, and Z axes, is decoded from UTF-8 format, stripped of extraneous characters, and parsed into floating-point numerical values representing the triaxial acceleration measurements in g-forces, which are subsequently returned for further processing in the vibration monitoring pipeline, consistent with the data flow described in earlier sections.
 	
-	When the ADXL335 is powered with a 5\,V supply, each axis outputs an analog voltage centered at about 
-	\(2.5\,\text{V}\) when experiencing \(0\,g\) (no acceleration). The sensitivity in this case is approximately 
-	\(300\,\text{mV}/g\), meaning the output shifts by \(0.3\,\text{V}\) for every \(\pm 1\,g\) of acceleration 
+	When the ADXL335 is powered with a 3.3\,V supply, each axis outputs an analog voltage centered at about 
+	\(1.65\,\text{V}\) when experiencing \(0\,g\) (no acceleration). The sensitivity in this case is approximately 
+	\(330\,\text{mV}/g\), meaning the output shifts by \(0.33\,\text{V}\) for every \(\pm 1\,g\) of acceleration 
 	along that axis. To read this with a 10-bit ADC (0--1023 counts at 5\,V reference), you first convert the raw 
 	ADC value to voltage as
 	
 	\[
-	V = \text{raw} \times \frac{5.0}{1023.0}.
+	V = \text{raw} \times \frac{3.3}{1023.0}.
 	\]
 	
-	Then, subtract the zero-g bias (\(2.5\,\text{V}\)) and divide by the sensitivity (\(0.300\)) to convert to g-units:
+	Then, subtract the zero-g bias (\(1.65\,\text{V}\)) (which corresponds to the half of the 3.3\,V - the supply of the ADXL335 sensor) and divide by the sensitivity (\(0.330\)) to convert to g-units:
 	
 	\[
-	a_g = \frac{V - 2.5}{0.300}.
+	a_g = \frac{V - 1.65}{0.330}.
 	\]
 	
 	This procedure should be repeated for the \(X\), \(Y\), and \(Z\) axes, after which you may optionally compute 
@@ -208,6 +209,8 @@
 	\[
 	|a| = \sqrt{a_x^2 + a_y^2 + a_z^2}.
 	\]
+	
+	It can be noticed here that the breakout improves the data acquisition procedure and conveys better and more accurate value.  there is a benefit of utilizing the 3.3V, because we can make the most of the whole 0-3.3V range of the analog read pins in this set-up. In case the 10bit values have a reference voltage at 5\,V , which entails that the Arduino will never receive 10bit values greater than 676. This leads to a sensitivity decrease. 
 	
 	After this the Fast-Fourier-Transform is taking place. When performing an FFT on accelerometer data, the constant component caused by sensor orientation appears only at 0 Hz (the DC component). By ignoring this 0 Hz peak, the FFT reflects solely the dynamic vibrations of the system, meaning the amplitudes at non-zero frequencies correspond to the actual mechanical motion rather than the static effect of gravity. As a result, even if the time-domain signal has a significant constant offset due to tilt, the vibration magnitudes extracted from the frequency domain remain small and accurately represent only the true oscillatory behavior of the component.
 	
