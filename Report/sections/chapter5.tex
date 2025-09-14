@@ -95,6 +95,37 @@
 }
 
 
+\section{System Performance}
+{
+	In the Appendix Section \ref{subsec:tests} there is many cases of mechanical machine faults. The depicted examples extracted from the Datasets \cite{ihsannur} and \cite{hong2023hust}, depict the frequency domain bits related to these faults as well as the raw data wave, where all these frequency domains where calculated from.
+	
+	All the waveforms are readings of acceleration sensors, which entails that the result are in [g]. This facilitates immensely the process since the algorithms used for this project utilize this this unit as well.
+	
+	The threshold that is being used as a metrics of dealing with a faulty case, is the 1[g]. So in case the magnitude of the some bit exceeds this threshold this entails that there is a faulty case. 
+	
+	What can be noticed in the table \ref{tab:critical_failures} is that there is a prediction pattern. It is easier to predict the misalignment rather than any other mechanical fault. The threshold concept seems to be ineffective in the case of small-size mechanical components, since the only case that it predicted successfully is this of the misalignment.
+	
+	
+	\begin{table}[ht]
+		\centering
+		\caption{Summary of critical system failures}
+		\label{tab:critical_failures}
+		\begin{tabular}{lcccc}
+			\hline
+			Fault Condition & Speed & Test Cases & Correct & Incorrect Prediction \\
+			\hline
+			Unbalance & 50 Hz & 11 & 0 & No Alarm \\
+			Misalignment & 50 Hz & 14 & 0 & Correct Alarm \\
+			Ball Fault & 24 Hz & 3 & 0 & No Alarm \\
+			Ball Fault & 50 Hz & 4 & 0 & No Alarm \\
+			Inner Race Fault & 24 Hz & 4 & 0 & No Alarm \\
+			Outer Race Fault & 24 Hz & 3 & 0 & No Alarm \\
+			\hline
+		\end{tabular}
+	\end{table}
+}
+
+
 
 \section{Data Depiction and Visualization}
 {
