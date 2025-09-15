@@ -340,8 +340,6 @@
 	The network infrastructure was configured to ensure reliable and secure data transmission from the sensor system to the cloud database. The router configuration provided optimal performance for IoT data transmission with excellent signal strength and enterprise-grade security protocols, supporting the structured src layout organization of the project.
 	
 	The data transmission pathway followed a secure flow: \textit{HW Setup → Local Router (192.168.2.1) → Internet → Supabase API (HTTPS)}. All communications used HTTPS with TLS 1.3 encryption and API key authentication, consistent with the security practices implemented through environment variables and Poetry dependency management. The system transmitted data in JSON format via HTTPS POST requests with a maximum payload size of 1 MB at 30-second intervals, incorporating timestamps, sensor IDs, and checksums for data integrity verification, following the structured payload schema defined in the API implementation.
-	
-	Network performance exceeded all requirements with a \textbf{100 percent} transmission success rate across all API calls, zero timeout incidents, and no security breaches detected. This performance validates the robust error handling and logging mechanisms implemented in the HTTPS communication methodology. Each successfully transmitted batch contained a payload of approximately 12,847 data points—the length of the FFT result array—and this operation was repeated multiple times throughout the testing and deployment phase. Complete router specifications are provided in Appendix \ref{tab:router_specs}.
 }
 
 % ====== Section 3: Requirements ======  

@@ -36,6 +36,50 @@
 % ====== Section 4: Software & Data Flow ======  
 \section{Software Architecture and Data Flow}
 
+\subsection{Dataflow Block Diagram} 
+{
+	Figure \ref{fig:dataflowblock} illustrates a layout of the algorithms in the following sections.
+	
+	Arduino UNO collects data and sends data in data batches to the serial port, where data in bit format are stored in the memory of Raspberry Pi and are first converted to g-units and then transformed in the frequency domain. Following this step, data is stored to the Supabase and then presented on a webpage upon request.
+	
+	\begin{figure}[h]  
+		\centering  
+		\begin{tikzpicture}[node distance=1.5cm]
+			% Architecture Diagram (Left)
+			\node (sensor) [draw, rectangle] {ADXL335};  
+			\node (arduino) [draw, rectangle, below of=sensor] {Arduino};  
+			\node (rpi) [draw, rectangle, below of=arduino] {Raspberry Pi 4};  
+			\node (supabase) [draw, rectangle, below of=rpi] {Supabase};  
+			\node (vercel) [draw, rectangle, below of=supabase] {Vercel API};  
+			\node (react) [draw, rectangle, below of=vercel] {React App};  
+			
+			\draw[->] (sensor) -- node[right] {Analog (0-3.3V)} (arduino);  
+			\draw[->] (arduino) -- node[right] {Serial Data} (rpi);  
+			\draw[->] (rpi) -- node[right] {HTTP POST} (supabase);  
+			\draw[->] (supabase) -- node[right] {SQL Query} (vercel);  
+			\draw[->] (vercel) -- node[right, pos=0.3] {HTTP GET/JSON} (react);
+			
+			% Data Transformation Diagram (Right)
+			\begin{scope}[xshift=8cm]
+				\node (voltage) [draw, rectangle] {0-3.3V Input};
+				\node (conversion) [draw, rectangle, below of=voltage] {Volt to g Conversion};
+				\node (fft) [draw, rectangle, below of=conversion] {FFT Processing};  % Fixed reference
+				\node (freqDomain) [draw, rectangle, below of=fft] {Frequency Domain Data};
+				\node (database) [draw, rectangle, below of=freqDomain] {Supabase Storage};
+				
+				\draw[->] (voltage) -- node[right] {Raw Voltage [ADXL335]} (conversion);
+				\draw[->] (conversion) -- node[right] {Acceleration (g) [Arduino]} (fft);  % Fixed target
+				\draw[->] (fft) -- node[right] {Frequency Spectrum [Raspberry]} (freqDomain);
+				\draw[->] (freqDomain) -- node[right] {Processed Data} (database);
+			\end{scope}
+		\end{tikzpicture}  
+		\caption{Condition monitoring system dataflow.}
+		\label{fig:dataflowblock}  
+	\end{figure}
+	
+
+}
+
 \subsection{The Arduino UNO Algorithm} 
 \label{subsec:arduino}
 {
@@ -43,6 +87,8 @@
 	
 	The Arduino UNO receives analog signals from the sensor breakout board through its integrated analog-to-digital converter (ADC), which features 10-bit resolution across six input channels. Each designated analog input pin (A0, A1, A2) continuously monitors voltage levels in the range of 0,V to 5,V, corresponding to the physical phenomena being measured by the sensors, which entails that the reading can be interpreted as g's or mm/s$^2$. The ADC performs successive approximation conversion at a sampling rate of approximately 10,000 samples per second, transforming continuous analog voltages into discrete digital values ranging from 0 (representing 0V) to 1023 (representing 5V). Each converted value is stored as a 16-bit signed integer (2 bytes) in memory, maintaining compatibility with the Arduino's architecture while preserving measurement precision.
 	
+	The data acquisition process follows a structured double-buffering approach where readings are temporarily stored in a two-dimensional array before processing and transmission. This architecture ensures temporal consistency between related sensor measurements while optimizing memory utilization through fixed-size allocation.
+		
 	\begin{algorithm}[H]
 		\caption{Snippet of Data Acquisition \& Transmission (see the whole code on Appendix Section \ref{subsec:arduino-algorithm})}
 		\label{alg:dataacq}
@@ -73,7 +119,7 @@
 		\end{algorithmic}
 	\end{algorithm}
 	
-	The data acquisition process follows a structured double-buffering approach where readings are temporarily stored in a two-dimensional array before processing and transmission. This architecture ensures temporal consistency between related sensor measurements while optimizing memory utilization through fixed-size allocation.
+
 	
 	A snippet of the Arduino UNO algorithm implementation follows hereunder (Algorithm \ref{alg:dataacq}):  
 
@@ -127,6 +173,10 @@
 	
 	Within this setup, Poetry and .env files play crucial roles. Poetry simplifies dependency management by consolidating everything into a single pyproject.toml, handling versioning, virtual environments, and packaging in a reproducible way. This ensures consistency across machines and deployments, preventing “works on my machine” problems. On the other hand, .env files keep sensitive information (like API keys, database credentials, and tokens) out of the codebase, promoting security and flexibility. Paired with a .env.example, they also document required environment variables without leaking secrets. Together, Poetry and .env form the backbone of a professional, maintainable, and secure Python project setup.
 	
+	An overview of the core processing workflow implemented in the project is presented in Algorithm \ref{alg:rpi-processing}, highlighting the principal computational processes and methodological practices employed. This snippet captures the essential data acquisition, processing, and transmission pipeline that forms the foundation of the vibration monitoring system.
+
+	For a comprehensive examination of the complete project architecture, readers are directed to the Appendix section. Specifically, Section \ref{subsec:raspberrypi-algorithm} provides detailed algorithmic descriptions of all constituent scripts, including their functional specifications, inter-module communication protocols, and implementation details. The appendix offers complete visibility into the system's modular design, encompassing data acquisition, signal processing, API communication, and utility functions that collectively enable the real-time vibration monitoring capabilities.
+	
 	The srclayout project structure looks like this: 
 	\begin{verbatim}
 		vibration-monitoring-project/
@@ -177,9 +227,7 @@
 		\end{algorithmic}
 	\end{algorithm}
 
-	An overview of the core processing workflow implemented in the project is presented in Algorithm \ref{alg:rpi-processing}, highlighting the principal computational processes and methodological practices employed. This snippet captures the essential data acquisition, processing, and transmission pipeline that forms the foundation of the vibration monitoring system.
-	
-	For a comprehensive examination of the complete project architecture, readers are directed to the Appendix section. Specifically, Section \ref{subsec:raspberrypi-algorithm} provides detailed algorithmic descriptions of all constituent scripts, including their functional specifications, inter-module communication protocols, and implementation details. The appendix offers complete visibility into the system's modular design, encompassing data acquisition, signal processing, API communication, and utility functions that collectively enable the real-time vibration monitoring capabilities.
+
 	
 	The serial communication module, as previously highlighted in the system architecture, establishes a connection with the Arduino microcontroller at a specified baud rate, initializing the serial port with a timeout parameter to prevent blocking operations. 
 	
@@ -362,3 +410,26 @@
 
 }
 
+\section{Database Schema}
+{
+As regards the database set-up, the Supabase database consists of the following tables:
+
+\begin{itemize}
+	\item \texttt{customers}
+	\item \texttt{sensors}
+	\item \texttt{measurements}
+\end{itemize}
+ 
+Each customer can own several sensors that measure different points, i.e., different pieces of equipment. 
+Each sensor has a name based on the machine and its function. 
+All measurement data is stored in the main table \texttt{measurements}. 
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/supabase.png}
+	\caption{Entity-relationship schema of the Supabase database.}
+	\label{fig:supabase-schema}
+\end{figure}
+
+}

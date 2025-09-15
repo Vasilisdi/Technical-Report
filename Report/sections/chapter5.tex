@@ -38,14 +38,15 @@
 	
 	Subsequently, the Arduino transmitted these batches to the Raspberry Pi via serial communication using an optimized request-response protocol. In this synchronous communication pattern, the Arduino sends exactly one line of three comma-separated acceleration values at a time, effectively preventing buffer overflows while ensuring data integrity. The Raspberry Pi efficiently received, buffered, and organized the incoming data, demonstrating that the system could handle the expected data rate of approximately 600 samples per second without data loss.
 	
-	It is worth noting that even when the reading window is increased, the Arduino handles data transmission efficiently, as it communicates readings through the serial port in batches of 10 values.
+	It is worth noting that even when the whole amount of the transmitted data is increased, the Arduino handles data transmission efficiently, as it communicates readings through the serial port in batches of 10 values. I this case there is a $100\%$ success of data transmission.
+	
 }
 
 \subsection{Raspberry Pi to Supabase and System Performance}
 {
-	Finally, the Raspberry Pi transmitted the data to the Supabase API. By comparing the readings collected on the Raspberry Pi with the data successfully posted to Supabase, it was confirmed that the entire pipeline—from sensor to cloud—worked reliably. The main limitation observed was internet speed; however, the Wi-Fi link itself was more than sufficient to handle local transfers without delay.
+
 	
-	Overall, each component of the system—from sensor to Arduino, Arduino to Raspberry Pi, and Raspberry Pi to Supabase—was capable of managing the data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second. This is also illustrated in Figure \ref{fig:datatransmitting}, where the raw data from the Arduino is 20,684, the data received by the Raspberry Pi is also 20,684, and the processed data of length 500 has been received by Supabase. This can be easily validated using the `values` column.
+	Each component of the system—from sensor to Arduino, Arduino to Raspberry Pi, and Raspberry Pi to Supabase—was capable of managing the data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second. This is also illustrated in Figure \ref{fig:datatransmitting}, where the raw data from the Arduino is 20,684, the data received by the Raspberry Pi is also 20,684, and the processed data of length 500 has been received by Supabase. This can be easily validated using the `values` column.
 	
 	\begin{figure}[h]  
 		\centering  
@@ -92,6 +93,8 @@
 	\end{table}
 	
 	The whole system was further checked for performance using cronjob commands, performing recursive data reading over an entire day. No temperature or similar failures of the electronics, microcomputer, or microcontroller were detected, confirming that the system operated reliably.
+	
+	All in all, the Raspberry Pi transmitted the data to the Supabase API. By comparing the readings collected on the Raspberry Pi with the data successfully posted to Supabase, it was confirmed that the entire pipeline—from sensor to cloud—worked reliably. In this case scenario, there is a $100\%$ successful data transmission in all instances.
 }
 
 
@@ -123,21 +126,50 @@
 			\hline
 		\end{tabular}
 	\end{table}
+	
+	A summary of all the previously concept test is summarized in Table \ref{tab:system_summary}:
+	
+	\begin{table}[ht]
+		\centering
+		\caption{Summary of system test results}
+		\label{tab:system_summary}
+		\begin{tabular}{lcc}
+			\hline
+			Task / Condition & Test Cases & Success Rate \\
+			\hline
+			Misalignment Prediction & 14 & 100\% \\
+			Other Bearing Failure   & 25 & 0\% \\
+			Data Transmission (Raspberry $\rightarrow$ Supabase) & 2 & 100\% \\
+			Data Transmission (Arduino $\rightarrow$ Raspberry Pi) & 2 & 100\% \\
+			\hline
+		\end{tabular}
+	\end{table}
+	
 }
 
 
 
 \section{Data Depiction and Visualization}
 {
+	"OPWS EGRAPSA STO EMAIL EDW XREIAZETAI PERISSOTERO ANALYSI KAI EKSHGHSH TWN FIGURES. EKSHGHSE TA TEST VECTOR POY EXEIS
+	Sta results tha prepei na eksigiseis parapano ti provlepeis me to sistima --- ta faults
+	Kai meta dixneis statistika oti sta 100 vectors vrikes xx apo ta faults opote exei xx - 100PERCENT accuracy of fault detection … opote ginetai validation"
+	
+	Real machinery operation data visualization is taking place in the second phase, following the testing phase. This concept focuses on developing a condition monitoring, cloud-based, application.
+	
 	Prior to the system verification described in the previous section, testing was conducted using a simplified algorithm derived from the main implementation. These preliminary implementations can be found in Appendix \ref{subsec:raspberrypi-algorithm} (Algorithm 1 and Algorithm 7).
 	
 	The purpose of this algorithm was to validate initial data visualization, demonstrating that both raw time-domain signals and frequency-domain data could be successfully processed and simulated within the Python interface. This approach proved efficient during testing, as it enabled rapid verification of expected patterns. In particular, the frequency spectra produced by the FFT could be readily compared with patterns described in the relevant literature, serving as an early confirmation of correct signal behavior.
+	
+	Network performance is exquisite with a \textbf{100 percent} transmission success rate across all API calls, zero timeout incidents, and no security breaches detected. This performance validates the robust error handling and logging mechanisms implemented in the HTTPS communication methodology. Each successfully transmitted batch contained a payload of approximately 12,847 data points—the length of the FFT result array—and this operation was repeated multiple times throughout the testing and deployment phase. Complete router specifications are provided in Appendix \ref{tab:router_specs}.
 	
 	For the Vercel-based interface, visualization tools and interactive charts were employed to depict the transmitted sensor data, supporting the analysis of amplitudes, frequency trends, and potential anomalies over time. Upon accessing the deployed webpage, the dashboard dynamically retrieves sensor data from Supabase, compares the current measurements against stored healthy baseline data, and plots both datasets on the same charts. This comparative visualization enables users to identify deviations at a glance, making the dashboard an effective, real-time monitoring tool deployed efficiently on Vercel.
 	
 	The following figures illustrate the deployed Vercel-based dashboard used for vibration data monitoring. The interface presents a series of interactive plots that allow comparison between the stored healthy baseline state of the machinery and the latest current measurements retrieved from Supabase. Each chart provides a clear visual distinction between the two states, enabling the detection of deviations across the X, Y, and Z axes as well as the overall vibration magnitude. By scrolling through the interface, the user can review each coordinate in detail, observing the amplitude-frequency relationships that characterize both normal and potentially anomalous machine conditions.
 	
 	It must also be noted that on each plot two lines are depicted: the blue line corresponds to the healthy state reference, while the green line illustrates the current state of the machinery. Moreover, it is worth noting that in the case of the values in the frequency domain exceeding the value 1[g], then an orange horizontal line will show up, indicating the dangerous zone. This ensues that in the casing of having peaks exceeding this values some mechanical components needs to be further investigated or even replaced.
+	
+	"DEN FAINETAI TO CAPTION MEGALWSE TO FONT SE Y KAI X AXIS KAI VALE ASPRO BACKGROUND KAI KANE ZOOM SE ALLO ENA"
 	
 	\begin{figure}[h]
 		\centering

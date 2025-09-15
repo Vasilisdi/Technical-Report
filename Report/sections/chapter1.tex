@@ -1,24 +1,38 @@
 \chapter{Introduction}
 \label{chap1}
 {
-Most of the industrial plants nowadays face severe harness related to unplanned production downtimes. For this reason most of the industrial manager crave the development and usage of smart devices that are able to predict these machinery breakdowns. This fact would also require their taking action so as to manage some upcoming material failure. 
+Most of the industrial plants nowadays face severe harness related to unplanned production downtimes. For this reason most of the industrial manager crave the development and usage of smart devices that are able to predict these machinery breakdowns. This fact would also require their taking action so as to manage some upcoming machine failure. 
 
 It is worth mentioning at this point that the equipment failure can be handled by taking some action in the majority of the cases. This ensues that the maintenance teams is always responsible and can most of the time alleviate potential production issues. For this purpose, engineers need data readings, such that they can analyze and conclude what the actual situation is. 
 
+The data reading aim at the collection of data related mostly on vibration. The most common cause of the machine failures is this of bearings failure or missalignment. In most of the cases, the missalignment case stresses the whole mechanism (shaft, coupling and bearings) and this could lead to the complete destruction of all the machine components. 
+
+Another case that needs to be studied is this of the bearing failure. Bearings have a specific operational number of hours of life. Especially the bearings that require periodical greasing are susceptible to failure because of lack of lubrication. The bearing failure can be detected by measuring using some sensing devices. This could predict the failure of a bearing even in the preliminary stages of the fault.
+
 There is plethora of different devices that may contribute to this concept. This wide variety of sensors and measuring devices yields the opportunity of receiving and analyzing different machines making the most of distinct approaches.
 
-In this chapter the readers will get some intuition into the object of the diploma thesis, along with its contribution and structure. In addition to this, some additional information about the concept of the predictive maintenance will be presented.
+In this chapter the readers will get some intuition into the object of the diploma thesis, along with its contribution and structure. 
+
+Last but not least, the main concept in this technical report is this of the Predictive Maintenance. Wu et al articulate that advancements of Internet of Things(IoT) technology has made predictive maintenance prominent nowadays \cite{WU2025}. The authors explain that it is a condition-based maintenance practice, which in turn requires proactive maintenance. 
+
+In the aforementioned article, it is clearly highlighted that the authors focus on the computational resources and the data collection. Wu et al pursue the development of empirical machine learning models so as to predict performance drops and potential issues \cite{WU2025}. Machine learning is the most common practice so as to create a model-based prediction, but is not the only deployed implementation.
+
+The most common reference feature when it comes to failure prediction is the machine body vibration. Chen et al focus on the vibration-based analysis of some machinery, utilizing mainly machine learning (ML) algorithms \cite{Chen2017}. But there is also the approach of the FFT (Fast Fourier Transform) for the feature extraction of the Vibration Signals. This requires the usage of the FFT algorithm (see Chapter \ref{chap2}).
 }
  
 
 
-\section{Object of the Diploma Thesis}
-{
+\section{Main Objectives of the Diploma Thesis}
+{	
 Elaboration on a system that predicts the failure of mechanical components based on historical data. This thesis focuses on resolving the issue of unplanned shutdowns due to corrective maintenance of machines that have bearings.
 
 The problem that is being investigated is the creation of a set-up that collects and sends some reading to a database. The main focus of the project will be the usage of low-cost components and free-of-charge services. 
 
-Moreover, the operational efficiency of the whole set-up is to be investigated. The ultimate objective is the development of a product that is best value for money.
+Moreover, the operational efficiency of the whole set-up is to be investigated. The ultimate objective is the development of a product that is best value for money, aiming at the development of a low-cost device that can efficiently gather reading from machinery, and this must be combined with the the development of an algorithm that is able to analyze the readings and predict any potential upcoming issues.
+
+The main challenges here lie into the fact that the sensor has some limitations and requirement of case-specific data. This derives from the fact that every machine has its own vibration pattern, and this could be attributed to an abundance of factors (e.g. the foundation, the bearings clearance, the route of the issue itself etc), for this reason the most reliable - ideal practice would be the collection of readings and trend tracking, under the condition that the machine data starts being collected from the first run. 
+
+In addition to the challenges that have already been mentioned, there is always of the relevant data collection in the case of the development of machine learning models. Datasets that resemble the actual machine conditions are required in this case scenario.
 
 The sensing component of the set-up must be attached on the studied machinery. The reason behind this is the efficiency and the accuracy of the readings. The sensor must be fixed on the machinery frame so as to get vibration readings of it. In addition to this, there is the need of a microcomputer and a microcontroller that could gather and analyze the reading.
 
@@ -32,7 +46,7 @@ Getting a good grasp on the upcoming required maintenance activities and being a
 
 The concept of preventive maintenance lies into the fact that the maintenance personnel needs to follow some periodical activities related to lubrication and tightness checks among others. In addition to this straight forward practice, they need to keep track of some data readings so as to figure out what the status of their machines are especially if they notice some abnormal status. 
 
-So within the concept of the preventive maintenance there is a subfield named predictive maintenance that focuses mostly on the readings and data. For this purpose the best practice is taking periodical readings and keep track of the health status of the machine.
+So within the concept of the preventive maintenance there is a subfield named predictive maintenance that focuses mostly on the readings and data. For this purpose the best practice is taking periodical readings and keep track of the health status of the machine. Nodem et al claim that preventive maintenance is usually planned and aimed at increasing the reliability of a deteriorating system or decreasing the operating costs of repairable systems \cite{DehayemNodem2011}.
 }
 
 \subsection{Contribution}
@@ -63,6 +77,6 @@ In Chapter \ref{chap4}, we develop the core signal processing methodology. The f
 
 Chapter \ref{chap5} presents the experimental results and performance evaluation. It describes the data collection and processes the performance of the microcontroller and microcomputer under some memory stress. The results of the fault diagnosis are analyzed to assess the system's accuracy. In addition to this, readings are illustrated.
 
-Finally, Chapter \ref{chap6} concludes the thesis by summarizing the key findings and contributions. It discusses the implications of the results. In addition to this it discusses some new concepts that could be implemented so as to improve the performance of the project.
+Finally, Chapter \ref{chap_last} concludes the thesis by summarizing the key findings and contributions. It discusses the implications of the results. In addition to this it discusses some new concepts that could be implemented so as to improve the performance of the project.
 }
 
