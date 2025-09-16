@@ -1,8 +1,8 @@
-\beamer@slide {fig:System}{4}
-\beamer@slide {fig:FFT}{13}
-\beamer@slide {fig:faultTree}{15}
-\beamer@slide {fig:dataflow}{17}
-\beamer@slide {fig:arduino_algorithm}{25}
-\beamer@slide {fig:rpi_algorithm}{27}
-\beamer@slide {fig:vercel_flow_diagram}{29}
-\beamer@slide {fig:vercel4}{35}
+\beamer@slide {fig:System}{20}
+\beamer@slide {fig:FFT}{23}
+\beamer@slide {fig:faultTree}{25}
+\beamer@slide {fig:dataflow}{27}
+\beamer@slide {fig:arduino_algorithm}{35}
+\beamer@slide {fig:rpi_algorithm}{37}
+\beamer@slide {fig:vercel_flow_diagram}{39}
+\beamer@slide {fig:vercel4}{45}

@@ -7,14 +7,16 @@
 	
 	As previously discussed in Chapter \ref{chap4}, concerns regarding data receiving and  transmission integrity were addressed. The Arduino UNO's hardware architecture imposes specific constraints on data handling capabilities, with its 64-byte serial buffers limiting maximum amount of data input to approximately 600 samples (considering the set-up and the implementation of this very project, which ensues that this is the estimated amount of data based on the dataset format) per second when transmitting three-axis acceleration data. This necessitated careful design of the communication protocol to prevent buffer overflows while maintaining real-time monitoring capabilities.
 	
-	In addition, further investigation is carried out considering the Raspberry Pi data handling capacity, since the latter one has to receive, store, process and post data, which activity is far more demanding.
+	In addition, further investigation is carried out considering the Raspberry Pi data handling capacity, since the latter one has to receive, store, process and post data, which activity is far more demanding. 
 	
-	For testing and deployment, the Raspberry Pi 4 maintained a continuous connection to a host PC within the same local network. This configuration utilized the Raspbian operating system—a lightweight, Debian-based Linux distribution optimized for embedded systems—running on the Raspberry Pi. Communication between the host PC and Raspberry Pi was established through SSH (Secure Shell protocol), which provided secure remote access and full terminal control over the Raspberry Pi. This setup enabled real-time monitoring, debugging, and management of the data acquisition processes without requiring direct physical access to the embedded system.   
+	Last but not least, The data acquired by the React application are posted with an orange line as a machinery health status indication. If the magnitude peak at any frequency exceed this limit it is considered as an maintenance alarm. This concept has been implemented first in the testing phase in the python environment and later on it is used for the deployment and data is depicted using Vercel.
+	
+	Finally, for testing and deployment, the Raspberry Pi 4 maintained a continuous connection to a host PC within the same local network. This configuration utilized the Raspbian lite operating system—a lightweight, Debian-based Linux distribution optimized for embedded systems—running on the Raspberry Pi. Communication between the host PC and Raspberry Pi was established through SSH (Secure Shell protocol), which provided secure remote access and full terminal control over the Raspberry Pi. This setup enabled real-time remote monitoring, debugging, and management of the data acquisition processes without requiring direct physical access to the embedded system.   
 }
 
-\section{System Verification and Validation}
+\section{Precommissioning System Verification and Validation}
 
-\subsection{Arduino to Raspberry Pi Data Transmission}
+\subsection{Arduino to Raspberry Pi Data Transmission Performance Metrics}
 {
 	The system was tested across all stages of data transmission, with careful consideration of the Arduino's operational limits. Sensor readings were first collected by the Arduino, which processed the raw signals from each axis and calculated the amplitude. The Arduino successfully managed the incoming sensor data without loss or timing issues, operating well within its 64-byte buffer constraints at the configured 115200 baud rate.
 	
@@ -42,7 +44,7 @@
 	
 }
 
-\subsection{Raspberry Pi to Supabase and System Performance}
+\subsection{Raspberry Pi to Supabase and System Performance Metrics}
 {
 
 	
@@ -98,7 +100,9 @@
 }
 
 
-\section{System Performance}
+
+
+\section{Summarizing Testing System Performance}
 {
 	In the Appendix Section \ref{subsec:tests} there is many cases of mechanical machine faults. The depicted examples extracted from the Datasets \cite{ihsannur} and \cite{hong2023hust}, depict the frequency domain bits related to these faults as well as the raw data wave, where all these frequency domains where calculated from.
 	
@@ -106,7 +110,20 @@
 	
 	The threshold that is being used as a metrics of dealing with a faulty case, is the 1[g]. So in case the magnitude of the some bit exceeds this threshold this entails that there is a faulty case. 
 	
-	What can be noticed in the table \ref{tab:critical_failures} is that there is a prediction pattern. It is easier to predict the misalignment rather than any other mechanical fault. The threshold concept seems to be ineffective in the case of small-size mechanical components, since the only case that it predicted successfully is this of the misalignment.
+	In Figure \ref{fig:missalignmentfault1} the 1 [g] threshold is depicted, indicating the critical upper limit. In Section \ref{subsec:dataflowdia}, the concept of 1 [g] as an alarm has been put. In Section \ref{sec:faultfrequencies}, the faults have been analyzed, yielding some illustration of the faulty machinery spectra. For this reason visual checks take place, considering the aforementioned features so as to decide frequency spectra could reveal. 
+	
+	First, the rotational speed of the machine constitutes the most crucial frequency. In Figure \ref{fig:missalignmentfault1} it can be noticed that a motor working at 3000 [rpm], which equals to 50[Hz] (see Equation \ref{eq:freq_rpm}), has bit peak at the rotational speed of the machine. According to Section \ref{sec:faultfrequencies} this was the expected illustration.
+	
+	Secondly, the peak exceed some te threshold of the 1 [g], which leads to some maintenance alarm. 
+	
+	Third trait of a mechanical fault is this of the bearing components crucial frequencies. In Section~\ref{sec:faultfrequencies}, it was discussed that in the case of bearing component faults, the resulting vibration spectrum often exhibits frequency peaks at integer multiples of the rotational speed. The characteristic bearing fault frequencies can be expressed in the general form:
+	\begin{equation}
+		f_{\text{fault}} = n \times f \times F_{\text{bearing}}
+		\label{eq:general_fault}
+	\end{equation}
+	where $n$ is an integer and $F_{\text{bearing}}$ is a specific bearing factor.
+	
+	Using the aforementioned knowhow, it can be estimated what the faulty condition might be. What can be noticed in the table \ref{tab:critical_failures} is that there is a prediction pattern. It is easier to predict the misalignment rather than any other mechanical fault. The threshold concept seems to be ineffective in the case of small-size mechanical components, since the only case that it predicted successfully is this of the misalignment.
 	
 	
 	\begin{table}[ht]
@@ -139,8 +156,8 @@
 			\hline
 			Misalignment Prediction & 14 & 100\% \\
 			Other Bearing Failure   & 25 & 0\% \\
-			Data Transmission (Raspberry $\rightarrow$ Supabase) & 2 & 100\% \\
-			Data Transmission (Arduino $\rightarrow$ Raspberry Pi) & 2 & 100\% \\
+			Data Transmission (Raspberry $\rightarrow$ Supabase) & 3 & 100\% \\
+			Data Transmission (Arduino $\rightarrow$ Raspberry Pi) & 3 & 100\% \\
 			\hline
 		\end{tabular}
 	\end{table}
@@ -149,13 +166,11 @@
 
 
 
-\section{Data Depiction and Visualization}
+\section{System Deployment}
 {
-	"OPWS EGRAPSA STO EMAIL EDW XREIAZETAI PERISSOTERO ANALYSI KAI EKSHGHSH TWN FIGURES. EKSHGHSE TA TEST VECTOR POY EXEIS
-	Sta results tha prepei na eksigiseis parapano ti provlepeis me to sistima --- ta faults
-	Kai meta dixneis statistika oti sta 100 vectors vrikes xx apo ta faults opote exei xx - 100PERCENT accuracy of fault detection … opote ginetai validation"
+	Real machinery operation data visualization is taking place in the second phase, following the testing phase. This concept focuses on developing a condition monitoring, cloud-based, application. This concept works by retaining a reference healthy-status frequency curve, so as to compare future results to this initial reference point. Moreover, further vibration analysis can be executed utilizing all historical data for all 3-axis.
 	
-	Real machinery operation data visualization is taking place in the second phase, following the testing phase. This concept focuses on developing a condition monitoring, cloud-based, application.
+	The sensing set-up has been deployed on an actual fan rotating at 35 [Hz]. This fan is loose, and not fixed on some foundation.
 	
 	Prior to the system verification described in the previous section, testing was conducted using a simplified algorithm derived from the main implementation. These preliminary implementations can be found in Appendix \ref{subsec:raspberrypi-algorithm} (Algorithm 1 and Algorithm 7).
 	
@@ -169,33 +184,13 @@
 	
 	It must also be noted that on each plot two lines are depicted: the blue line corresponds to the healthy state reference, while the green line illustrates the current state of the machinery. Moreover, it is worth noting that in the case of the values in the frequency domain exceeding the value 1[g], then an orange horizontal line will show up, indicating the dangerous zone. This ensues that in the casing of having peaks exceeding this values some mechanical components needs to be further investigated or even replaced.
 	
-	"DEN FAINETAI TO CAPTION MEGALWSE TO FONT SE Y KAI X AXIS KAI VALE ASPRO BACKGROUND KAI KANE ZOOM SE ALLO ENA"
-	
 	\begin{figure}[h]
 		\centering
-		\includegraphics[width=0.7\linewidth]{figures/vercelimage1.png}
+		\includegraphics[width=1\linewidth]{figures/vercelimage1.png}
 		\caption{Visualization of the X-axis vibration data. The initial view of the Vercel dashboard shows the dynamically loaded measurement data from Supabase, where the healthy baseline (blue) is compared against the current state (green).}
 		\label{fig:vercel1}
 	\end{figure}
 	
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=0.7\linewidth]{figures/vercelimage2.png}
-		\caption{Visualization of the Y-axis vibration data. The chart compares the healthy baseline spectrum (blue reference) with the current sensor measurements (green), enabling the detection of frequency-domain deviations.}
-		\label{fig:vercel2}
-	\end{figure}
+	As already has been articulated, in the case of \ref{fig:vercel1}, the data visualized here are about a loose base fan. This entails that we expect to receive finding similar to this of Figure \ref{fig:faultsunfaults}. Indeed, the arbitrary peak bits about the Fs peak of the rotational speed, indicate that there os the case of a loose support.
 	
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=0.7\linewidth]{figures/vercelimage3.png}
-		\caption{Visualization of the Z-axis vibration data. Similar to the X- and Y-axis plots, the frequency response is depicted with both the healthy baseline (blue) and current state (green), highlighting differences between conditions.}
-		\label{fig:vercel3}
-	\end{figure}
-	
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=0.7\linewidth]{figures/vercelimage4.png}
-		\caption{Visualization of the overall vibration magnitude. This chart combines all three coordinate axes into a single representation, showing the total vibration energy with the healthy baseline (blue) compared against the current state (green).}
-		\label{fig:vercel4}
-	\end{figure}
 }

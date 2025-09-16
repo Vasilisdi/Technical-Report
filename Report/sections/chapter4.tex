@@ -38,9 +38,12 @@
 
 \subsection{Dataflow Block Diagram} 
 {
+	\label{subsec:dataflowdia}
 	Figure \ref{fig:dataflowblock} illustrates a layout of the algorithms in the following sections.
 	
-	Arduino UNO collects data and sends data in data batches to the serial port, where data in bit format are stored in the memory of Raspberry Pi and are first converted to g-units and then transformed in the frequency domain. Following this step, data is stored to the Supabase and then presented on a webpage upon request.
+	Arduino UNO collects data and sends data in data batches to the serial port, where data in bit format are stored in the memory of Raspberry Pi and are first converted to g-units and then transformed in the frequency domain. Following this step, data is stored to the Supabase and then presented on a webpage upon request. 
+	
+	The terminal recipient of the collected readings is the React application of Vercel that illustrates the collected data. There is a threshold value at 1[g] magnitude of the frequency spectrum that works as a decisive factor for identifying the failure of some mechanical components.
 	
 	\begin{figure}[h]  
 		\centering  
@@ -298,12 +301,41 @@
 }
 
 
+\section{Database Set-up}
+{
+	\label{subsec:database}
+	As regards the database set-up, the Supabase database consists of the following tables:
+	
+	\begin{itemize}
+		\item \texttt{customers}
+		\item \texttt{sensors}
+		\item \texttt{measurements}
+	\end{itemize}
+	
+	Each customer can own several sensors that measure different points, i.e., different pieces of equipment. 
+	Each sensor has a name based on the machine and its function. 
+	All measurement data is stored in the main table \texttt{measurements}. 
+	
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.7\linewidth]{figures/supabase.png}
+		\caption{Entity-relationship schema of the Supabase database.}
+		\label{fig:supabase-schema}
+	\end{figure}
+	
+}
 
 
 \subsection{Vercel Implementation and Supabase Integration}
 	\label{subsec:vercelsec}
 {
 	After sending all data to Supabase, you can deploy this Next.Js-friendly application that visualizes your sensor measurements. The project structure is optimized for Next.js with TypeScript and includes all necessary configuration files. When you deploy this application to Vercel, you'll receive a unique URL that you can share with specific email addresses.
+	
+	It is worth mentioning at this point that there is discrete data rows for each of the 3-axis. This entails that data stored independent from each other (see Section \ref{subsec:database}). For this reason, Vercel identifies the set of (X,Y,Z and their Magnitude) based on the instance of time (there is the startMeasurement and endMeasurement columns).
+	
+	The aforementioned separate data are posted on different figures so as to distinct from each other and focus on the axis that deals with the more intense vibration.
+	
 	
 	Once the Next.js application is deployed on Vercel, the web page becomes accessible from any remote device 
 	using the assigned Vercel domain (e.g., \texttt{https://yourproject.vercel.app}). When a user opens this page, the frontend code hosted on Vercel executes in the browser and communicates directly with the Supabase API  using the project URL and the public \texttt{anon} key. Supabase then applies the defined Row Level Security (RLS) policies to determine which data can be returned. As a result, users can view the permitted Supabase results on the web page from any location, making the system fully accessible online.
@@ -410,26 +442,3 @@
 
 }
 
-\section{Database Schema}
-{
-As regards the database set-up, the Supabase database consists of the following tables:
-
-\begin{itemize}
-	\item \texttt{customers}
-	\item \texttt{sensors}
-	\item \texttt{measurements}
-\end{itemize}
- 
-Each customer can own several sensors that measure different points, i.e., different pieces of equipment. 
-Each sensor has a name based on the machine and its function. 
-All measurement data is stored in the main table \texttt{measurements}. 
-
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/supabase.png}
-	\caption{Entity-relationship schema of the Supabase database.}
-	\label{fig:supabase-schema}
-\end{figure}
-
-}
