@@ -168,7 +168,9 @@
 
 \subsection{The Raspberry Pi 4 Algorithm} 
 {
-	While the Arduino UNO sketches seem to be quite straight forward and the only difficulty that had to be overcome was its memory limitations, the Raspberry Pi 4 algorithms are far more sophisticated. 
+	 In contrast with Arduino UNO, the Raspberry Pi 4 would require an external Analog to Digital converter so as to receive data from ADXL335. For this reason Arduino UNO is mandatory for the needs of this project.
+	 
+	 While the Arduino UNO sketches seem to be quite straight forward and the only difficulty that had to be overcome was its memory limitations, the Raspberry Pi 4 algorithms are far more sophisticated. 
 	
 	An efficient way to organise the files of a project is the "src layout" \cite{srclayout}. A well-structured project layout, such as the src-based approach with clearly separated folders for source code, tests, configs, and scripts, is highly effective because it enforces organization and scalability as a project grows. By isolating source code under src/, you avoid common import conflicts and ensure your code behaves the same way in both development and production. 
 	

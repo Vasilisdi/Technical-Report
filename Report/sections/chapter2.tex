@@ -8,9 +8,9 @@
 \subsection{The Scope of Predictive Maintenance}
 {
 
-There is a tremendous abundance of applications where the vibration analysis is a prerequisite. Readings and records are of vital importance in the context of the predictive maintenance implementation. Most of the industries nowadays strive to make use of accurate preventive maintenance plans, which requires a well-rounded continuous monitoring system, that keeps data of the whole equipment. The ultimate goal of the preventive maintenance plan is the elimination of the unwanted shut-downs due to a machine failure and the increase of plant reliability \cite{DehayemNodem2011}.
+There is a tremendous abundance of applications where the vibration analysis is a prerequisite. Readings and recordings are of vital importance in the context of the predictive maintenance implementation. Most of the industries nowadays strive to make use of accurate preventive maintenance plans, which requires a well-rounded continuous monitoring system, that keeps data of the whole equipment. The ultimate goal of the preventive maintenance plan is the elimination of the unwanted shutdowns due to a machine failure and the increase of plant reliability \cite{DehayemNodem2011}.
 
-Most of the machines need bearings because bearings are mechanical components designed to support rotating shafts and minimize friction. The bearings failure may have a wide variety of causes, lubrication shortage, seal failure, high temperatures, misalignment are some of the causes among others. Therefore vibration analysis focuses on predicting all theses possible causes of bearings failure. Some of the preventive actions against the bearings failure are described bellow \cite{Li2001}.
+Most of the machines need bearings, since bearings are mechanical components designed to support rotating shafts and minimize friction. The bearings failure may have a wide variety of causes, lubrication shortage, seal failure, high temperatures, misalignment are some of the causes among others. Therefore vibration analysis focuses on predicting all theses possible causes of bearings failure. Some of the preventive actions against the bearings failure are described bellow \cite{Li2001}.
 
 Proper lubrication plays a vital role in bearing longevity. Rather than choosing oils based solely on moderate operating temperatures, engineers must consider factors like bearing speed, size, and load. Maintaining an adequate oil film is critical, and minimum viscosities are established based on bearing type. This oil film ensure that no metal-to-metal contact takes place for a predetermined load and speed. If these thresholds aren't met, metal-to-metal contact occurs, significantly reducing reliability \cite{Bloch1998}.
 
@@ -30,7 +30,7 @@ The laser mechanism set-up (laser emitters and receivers) are connected to some 
 
 However there could be some more causes of machinery failure, specifically a loose machinery base or tightening bolt is another that could lead to a components failure. Hence, the way to alleviate this issue is to align and tighten the machinery back to the frame.
 
-How does vibration diagnosis contribute to operational reliability and cost efficiency in engineering applications? The answer to this question is that the implementation of vibration-analysis-based predictive maintenance helps in the direction of troubleshooting the cause of some issue. In addition, raising awareness on some upcoming failure leads to proper planning, which can prevent greater equipment damage.
+Vibration diagnosis contributes to operational reliability and cost efficiency in engineering applications immensely. The implementation of vibration-analysis-based predictive maintenance helps in the direction of troubleshooting the cause of some issue. In addition, this vital information could alert the working personnel for some upcoming failure, which leads to proper planning and equipment damage prevention.
 }
 
 
@@ -75,9 +75,14 @@ Chen et al included in their research some more photos related to faulty bearing
 \subsection{The Reliability}
 {	
 
-	To begin with, the ultimate objective of the preventive maintenance concept is to improve the dependability. In essence, it is a concept that encompasses different subconcepts like Reliability, Availability, Maintenability and others. The reliability interprets the successful uninterrupted operation of an adequately-performing device or an engineering system. This entails that the operating system must retain not only a low Failure rate, but the most important trait of a device in operation must be the absence of failures so as to claim the title of a "reliable system".
+	To begin with, the ultimate objective of the preventive maintenance concept is to improve the dependability. In essence, it is a concept that encompasses different subconcepts like Reliability, Availability, Maintenability and others. 
 	
-	According to Martz, "reliability analysis is the engineering and statistical methodology used to assess the unknown reliability of a device. It may be used qualitatively as a means for identifying the various failure modes and causes, or it may be applied quantitatively, using appropriate failure data, to provide a numerical estimate of the unknown reliability" \cite{Martz2001}. Hence, it is worth it utilizing the aforementioned metrics (MTTF and MTBF), when contemplating reliability, since these constitute the actual metrics of reliability.
+	
+	The reliability interprets the successful uninterrupted operation of an adequately-performing device or an engineering system. This entails that the operating system must retain not only a low Failure rate, but the most important trait of a device in operation must be the absence of failures so as to assert that a system is "reliable system".
+	
+	According to Martz et al, reliability analysis is a statistical and engineering practice so as to extract metrics of reliability of a working machine. It can be utilized to assess possible break down modes and their causes. This study on the health status of some machine is used in order to have a numerical-quantified estimate of the machinery reliability \cite{Martz2001}.
+	
+	Hence, it is worth it utilizing the aforementioned metrics (MTTF and MTBF), when contemplating reliability, since these constitute the actual metrics of reliability.
 	
 	The initial aspect of the theoretical background to be elaborated upon is Mean Time to Failure (MTTF) is a fundamental reliability metric used to estimate the average operational lifetime of non-repairable components and systems. In the context of this very article, the main focus of the study is mechanical components (e.g bearings, gears) as well as a system-machine in operation.
 	
@@ -85,14 +90,14 @@ Chen et al included in their research some more photos related to faulty bearing
 	
 	\begin{itemize}
 		\item \( f(x) \) is the probability density function of the time to failure.
-		\item \( R(t) \) represents the probability that the device is still operational at time \( t \) \cite{Martz2001}.
-		\item \( F(t) \) is the cumulative distribution function of the time to failure, representing the probability that the system has failed by time \( t \).
+		\item \( R(t) \) interprets the probability that the device is still operational at time \( t \) \cite{Martz2001}.
+		\item \( F(t) \) is the cumulative distribution function of the time to failure, interpreting the probability that the system has failed by time \( t \).
 	\end{itemize}
 	
 	\subsubsection{Interpretation of the Mean Time To Failure}
 	\indent	
 	
-	In this regard the MTTF (Mean Time To Failure) can be modeled as the integral of the reliability function \( R(t) \) over time, from zero to infinity:
+	MTTF (Mean Time To Failure) can be modeled as the integral of the reliability function \( R(t) \) over time, from zero to infinity \cite{Martz2001}:
 	
 	\[
 	\text{MTTF} = \int_{0}^{\infty} R(t) \, dt
@@ -112,13 +117,13 @@ Chen et al included in their research some more photos related to faulty bearing
 	\subsubsection{Interpretation of the Mean Time Between Failures}
 	\indent	
 	
-	The MTBF (Mean Time Between Failures) is another critical metric used in reliability engineering, particularly for repairable systems. It represents the average time between failures for a system or component. For repairable systems, MTBF is calculated as the sum of the operational time divided by the number of failures:
+	The MTBF (Mean Time Between Failures) is another critical metric used in reliability engineering, particularly for repairable systems. It represents the average time between failures for a system or component. For repairable systems, MTBF is calculated as the sum of the operational time divided by the number of failures \cite{Martz2001}:
 	
 	\[
 	\text{MTBF} = \frac{\text{Total operational time}}{\text{Number of failures}}
 	\]
 	
-	In this case, the reliability function would be:
+	In this case, the reliability function is expressed as follows:
 	
 	\[
 	R(t) = e^{-\lambda t}
@@ -131,16 +136,16 @@ Chen et al included in their research some more photos related to faulty bearing
 	\]
 	
 	
-	MTBF helps in understanding the reliability of a system over time and is essential for planning maintenance schedules, improving system design, and ensuring continuous operation with minimal downtime. A higher MTBF indicates a more reliable system that experiences fewer failures over its operational life.
+	
+	MTBF (Mean Time Before Failure) is an indicative for planning significant maintenance activities tacking the minimum risk possible. The greater this number is the better the reliability of a system is \cite{Martz2001}. This ensues that a system go through a lower number of failures.
 	
 	
 	\subsubsection{Interpretation of the Failure Rate}
 	\indent	
 	
-	The Failure rate, often denoted as \(\lambda\), is defined as the frequency with which an engineered system or component fails. This metric is typically expressed in terms of the number of failures per unit time.
+	The FT (Failure Rate), often designated as \(\lambda\), is defined as the frequency with which an engineered system or component fails. The units of the FT is the number of failures per unit time.
 	
-	In mathematical term the Failure rate can be expressed as follows: 
-	
+	The Failure rate is expressed as follows: 
 	
 	\[
 	\lambda(t) = \frac{f(t)}{R(t)} = \frac{f(t)}{1 - F(t)}
@@ -149,14 +154,17 @@ Chen et al included in their research some more photos related to faulty bearing
 	There is three failure rate cases that may be encountered: 
 	
 	\begin{itemize}
-		\item \textbf{Constant Failure Rate:} A constant \( \lambda \) suggests that the system is in its "useful life" period, where the rate of failure is steady and does not change over time.
-		\item \textbf{Increasing Failure Rate (IFR):} An increasing \( \lambda(t) \) indicates that the system is aging and becoming more prone to failure.
-		\item \textbf{Decreasing Failure Rate (DFR):} A decreasing \( \lambda(t) \) is often observed during the initial "infant mortality" period, where early failures occur, but the remaining items are more reliable over time.
+		\item A constant \( \lambda \) is indicative of a normal-operating system, since the amount of failures over time does not fluctuate.
+
+		\item An increasing \( \lambda(t) \) indicates that the system is getting stressed and becoming more susceptible to failures.
+		
+		\item A decreasing \( \lambda(t) \) is indicative of a system that becomes more reliable in terms of time. This happens after the starting phase of its operational life.
+
 	\end{itemize}
 	
 	
 	\subsubsection{Constant Failure Rate}
-	For systems with an exponential distribution of failure times (i.e., a constant failure rate), the failure rate \( \lambda \) is constant over time:
+	Here comes the interpretation of the Constant Failure Rate, the failure rate \( \lambda \) is constant over time:
 	
 	\[
 	\lambda = \text{constant}
@@ -173,14 +181,14 @@ Chen et al included in their research some more photos related to faulty bearing
 	\]
 	
 	\subsubsection{Interpretation of the Availability}
-	Availability (A) is typically expressed as a percentage and is calculated using the following formula\cite{Ruane2022}:
+	Availability (A) is typically expressed as a percentage and is calculated using the following mathematical expression \cite{Ruane2022}:
 	\[
 	A = \frac{MTBF}{MTBF + MTTR} \times 100\%
 	\]
 	Where:
 	\begin{itemize}
 		\item MTBF (Mean Time Between Failures): The average time interval between two consecutive expected failures of a system component or mechanism.
-		\item MTTF (Mean Time To Repair): The average time required to repair a failed system component or mechanism and restore it to operational status.
+		\item MTTF (Mean Time To Repair): The average time required to repair a shut system or mechanism and set  it back to operation.
 	\end{itemize}
 
 
@@ -249,19 +257,23 @@ Some typical applications that use vibration analysis implementations are turbin
 
 Li and McKee explain in their research that most of the vibration analysis applications are related to electrical and mechanical equipment that utilize roller bearings \cite{Li2001}. 
 
-Similarly, Lilly and Marscher have studied the vibration and noise derived from pumps and motors separately \cite{Lilly2008}. In addition, the concept of translational and torsional vibration is introduced. In addition to this, the concept of vibration analysis on piping is studied as well. In this context, the translational vibration analysis is made for the engine-pump-support structure, investigating the lateral vibration.  For this study the usage of high-quality sensors is a prerequisite. There is also the concept of the torsional vibration analysis, which is also subtle and requires special study on the oscillating torque.
+Similarly, Lilly and Marscher have studied the vibration and noise derived from pumps and motors separately \cite{Lilly2008}. In addition, the concept of translational and torsional vibration is introduced. In addition to this, the concept of vibration analysis on piping is studied as well. 
 
-In addition to the aforementioned study, Lilly and Marscher investigate also the possibility of using some actuators that may compensate the noise of the motor-pump compound, making the most of the electronically generated sound waves. This technique aims at the cancellation of noise pollution \cite{Lilly2008}.
+The translational vibration analysis is made for the engine-pump-support structure, investigating the lateral vibration.  For this study the usage of high-quality sensors is a prerequisite. There is also the concept of the torsional vibration analysis, which is also subtle and requires special study on the oscillating torque. This application is difficult to be studied.
+
+Moreover, Lilly and Marscher investigate also the possibility of using some actuators that may compensate the noise of the motor-pump compound, making the most of the electronically generated sound waves. This technique aims at the cancellation of noise pollution \cite{Lilly2008}.
 
 The study by Jiao et al. demonstrates the efficacy of time-domain feature extraction combined with Independent Component Analysis (ICA) for gearbox fault diagnosis. Their approach maximizes mutual information to isolate fault-related vibrations from noisy multi-channel measurements, achieving high accuracy in classifying faults such as teeth surface damage and loose foundations \cite{Jiao2017}. 
 
 There is also the chance of implementing advanced signal processing techniques, such as envelope analysis and cyclostationary methods, to enhance fault detection in complex systems like helicopters, where high noise and low signal-to-noise ratios are prevalent \cite{Girondin2012}.
 
-In the context of unmanned aerial vehicles (UAVs), Mohd Ghazali and Rahiman employ vibration sensors and artificial intelligence (AI) techniques, including fuzzy logic and neural networks, to detect faults in drone arms. Their framework addresses the challenges of real-time decision-making and integrates IoT for remote monitoring, showcasing the adaptability of vibration analysis to emerging technologies \cite{Ghazali2022}. Meanwhile, Girondin et al. focus on bearing faults in helicopters, proposing redundancy-based harmonic analysis to overcome limitations imposed by low sampling frequencies and environmental noise. Their geometric mean criterion proves robust in identifying fault frequencies despite parasitic vibrations \cite{Girondin2012}.
+In the context of unmanned aerial vehicles (UAVs), Mohd Ghazali and Rahiman employ vibration sensors and artificial intelligence (AI) techniques, including fuzzy logic and neural networks, to detect faults in drone arms. Their framework addresses the challenges of real-time decision-making and integrates IoT for remote monitoring, showcasing the adaptability of vibration analysis to emerging technologies \cite{Ghazali2022}. 
+
+Meanwhile, Girondin et al. focus on bearing faults in helicopters, proposing redundancy-based harmonic analysis to overcome limitations imposed by low sampling frequencies and environmental noise. Their geometric mean criterion proves robust in identifying fault frequencies despite parasitic vibrations \cite{Girondin2012}.
 
 Theoretical advancements in vibration analysis also emphasize the role of preprocessing steps, such as whitening and Minimum Entropy Deconvolution (MED), to accentuate impulsive features indicative of faults \cite{Girondin2012}. These methods, combined with machine learning classifiers like Support Vector Machines (SVM) and neural networks, enable automated fault diagnosis with minimal human intervention, as demonstrated in gearbox and bearing applications \cite{Jiao2017, Ghazali2022}.
 
-Vibration analysis serves as a versatile tool across industries, from traditional rotating machinery to cutting-edge UAVs. Its evolution—driven by innovations in signal processing, AI, and IoT—continues to expand its applicability and precision in fault detection and predictive maintenance.
+Vibration analysis constitutes significant asset of the modern industry, from traditional rotating machinery to cutting-edge UAVs. Its evolution—driven by innovations in signal processing, AI, and IoT—continues to evolve while data bases are still developing.
 }
 
 \section{Fundamentals of Bearing Fault Frequencies}
@@ -390,7 +402,7 @@ In most of the actual applications a machine learning implementation is a common
 {
 In this section a deeper elabotation on Fourier Analysis and Transform is going to take place. 
 
-Serafeimidou explains in detail the theoritical background of the Fourier Analysis \cite{diff_eq}. For an arbitrary finite range [-L,L] there is a family of functions, which meet the Dirichlet condition, and these functions can be expressed as a trigonometric sequence: 
+Serafeimidou explains in detail the theoritical background of the Fourier Analysis. For an arbitrary finite range [-L,L] there is a family of functions, which meet the Dirichlet condition, and these functions can be expressed as a trigonometric sequence \cite{diff_eq}: 
 
 \begin{equation}
     f(x) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \left( a_n \cos(n\pi \omega x) + b_n \sin(n\pi \omega x) \right),
@@ -399,7 +411,7 @@ Serafeimidou explains in detail the theoritical background of the Fourier Analys
 
 where \( \omega = \frac{\pi}{L} \).
 
-In addition its constants can be expressed as follows:
+In addition its constants can be expressed as follows \cite{diff_eq}:
 
 \begin{equation}
     a_n = \frac{1}{L} \int_{-L}^{L} f(u) \cos(n \omega u) \,du   
@@ -409,7 +421,7 @@ In addition its constants can be expressed as follows:
     b_n = \frac{1}{L} \int_{-L}^{L} f(u) \sin(n \omega u) \,du    
 \end{equation}
 
-The equation \eqref{eq:tri_seq} needs to be expressed as a valid form within the whole \( x \in \mathbb{R} \). For this reason the  trigonometric integral (which is called Fourier integral) can be expressed as follows: 
+The equation \eqref{eq:tri_seq} needs to be expressed as a valid form within the whole \( x \in \mathbb{R} \). For this reason the  trigonometric integral (which is called Fourier integral) can be expressed as follows \cite{diff_eq}: 
 
 \begin{equation}
     F(x) = \int_0^{\infty} \left[ A(\omega) \cos(\omega x) + B(\omega) \sin(\omega x) \right] \, d\omega
@@ -438,10 +450,10 @@ Assuming that there exist real functions \( f(x) \) defined in \( \mathbb{R} \) 
 }
 \end{itemize}
 
-Hence, given that the aforementioned conditions are met, \( A(\omega) \) (see Eq. \eqref{eq:Aomega}) and \( B(\omega) \) (see Eq. \eqref{eq:Bomega}) tend to attain a real value for \( \omega \), which implies that \( A(\omega) \) and \( B(\omega) \) are defined for every \( \omega \in \mathbb{R} \). In addition to this, the integral of the equation \eqref{eq:tri_int} tends to attain a real value for x, which ensues that F(x) is defined for every \( x \in \mathbb{R} \).
+Hence, given that the aforementioned conditions are met, \( A(\omega) \) (see Eq. \eqref{eq:Aomega}) and \( B(\omega) \) (see Eq. \eqref{eq:Bomega}) tend to attain a real value for \( \omega \), which implies that \( A(\omega) \) and \( B(\omega) \) are defined for every \( \omega \in \mathbb{R} \). In addition to this, the integral of the equation \eqref{eq:tri_int} tends to attain a real value for x, which ensues that F(x) is defined for every \( x \in \mathbb{R} \)  \cite{diff_eq}.
 
 \( F(x) \) is identical to \( f(x) \) whenever \( f(x) \) is a continuous function. 
-There are some special cases when \( f(x) \) is not a continuous function, and to deal with these cases, we define:
+There are some special cases when \( f(x) \) is not a continuous function, and to deal with these cases, we define  \cite{diff_eq}:
 
 \begin{equation}
     F(x) = \frac{1}{2} \left[ \lim_{x \to x^+} f(x) + \lim_{x \to x^-} f(x) \right]
@@ -449,7 +461,7 @@ There are some special cases when \( f(x) \) is not a continuous function, and t
 
 This ensures that \( F(x) \) is properly handled even in cases of discontinuity.
 
-All things considered the Fourier Transform \( F(\omega) = \mathcal{F} \{ F(x) \} \) can be mathematically expressed as follows:
+All things considered the Fourier Transform \( F(\omega) = \mathcal{F} \{ F(x) \} \) can be mathematically expressed as follows  \cite{diff_eq}:
 
 
 \begin{equation}
@@ -470,11 +482,11 @@ Hence, the mathematical formulation for determining the amplitude of each freque
 }
 \subsubsection{Fast Fourier Transform (FFT)}
 {
-The Fast Fourier Transform (FFT) is an efficient algorithm for computing the Discrete Fourier Transform (DFT), expessed by the equation \eqref{eq:DFT} and its inverse. One of the most prominent FFT algorithms, the Cooley-Tukey algorithm \cite{CooleyTukey1965}, employs a divide-and-conquer approach to reduce the computational complexity from $\mathcal{O}(n^2)$ (for the naive DFT) to $\mathcal{O}(2 n \log n)$, enabling significant speedups for large amount of data.
+The Fast Fourier Transform (FFT) is an efficient algorithm for computing the Discrete Fourier Transform (DFT), expessed by the equation \eqref{eq:DFT} and its inverse. One of the most prominent FFT algorithms, the Cooley-Tukey algorithm \cite{CooleyTukey1965}, employs a divide-and-conquer approach to reduce the computational complexity from $\mathcal{O}(n^2)$ (for the naive DFT) to $\mathcal{O}(2 n \log n)$, enabling significant speed improvement for large amount of data.
 
 This reduces complexity from $\mathcal{O}(n^2)$ (naive DFT entails direct implementation of the equation \eqref{eq:DFT}) to less than $\mathcal{O}(2 n \log n)$ (a Fast Fourier Transform implementation), enabling major time savings for complex and large-scale transforms. It is also worth articulating that the complexity can be interpreted as the number of operations executed \cite{CooleyTukey1965}, \cite{Singeleton1967}. 
 
-Both algorithms are implemented in major numerical packages including MATLAB and NumPy's routines \cite{FFT}. What is highlighted  by Singeleton is that the Cooley-Tukey approach is considerably faster and decently performing especially when coupled with some additional practices so as to execute the Fast Fourier Transform \cite{Singeleton1967}. 
+Both algorithms are implemented in major numerical packages including MATLAB and NumPy's routines \cite{FFT}. What is highlighted  by Singeleton is that the Cooley-Tukey approach is considerably faster and decently performing especially when working along with some additional practices so as to execute the Fast Fourier Transform \cite{Singeleton1967}. 
 
 The computation time according to the aforementioned article decreases drastically by making use of the Cooley-Tukey algorithm. In addition, this very algorithm performs and adapts better to different applications compared to Good's, Danielson's and Goertzel's approaches.
 
@@ -495,14 +507,14 @@ It is hereby worth it elaboration on the Fast Fourier Transform algorithm \cite{
 
 where \( j_{v} \) and \( k_{v} \) are the contents of the respective bit positions within the binary representation, which ensues that they are equal to 0 or 1.
 
-The aforementioned set-up (see eq. \eqref{eq:DFT}) leads to the following equation \eqref{eq:FFT}, encompassing twiddle factors expressed as:
+The aforementioned set-up (see eq. \eqref{eq:DFT}) leads to the following equation \eqref{eq:FFT}, encompassing twiddle factors expressed as \cite{CooleyTukey1965}:
 
 \begin{equation}
 	W = e^{-2\pi i/N}
 	\label{eq:twiddle}
 \end{equation}
 
-And the Fast Fourier Transform:
+And the Fast Fourier Transform \cite{CooleyTukey1965}:
 
 \begin{equation}
 	X(j_{m-1}, \cdots ,j_0) = \sum_{k_{0}} \sum_{k_{1}} \cdots \sum_{m-1} x({k_{m-1} , \cdots , k_0}) \cdot W^{j \cdot k_{m-1} \cdot 2^{m-1} + \cdots + j \cdot k_0}
@@ -514,19 +526,19 @@ where as per the first step:
 	W^{j \cdot k_{m-1} \cdot 2^{m-1}} = W^{j_{0} \cdot k_{m-1} \cdot 2^{m-1}}
 \end{equation}
 
-Furthermore, in the context of the first calculation, the first array can be expressed as follows:
+Furthermore, in the context of the first calculation, the first array can be expressed as follows \cite{CooleyTukey1965}:
 
 \begin{equation}
 	x_{1}(j_0, k_{m-2}, \cdots, k_0) = \sum_{\mathbf{k_{m-1}}} x(\mathbf{k_{m-1, \cdots, k_0}}) \cdot W^{\mathbf{j_0}  \cdot \mathbf{k_{m-1}} \cdot \mathbf{2^{m-1}} }
 \end{equation}
 
-And hereunder can be contemplated that proceeding to the next innermost-successive sum:
+And hereunder can be contemplated that proceeding to the next innermost-successive sum \cite{CooleyTukey1965}:
 
 \begin{equation}
 	W^{j \cdot k_{m-1} \cdot 2^{m-1}} = W^{(j_{l-1} \cdot 2^{l-1} + \cdots + j_0) \cdot k_{m-l} \cdot 2^{m-l}}
 \end{equation}
 
-followed by the calculation of the arrays:
+followed by the calculation of the arrays \cite{CooleyTukey1965}:
 
 \begin{equation}
 	x_{l}(j_0, \cdots, j_{l-1} , k_{m-l-1} , \cdots, k_0) = \sum_{\mathbf{k_{m-l}}} x_{l-1}(j_0, \cdots , j_{l-2} \cdots, k_{m-l} , \cdots , k_0) \cdot  W^{(j_{l-1} \cdot 2^{l-1} + \cdots + j_0) \cdot k_{m-l} \cdot 2^{m-l}}
@@ -535,7 +547,7 @@ followed by the calculation of the arrays:
 
 for l = 1, 2, ... , m
 
-And this could constitute a recursive procedure obtaining the successive arrays. And last but not least, this finally could lead to the calculation of X spectrum. It can be contemplated that from the Equation \eqref{eq:Radix2}, there is at all times two consecutive values, the even and the odd value that can be stored at a specific location corresponding to an index of: 
+And this could constitute a recursive procedure obtaining the successive arrays. And last but not least, this finally could lead to the calculation of X spectrum. It can be contemplated that from the Equation \eqref{eq:Radix2}, there is at all times two consecutive values, the even and the odd value that can be stored at a specific location corresponding to an index of \cite{CooleyTukey1965}: 
 
 \begin{equation}
 	(j_0 2^{m-1} + \cdots + j_{l-1} 2^{m-l} +  k_{m-l-1} 2^{m-l-1} + \cdots + k_0)
@@ -543,16 +555,16 @@ And this could constitute a recursive procedure obtaining the successive arrays.
 
 It is also worth it recalling that m is defined by \( N = 2^m \). Since bit positions \( 2^(m-l) \), meaning the j and k coefficients, can only get the values 0 and 1, which ensues that there is multiple-storage locations that can be calculated simultanously.
 
-The array calculated gives the desired Fourier sums: 
+The array calculated gives the desired Fourier sums \cite{CooleyTukey1965}: 
 
 \begin{equation}
-	X(j_{m-1}, cdots, j_0) = A_{m}((j_0 , cdots , j_{m-1})
+	X(j_{m-1},  \cdots, j_0) = A_{m}((j_0 ,  \cdots , j_{m-1})
 \end{equation}
 
 
 At this point there is a need to simplify the Fast Fourier Transform algorithm. It is mendatory to recall the \eqref{eq:FFT} so as to depict the algorithm. 
 
-The calculations workload can be reduced, by decomposing the original input sequence \( X[k] \), of length \( N \), into two subsequences:
+The calculations workload can be reduced, by decomposing the original input sequence \( X[k] \), of length \( N \), into two subsequences \cite{CooleyTukey1965}:
 
 \begin{itemize}
     \item A sequence consisting of elements at even-numbered indices: \( X_{\text{even}}[k] \)
@@ -653,13 +665,10 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 	
 	\subsection{Cloud-Oriented Perspective}
 	{
-		An extremely accurate definition of the \textit{Internet of Things} is given by Gubbi et al, articulating that:
 		
-		\begin{quote}
-			``Interconnection of sensing and actuating devices providing the ability to share information across platforms through a unified framework, developing a common operating picture for enabling innovative applications. This is achieved by seamless ubiquitous sensing, data analytics and information representation with Cloud computing as the unifying framework.''
-		\end{quote}
+		Gubbi et al describe the IoT (Internet of Things) as a network of sensing and actuating devices that share information and interact with each other, since there is a combination of different standards (e.g cloud computing and data analytics). This approach discusses only the purpose of IoT \cite{Gubbi2013}.
 		
-		This approach is mostly "Cloud"-oriented. The authors focus mostly on the concept of ubiquitous information and evolving communication networks. The means to give ground to this very concept is Smart Connectivity. It is fueled by the prevalence of devices enabled by open wireless technology such as Bluetooth, radio frequency identification (RFID), Wi-Fi, and telephonic data services as well as embedded sensor.
+		This approach is mostly "Cloud"-oriented. The authors focus mostly on the concept of ubiquitous information and evolving communication networks, powered by Smart Connectivity. Moreover, IoT (Internet of Things) is fueled by technologies such as Bluetooth, radio frequency identification (RFID) and Wi-Fi\cite{Gubbi2013}.
 		
 		Nevertheless, Hardware-sensor breakouts are critically important, as they serve as the primary means of data collection in IoT systems. Middleware and computing tools for data analytics are equally invaluable, as they enable the processing of raw sensor data into actionable insights. Finally, visualization tools and dashboards play a key role in end-user interaction with the IoT environment, while also providing stakeholders with an intuitive and accessible representation of the data \cite{Gubbi2013}.
 	}
@@ -684,10 +693,7 @@ As discussed in this section, the Cooley-Tukey Fast Fourier Transform (FFT) algo
 			\label{fig:IoT}
 		\end{figure}
 			
-		All in all Atzori defines Internet of Things (IoT) as follows:
-			\begin{quote}
-				``Internet of Things constitutes a world-wide network of interconnected objects uniquely addressable, based on standard communication protocols.``
-			\end{quote}
+		Atzori defines Internet of Things (IoT) as a broad network (worldwide network) of unique entities that interact with each other via standard communication protocols.
 		}
 		
 		
@@ -705,11 +711,7 @@ The accelerometer ADXL335 is a single component sensing X, Y and Z, having a wid
 
 The Adafruit ADXL335 is a high performance sensor breakout, utilizing capacitors so as to decouple the noise of the power supply and filters om analog outputs for antialiasing and noise reduction. 
 
-As for the sensor's theory of operation \cite{ADXL335}:
-\begin{quote}
-ADXL335 is a polysilicon surface-micromachined structure built on top of a silicon wafer. Polysilicon springs suspend the structure over the surface of the wafer and provide a resistance against acceleration forces Deflection of the structure is meas
-ured using a differential capacitor that consists of independent fixed plates and plates attached to the moving mass. The fixed plates are driven by 180° out-of-phase square waves. Acceleration deflects the moving mass and unbalances the differential capacitor resulting in a sensor output whose amplitude is proportional to acceleration. Phase-sensitive demodulation techniques are then used to determine the magnitude and direction of the acceleration. 
-\end{quote}
+As for the sensor's theory of operation, the ADXL335 is fabricated using a polysilicon surface-micromachining process on a silicon wafer. The sensing element is suspended above the wafer by polysilicon springs, which provide a restoring force against acceleration. When acceleration occurs, the suspended mass is displaced, and this movement is detected through a differential capacitive structure composed of fixed electrodes and electrodes attached to the movable mass. The fixed electrodes are driven by two square-wave signals that are $180^{\circ}$ out of phase. Any displacement of the mass causes an imbalance in the differential capacitance, generating an output signal whose amplitude is directly proportional to the applied acceleration. Using phase-sensitive demodulation, the sensor extracts both the magnitude and direction of this acceleration \cite{ADXL335}. 
 
 This combination of mechanical design and signal processing provides robust acceleration measurement without requiring temperature compensation circuits -since this breakout retains a large tolerance into operation temperatures- or complex calibration procedures \cite{ADXL335}.
 

@@ -16,13 +16,33 @@
 
 \section{Precommissioning System Verification and Validation}
 
+\subsection{ADXL335 to Arduino Validation}
+{
+
+	In Figure \ref{fig:initdatatransmitting}, data are transmitter from ADXL335 to Arduino in 10 bit format (0 = 1023). The figure illustrates what is printed to the serial port, meaning what is expected to be sent to Raspberry Pi 4 via the USB port.
+
+	\begin{figure}[h]  
+		\centering  
+		\includegraphics[width=\linewidth]{figures/Adxl335 to Arduino.png}  
+		\caption{Transmitting system operational validation ADXL335 to Arduino.}  
+		\label{fig:initdatatransmitting}  
+	\end{figure}
+	
+	The amount of data cannot be measured at this point using this sketch, but the data are formatted the way it has been explained in \ref{chap4}.
+	
+	The Arduino reads three analog channels and sends the data to the Raspberry Pi via serial communication at 115,200 baud. Each reading is converted to a number (0–1023) and separated by a newline.	Here, the 115,200 baud rate seems to work well along with the ADXL335 sensor breakout. This conclusion is verified by the fact that the data have a normal looking format, without any missing data resembling the last row.
+}
+
+
+
+
 \subsection{Arduino to Raspberry Pi Data Transmission Performance Metrics}
 {
 	The system was tested across all stages of data transmission, with careful consideration of the Arduino's operational limits. Sensor readings were first collected by the Arduino, which processed the raw signals from each axis and calculated the amplitude. The Arduino successfully managed the incoming sensor data without loss or timing issues, operating well within its 64-byte buffer constraints at the configured 115200 baud rate.
 	
-	The Arduino's competency in receiving and transmitting data can be evaluated using Algorithm 7: "Testing Results" in the Appendix (see Section \ref{subsec:raspberrypi-algorithm}). This algorithm allows us to measure the effective sampling performance of the Arduino under typical operating conditions.
+	The Arduino's competency in receiving and transmitting data can be evaluated using Algorithm 7: "Testing Results" in the Appendix (see Section \ref{subsec:raspberrypi-algorithm}). This algorithm allows measuring the effective sampling performance of the Arduino under typical operating conditions.
 	
-	The sampling rate of the Arduino reflects its ability to acquire data from sensors. As discussed in Chapter \ref{chap4}, memory and processing limitations make data handling complex. In our experiments, the sampling rate \(F_s\) was calculated from the timestamps of acquired data by taking the average interval between successive samples and inverting it. This produced an average sampling rate of approximately 700 Hz, reflecting the Arduino's hardware capabilities.
+	The sampling rate of the Arduino reflects its ability to acquire data from sensors. As discussed in Chapter \ref{chap4}, memory and processing limitations make data handling complex. In executed experiments, the sampling rate \(F_s\) was calculated from the timestamps of acquired data by taking the average interval between successive samples and inverting it. This produced an average sampling rate of approximately 700 Hz, reflecting the Arduino's hardware capabilities (350 [Hz] is the expected amount of data since the spectra are mirrored for values greater than 350 [Hz]).
 	
 	When performing a Fast Fourier Transform (FFT) on the acquired data, the frequency resolution depends on both the sampling rate \(F_s\) and the number of FFT points \(L\):
 	
@@ -30,32 +50,96 @@
 	\Delta f = \frac{F_s}{L}
 	\]
 	
-	The Arduino reads three analog channels and sends the data to the Raspberry Pi via serial communication at 115,200 baud. Each reading from a channel is converted to a number (0–1023) and sent as a line of text with comma separators and a newline.
+	The Arduino reads three analog channels and sends the data to the Raspberry Pi via serial communication at 115,200 baud. Each reading is converted to a number (0–1023) and sent as a line of text with comma separators and a newline.
 	
-	With a buffer of 10 samples per channel, a full buffer send is roughly 180 bytes. At 115,200 baud, the serial connection can transmit about 11,520 bytes per second, which allows approximately 64 buffer sends per second. This corresponds to roughly 640 samples per second per channel.
+	With a buffer size of:
+	\[
+	N_b = 10 \; [\text{samples/buffer}],
+	\]
 	
-	A larger \(F_s\) increases the maximum measurable frequency, while a larger \(L\) improves frequency resolution. The limitation that we encountered here is the upper limit of 350 Hz in the frequency domain results, while the sampling rate is 700 Hz.
+	Since there is approximately 18 bytes per sample line in total due to the data format, it is estimated that a full buffer sends roughly: 
+	\[
+	B_{\text{send}} \approx 180 \; [\text{bytes/sending}].
+	\]
 	
-	Over a 30-second measurement window, the Raspberry Pi is expected to receive about 19,200 samples per channel, or roughly 57,600 samples total across the three channels. The actual measured data of 20,684 samples per channel closely matches this estimate, confirming that the system reliably handles the expected data rate without loss. It can be concluded here that no matter the amount of data received, the implementation described in Section \ref{subsec:arduino} ensures proper handling.
+	At a baud rate of: 
+	\[
+	R_b = 115{,}200 \; [\text{baud}] = 115{,}200 \; [\text{bits/s}],
+	\]
+	the serial connection can transmit about:
+	\[
+	R_{\text{bytes}} = \frac{R_b}{10} = \frac{115{,}200}{10} = 11{,}520 \; [\text{bytes/s}],
+	\]
+	since each byte requires 10 bits for UART transmission.
 	
-	Subsequently, the Arduino transmitted these batches to the Raspberry Pi via serial communication using an optimized request-response protocol. In this synchronous communication pattern, the Arduino sends exactly one line of three comma-separated acceleration values at a time, effectively preventing buffer overflows while ensuring data integrity. The Raspberry Pi efficiently received, buffered, and organized the incoming data, demonstrating that the system could handle the expected data rate of approximately 600 samples per second without data loss.
+	This allows approximately:
 	
-	It is worth noting that even when the whole amount of the transmitted data is increased, the Arduino handles data transmission efficiently, as it communicates readings through the serial port in batches of 10 values. I this case there is a $100\%$ success of data transmission.
+	\[
+	f_{\text{buffers}} = \frac{R_{\text{bytes}}}{B_{\text{send}}} = \frac{11{,}520}{180} \approx 64 \; [\text{buffer sends/s}].
+	\]
+	
+	A larger sampling rate \(F_s\) increases the maximum measurable frequency, while a larger \(L\) improves the frequency resolution. The limitation that we encountered here is the upper limit of:
+	\[
+	f_{\max} = \frac{F_s}{2} = \frac{700}{2} = 350 \; [\text{Hz}]
+	\]
+	in the frequency domain results, while the sampling rate is
+	\[
+	F_s = 700 \; [\text{Hz}].
+	\]
+		
+	For instance, a measurement window of 30 seconds:
+	\[
+	T = 30 \; [\text{s}],
+	\]
+	
+	Leads to the fact that the Raspberry Pi is expected to receive about:
+	
+	\[
+	N_{\text{estimated samples / second}} = F_s \cdot T = 640 \cdot 30 = 19{,}200 \; [\text{samples}].
+	\]
+	
+	It can be concluded here that no matter the amount of data received, the implementation described in Section \ref{subsec:arduino} ensures proper handling.
+	
+	Subsequently, the Arduino transmitted these batches to the Raspberry Pi via serial communication using an optimized practice. In this synchronous communication pattern, the Arduino sends exactly one line of three comma-separated acceleration values at a time, effectively preventing buffer overflows while ensuring data integrity.
+	
+	
+	\subsubsection{30-second measuring window}
+	{
+		The measured data of $20{,}684$ samples closely matches the expected estimate, confirming that the system reliably handles the anticipated data rate without any loss, as shown in Figure~\ref{fig:datatransmitting}.
+		
+		For the 30-second measurement period, the actual sampling rate was calculated as:
+		\[
+		F_{s,30} = \frac{N_{30}}{30} = \frac{20{,}684}{30} \approx 689.5 \; [\text{samples/s}].
+		\]
+		
+		
+		The Raspberry Pi efficiently received, buffered, and organized the incoming data, demonstrating that it could manage the expected data rate of approximately $640 \; [\text{samples/s}]$ without issues.
+		
+		It is also worth noting that even when the volume of transmitted data increases, the Arduino handles data transmission efficiently by sending readings in batches of 10 values per serial line. In this case, the transmission success rate was $100\%$.
+	}
+	
+	\subsubsection{60-second measuring window}
+	{
+		The measured data of $41{,}434$ samples closely matches the expected estimate, confirming that the system reliably handles the anticipated data rate without any loss, as shown in Figure~\ref{fig:datatransmittinglarger}. This is almost double of the one calculated over the 30 seconds readings window.
+		
+		For the 60-second measurement period, the actual sampling rate was:
+		\[
+		F_{s,60} = \frac{N_{60}}{60} = \frac{41{,}434}{60} \approx 690.6 \; [\text{samples/s}].
+		\]
+		
+		
+		During this longer measurement period, the Arduino transmitted buffered batches to the Raspberry Pi using an optimized technique. The Arduino sends exactly one line containing three comma-separated acceleration values at a time, effectively preventing buffer overflows while maintaining data integrity.
+		
+		The Raspberry Pi successfully received, buffered, and organized all incoming data, demonstrating that the system could handle the expected data rate of approximately $640 \; [\text{samples/s}]$ over an extended period without any loss.
+		
+		Even when the total transmitted data is doubled compared to the 30-second test, the Arduino continues to transmit efficiently in batches of 10 values. In this test as well, the transmission success rate was $100\%$.
+	}
+
 	
 }
 
 \subsection{Raspberry Pi to Supabase and System Performance Metrics}
 {
-
-	
-	Each component of the system—from sensor to Arduino, Arduino to Raspberry Pi, and Raspberry Pi to Supabase—was capable of managing the data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second. This is also illustrated in Figure \ref{fig:datatransmitting}, where the raw data from the Arduino is 20,684, the data received by the Raspberry Pi is also 20,684, and the processed data of length 500 has been received by Supabase. This can be easily validated using the `values` column.
-	
-	\begin{figure}[h]  
-		\centering  
-		\includegraphics[width=\linewidth]{figures/data transmitting.png}  
-		\caption{Transmitting system operational validation.}  
-		\label{fig:datatransmitting}  
-	\end{figure}
 	
 	Although verification of the data transmitted from the Arduino to the Raspberry Pi and ultimately posted to a Vercel dashboard was the most crucial part of this project, there is always the possibility of issues in other sections, such as Vercel’s data reception. For this reason, the amount of data received and posted by Vercel was also checked, and it was validated that the entire list of 500 data points was properly read.
 	
@@ -97,6 +181,37 @@
 	The whole system was further checked for performance using cronjob commands, performing recursive data reading over an entire day. No temperature or similar failures of the electronics, microcomputer, or microcontroller were detected, confirming that the system operated reliably.
 	
 	All in all, the Raspberry Pi transmitted the data to the Supabase API. By comparing the readings collected on the Raspberry Pi with the data successfully posted to Supabase, it was confirmed that the entire pipeline—from sensor to cloud—worked reliably. In this case scenario, there is a $100\%$ successful data transmission in all instances.
+	
+	\subsubsection{30-second measuring window}
+	{
+		Each component of the system—from the sensor to the Arduino, from the Arduino to the Raspberry Pi, and from the Raspberry Pi to Supabase—successfully managed the data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second. 
+		
+		\begin{figure}[h]  
+			\centering  
+			\includegraphics[width=\linewidth]{figures/data transmitting.png}  
+			\caption{System operational validation: data transmission from Arduino to Raspberry Pi for a 30-seconds measurement.}  
+			\label{fig:datatransmitting}  
+		\end{figure}
+		
+		This is illustrated in Figure~\ref{fig:datatransmitting}, where the raw data from the Arduino consists of 20,684 samples, the data received by the Raspberry Pi is also 20,684 samples, and the processed data of length 500 has been successfully stored in Supabase. This can be easily verified using the `values` column.
+		
+
+	}
+	
+	\subsubsection{60-second measuring window}
+	{
+		Moreover, a trial on greater measuring window took place. Similarly, for the 60-second measurement period, each component of the system—from sensor to Arduino, Arduino to Raspberry Pi, and Raspberry Pi to Supabase—handled the increased data load while maintaining data integrity, timing requirements, and reliability within the Arduino's operational constraints of 9,000–10,000 bytes per second.
+		
+		This is illustrated in Figure \ref{fig:datatransmittinglarger}, where the raw data from the Arduino consists of 41,434 samples, the data received by the Raspberry Pi is also 41,434 samples, and the processed data of length 2500 has been successfully stored in Supabase. Verification can be done making the comparison to the `values` column.
+		
+		\begin{figure}[h]  
+			\centering  
+			\includegraphics[width=\linewidth]{figures/data transmitting for larger readings number.png}  
+			\caption{System operational validation: data transmission from Arduino to Raspberry Pi for the 60-seconds measurement.}  
+			\label{fig:datatransmittinglarger}  
+		\end{figure}
+	}
+
 }
 
 
@@ -116,16 +231,9 @@
 	
 	Secondly, the peak exceed some te threshold of the 1 [g], which leads to some maintenance alarm. 
 	
-	Third trait of a mechanical fault is this of the bearing components crucial frequencies. In Section~\ref{sec:faultfrequencies}, it was discussed that in the case of bearing component faults, the resulting vibration spectrum often exhibits frequency peaks at integer multiples of the rotational speed. The characteristic bearing fault frequencies can be expressed in the general form:
-	\begin{equation}
-		f_{\text{fault}} = n \times f \times F_{\text{bearing}}
-		\label{eq:general_fault}
-	\end{equation}
-	where $n$ is an integer and $F_{\text{bearing}}$ is a specific bearing factor.
+	Third trait of a mechanical fault is this of the bearing components crucial frequencies. In Section~\ref{sec:faultfrequencies}, it was discussed that in the case of bearing component faults, the resulting vibration spectrum often exhibits frequency peaks at integer multiples of the rotational speed. 
 	
-	Using the aforementioned knowhow, it can be estimated what the faulty condition might be. What can be noticed in the table \ref{tab:critical_failures} is that there is a prediction pattern. It is easier to predict the misalignment rather than any other mechanical fault. The threshold concept seems to be ineffective in the case of small-size mechanical components, since the only case that it predicted successfully is this of the misalignment.
-	
-	
+		
 	\begin{table}[ht]
 		\centering
 		\caption{Summary of critical system failures}
@@ -162,35 +270,75 @@
 		\end{tabular}
 	\end{table}
 	
+	The characteristic bearing fault frequencies can be expressed in the general form:
+	\begin{equation}
+		f_{\text{fault}} = n \times f \times F_{\text{bearing}}
+		\label{eq:general_fault}
+	\end{equation}
+	where $n$ is an integer and $F_{\text{bearing}}$ is a specific bearing factor.
+	
+	Using the aforementioned knowhow, it can be estimated what the faulty condition might be. What can be noticed in the table \ref{tab:critical_failures} is that there is a prediction pattern. It is easier to predict the misalignment rather than any other mechanical fault. The threshold concept seems to be ineffective in the case of small-size mechanical components, since the only case that it predicted successfully is this of the misalignment.
+	
+
+	
 }
 
 
 
-\section{System Deployment}
+\section{Summarizing System Deployment}
 {
+	The deployment phase concerns the 30- and 60-second window readings. The two different concepts retain the following traits:
+	
+	\begin{itemize}
+		\item 30 seconds of readings 
+		    \begin{itemize}
+				\item 20684 data reading rows
+				\item Sampling rate: 689.5
+				\item Frequency domain data length: 500
+			\end{itemize}
+		\item 60 seconds of readings 
+			\begin{itemize}
+				\item 41434 data reading rows
+				\item Sampling rate: 690.6
+				\item Frequency domain data length: 2500
+			\end{itemize}
+	\end{itemize}
+	
+	
+	
 	Real machinery operation data visualization is taking place in the second phase, following the testing phase. This concept focuses on developing a condition monitoring, cloud-based, application. This concept works by retaining a reference healthy-status frequency curve, so as to compare future results to this initial reference point. Moreover, further vibration analysis can be executed utilizing all historical data for all 3-axis.
 	
-	The sensing set-up has been deployed on an actual fan rotating at 35 [Hz]. This fan is loose, and not fixed on some foundation.
+	The sensing set-up has been deployed on an actual fan rotating at 35 [Hz]. This fan is loose. The small-scale motored fan is mounted loosely (not screwed on some foundation) and this leads to the peaks, as analyzed bellow.
 	
 	Prior to the system verification described in the previous section, testing was conducted using a simplified algorithm derived from the main implementation. These preliminary implementations can be found in Appendix \ref{subsec:raspberrypi-algorithm} (Algorithm 1 and Algorithm 7).
 	
 	The purpose of this algorithm was to validate initial data visualization, demonstrating that both raw time-domain signals and frequency-domain data could be successfully processed and simulated within the Python interface. This approach proved efficient during testing, as it enabled rapid verification of expected patterns. In particular, the frequency spectra produced by the FFT could be readily compared with patterns described in the relevant literature, serving as an early confirmation of correct signal behavior.
 	
-	Network performance is exquisite with a \textbf{100 percent} transmission success rate across all API calls, zero timeout incidents, and no security breaches detected. This performance validates the robust error handling and logging mechanisms implemented in the HTTPS communication methodology. Each successfully transmitted batch contained a payload of approximately 12,847 data points—the length of the FFT result array—and this operation was repeated multiple times throughout the testing and deployment phase. Complete router specifications are provided in Appendix \ref{tab:router_specs}.
+	Network performance is exquisite with a 100 percent transmission success rate across all API calls, zero timeout incidents, and no security breaches detected. This performance validates the robust error handling and logging mechanisms implemented in the HTTPS communication methodology.
 	
 	For the Vercel-based interface, visualization tools and interactive charts were employed to depict the transmitted sensor data, supporting the analysis of amplitudes, frequency trends, and potential anomalies over time. Upon accessing the deployed webpage, the dashboard dynamically retrieves sensor data from Supabase, compares the current measurements against stored healthy baseline data, and plots both datasets on the same charts. This comparative visualization enables users to identify deviations at a glance, making the dashboard an effective, real-time monitoring tool deployed efficiently on Vercel.
 	
 	The following figures illustrate the deployed Vercel-based dashboard used for vibration data monitoring. The interface presents a series of interactive plots that allow comparison between the stored healthy baseline state of the machinery and the latest current measurements retrieved from Supabase. Each chart provides a clear visual distinction between the two states, enabling the detection of deviations across the X, Y, and Z axes as well as the overall vibration magnitude. By scrolling through the interface, the user can review each coordinate in detail, observing the amplitude-frequency relationships that characterize both normal and potentially anomalous machine conditions.
 	
 	It must also be noted that on each plot two lines are depicted: the blue line corresponds to the healthy state reference, while the green line illustrates the current state of the machinery. Moreover, it is worth noting that in the case of the values in the frequency domain exceeding the value 1[g], then an orange horizontal line will show up, indicating the dangerous zone. This ensues that in the casing of having peaks exceeding this values some mechanical components needs to be further investigated or even replaced.
+
 	
+	The difference between the illustrations of the Figures \ref{fig:vercel1} and \ref{fig:vercel2}, is that the second plot \ref{fig:vercel2} retains more detailed view of the situation since it has a processed data frequency length of 2500. Comparing the results of these two it can be concluded that the results resemble each other.
+	
+	As already has been articulated, in the case of \ref{fig:vercel1} and \ref{fig:vercel2}, the data visualized here are about a loose base fan. This entails that we expect to receive finding similar to this of Figure \ref{fig:faultsunfaults}. Indeed, the arbitrary peak bits about the Fs peak of the rotational speed, indicate that there os the case of a loose support.
+	
+		
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=1\linewidth]{figures/vercelimage1.png}
-		\caption{Visualization of the X-axis vibration data. The initial view of the Vercel dashboard shows the dynamically loaded measurement data from Supabase, where the healthy baseline (blue) is compared against the current state (green).}
+		\caption{30 seconds deployment, 500 frequency points and 20684 rows.}
 		\label{fig:vercel1}
 	\end{figure}
-	
-	As already has been articulated, in the case of \ref{fig:vercel1}, the data visualized here are about a loose base fan. This entails that we expect to receive finding similar to this of Figure \ref{fig:faultsunfaults}. Indeed, the arbitrary peak bits about the Fs peak of the rotational speed, indicate that there os the case of a loose support.
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=1\linewidth]{figures/vercelimage2_1.png}
+		\caption{60 seconds deployment, 2500 frequency points and 41434 rows.}
+		\label{fig:vercel2}
+	\end{figure}
 	
 }
