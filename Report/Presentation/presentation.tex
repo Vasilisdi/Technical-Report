@@ -68,7 +68,7 @@
 		\begin{itemize}[<+-| alert@+>]
 			\item Aims at tracking the health status of machines.
 			\item Tracks the deterioration of temperature and vibration.
-			\item Alert maintenance to take action before it is to late.		
+			\item Alert maintenance team to take action before it is to late.		
 		\end{itemize}
 	\end{frame}
 	
@@ -207,7 +207,7 @@
 			\item The ADXL335 sensitivity is $\ 300 mV / g $.
 			\item The Arduino UNO R3 sampling rate is 700 [Hz].
 			\item Flash memory and SRAM limitations require data to be transmitted in batches.
-			\item The frequency-domain analysis is limited to 350 Hz (Nyquist limit).
+			\item The frequency-domain analysis is limited to 350 Hz.
 			\item The measurement time window determines the total number of samples collected.
 		\end{itemize}
 	\end{frame}
@@ -225,7 +225,7 @@
 				
 				% Nodes with rectangles
 				\node (sensor) [draw, rectangle] {AnalogRead() from ADXL335};
-				\node (buffer) [draw, rectangle, below of=sensor] {Store in Batch Buffer (3$\times$10$\times$18B/sample samples = 180B)};
+				\node (buffer) [draw, rectangle, below of=sensor] {Store in Batch Buffer (3$\times$10samples$\times$18B/sample  = 180B)};
 				\node (send) [draw, rectangle, below of=buffer] {Send Batch via Serial to Raspberry Pi};
 				\node (loop) [draw, rectangle, below of=send] {Repeat Acquisition};
 				
@@ -249,7 +249,7 @@
 				% Nodes with rectangles
 				\node (wait) [draw, rectangle] {Wait for Arduino data};
 				\node (parse) [draw, rectangle, below of=wait] {Parse serial data into X, Y, Z};
-				\node (amplitude) [draw, rectangle, below of=parse] {Calculate amplitude from 3-axis readings};
+				\node (amplitude) [draw, rectangle, below of=parse] {Calculate acceleration amplitude from 3-axis readings};
 				\node (fft) [draw, rectangle, below of=amplitude] {Compute FFT for each dataset};
 				\node (api) [draw, rectangle, below of=fft] {Send results via HTTP POST to Supabase};
 				\node (loop) [draw, rectangle, below of=api] {Repeat acquisition and processing};
