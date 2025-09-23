@@ -17,83 +17,101 @@
 \headcommand {\beamer@subsectionentry {0}{1}{2}{8}{Problem Requirements}}
 \headcommand {\slideentry {1}{2}{1}{8/8}{Problem Requirements}{0}}
 \headcommand {\beamer@framepages {8}{8}}
-\headcommand {\slideentry {1}{2}{2}{9/12}{Problem Requirements}{0}}
-\headcommand {\beamer@framepages {9}{12}}
-\headcommand {\beamer@subsectionpages {8}{12}}
-\headcommand {\beamer@subsectionentry {0}{1}{3}{13}{Objective of the Thesis}}
-\headcommand {\slideentry {1}{3}{1}{13/13}{Objective of the Thesis}{0}}
-\headcommand {\beamer@framepages {13}{13}}
-\headcommand {\slideentry {1}{3}{2}{14/19}{Objective of the Thesis}{0}}
-\headcommand {\beamer@framepages {14}{19}}
-\headcommand {\slideentry {1}{3}{3}{20/20}{Objective of the Thesis}{0}}
-\headcommand {\beamer@framepages {20}{20}}
-\headcommand {\beamer@sectionpages {3}{20}}
-\headcommand {\beamer@subsectionpages {13}{20}}
-\headcommand {\sectionentry {2}{Background}{21}{Background}{0}}
-\headcommand {\slideentry {2}{0}{1}{21/21}{}{0}}
-\headcommand {\beamer@framepages {21}{21}}
-\headcommand {\beamer@subsectionpages {21}{21}}
-\headcommand {\beamer@subsectionentry {0}{2}{1}{22}{Fast-Fourier Transform}}
-\headcommand {\slideentry {2}{1}{1}{22/22}{Fast-Fourier Transform}{0}}
+\headcommand {\slideentry {1}{2}{2}{9/14}{Problem Requirements}{0}}
+\headcommand {\beamer@framepages {9}{14}}
+\headcommand {\beamer@subsectionpages {8}{14}}
+\headcommand {\beamer@subsectionentry {0}{1}{3}{15}{Objective of the Thesis}}
+\headcommand {\slideentry {1}{3}{1}{15/15}{Objective of the Thesis}{0}}
+\headcommand {\beamer@framepages {15}{15}}
+\headcommand {\slideentry {1}{3}{2}{16/21}{Objective of the Thesis}{0}}
+\headcommand {\beamer@framepages {16}{21}}
+\headcommand {\slideentry {1}{3}{3}{22/22}{Objective of the Thesis}{0}}
 \headcommand {\beamer@framepages {22}{22}}
-\headcommand {\slideentry {2}{1}{2}{23/23}{Fast-Fourier Transform}{0}}
+\headcommand {\beamer@sectionpages {3}{22}}
+\headcommand {\beamer@subsectionpages {15}{22}}
+\headcommand {\sectionentry {2}{Background}{23}{Background}{0}}
+\headcommand {\slideentry {2}{0}{1}{23/23}{}{0}}
 \headcommand {\beamer@framepages {23}{23}}
-\headcommand {\beamer@subsectionpages {22}{23}}
-\headcommand {\beamer@subsectionentry {0}{2}{2}{24}{Fault Detection}}
-\headcommand {\slideentry {2}{2}{1}{24/24}{Fault Detection}{0}}
+\headcommand {\beamer@subsectionpages {23}{23}}
+\headcommand {\beamer@subsectionentry {0}{2}{1}{24}{Fourier Transform}}
+\headcommand {\slideentry {2}{1}{1}{24/24}{Fourier Transform}{0}}
 \headcommand {\beamer@framepages {24}{24}}
-\headcommand {\slideentry {2}{2}{2}{25/25}{Fault Detection}{0}}
+\headcommand {\slideentry {2}{1}{2}{25/25}{Fourier Transform}{0}}
 \headcommand {\beamer@framepages {25}{25}}
-\headcommand {\beamer@sectionpages {21}{25}}
 \headcommand {\beamer@subsectionpages {24}{25}}
-\headcommand {\sectionentry {3}{Engineering and Design}{26}{Engineering and Design}{0}}
-\headcommand {\slideentry {3}{0}{1}{26/26}{}{0}}
+\headcommand {\beamer@subsectionentry {0}{2}{2}{26}{Fault Detection}}
+\headcommand {\slideentry {2}{2}{1}{26/26}{Fault Detection}{0}}
 \headcommand {\beamer@framepages {26}{26}}
-\headcommand {\slideentry {3}{0}{2}{27/27}{}{0}}
+\headcommand {\slideentry {2}{2}{2}{27/27}{Fault Detection}{0}}
 \headcommand {\beamer@framepages {27}{27}}
-\headcommand {\slideentry {3}{0}{3}{28/32}{}{0}}
-\headcommand {\beamer@framepages {28}{32}}
-\headcommand {\beamer@sectionpages {26}{32}}
-\headcommand {\beamer@subsectionpages {26}{32}}
-\headcommand {\sectionentry {4}{Implementation}{33}{Implementation}{0}}
-\headcommand {\slideentry {4}{0}{1}{33/33}{}{0}}
-\headcommand {\beamer@framepages {33}{33}}
-\headcommand {\beamer@subsectionpages {33}{33}}
-\headcommand {\beamer@subsectionentry {0}{4}{1}{34}{Arduino UNO Algorithm}}
-\headcommand {\slideentry {4}{1}{1}{34/34}{Arduino UNO Algorithm}{0}}
-\headcommand {\beamer@framepages {34}{34}}
-\headcommand {\slideentry {4}{1}{2}{35/35}{Arduino UNO Algorithm}{0}}
-\headcommand {\beamer@framepages {35}{35}}
-\headcommand {\beamer@subsectionpages {34}{35}}
-\headcommand {\beamer@subsectionentry {0}{4}{2}{36}{Raspberry Pi Algorithm}}
-\headcommand {\slideentry {4}{2}{1}{36/36}{Raspberry Pi Algorithm}{0}}
+\headcommand {\beamer@sectionpages {23}{27}}
+\headcommand {\beamer@subsectionpages {26}{27}}
+\headcommand {\sectionentry {3}{Engineering and Design}{28}{Engineering and Design}{0}}
+\headcommand {\slideentry {3}{0}{1}{28/28}{}{0}}
+\headcommand {\beamer@framepages {28}{28}}
+\headcommand {\slideentry {3}{0}{2}{29/29}{}{0}}
+\headcommand {\beamer@framepages {29}{29}}
+\headcommand {\slideentry {3}{0}{3}{30/35}{}{0}}
+\headcommand {\beamer@framepages {30}{35}}
+\headcommand {\beamer@sectionpages {28}{35}}
+\headcommand {\beamer@subsectionpages {28}{35}}
+\headcommand {\sectionentry {4}{Implementation}{36}{Implementation}{0}}
+\headcommand {\slideentry {4}{0}{1}{36/36}{}{0}}
 \headcommand {\beamer@framepages {36}{36}}
-\headcommand {\slideentry {4}{2}{2}{37/37}{Raspberry Pi Algorithm}{0}}
+\headcommand {\beamer@subsectionpages {36}{36}}
+\headcommand {\beamer@subsectionentry {0}{4}{1}{37}{Arduino UNO Algorithm}}
+\headcommand {\slideentry {4}{1}{1}{37/37}{Arduino UNO Algorithm}{0}}
 \headcommand {\beamer@framepages {37}{37}}
-\headcommand {\beamer@subsectionpages {36}{37}}
-\headcommand {\beamer@subsectionentry {0}{4}{3}{38}{Vercel Implementation and Supabase Integration}}
-\headcommand {\slideentry {4}{3}{1}{38/38}{Vercel Implementation and Supabase Integration}{0}}
+\headcommand {\slideentry {4}{1}{2}{38/38}{Arduino UNO Algorithm}{0}}
 \headcommand {\beamer@framepages {38}{38}}
-\headcommand {\slideentry {4}{3}{2}{39/39}{Vercel Implementation and Supabase Integration}{0}}
+\headcommand {\beamer@subsectionpages {37}{38}}
+\headcommand {\beamer@subsectionentry {0}{4}{2}{39}{Raspberry Pi Algorithm}}
+\headcommand {\slideentry {4}{2}{1}{39/39}{Raspberry Pi Algorithm}{0}}
 \headcommand {\beamer@framepages {39}{39}}
-\headcommand {\beamer@sectionpages {33}{39}}
-\headcommand {\beamer@subsectionpages {38}{39}}
-\headcommand {\sectionentry {5}{Results}{40}{Results}{0}}
-\headcommand {\slideentry {5}{0}{1}{40/40}{}{0}}
+\headcommand {\slideentry {4}{2}{2}{40/40}{Raspberry Pi Algorithm}{0}}
 \headcommand {\beamer@framepages {40}{40}}
-\headcommand {\slideentry {5}{0}{2}{41/44}{}{0}}
-\headcommand {\beamer@framepages {41}{44}}
-\headcommand {\slideentry {5}{0}{3}{45/45}{}{0}}
-\headcommand {\beamer@framepages {45}{45}}
-\headcommand {\beamer@sectionpages {40}{45}}
-\headcommand {\beamer@subsectionpages {40}{45}}
-\headcommand {\sectionentry {6}{Conclusions}{46}{Conclusions}{0}}
-\headcommand {\slideentry {6}{0}{1}{46/46}{}{0}}
-\headcommand {\beamer@framepages {46}{46}}
-\headcommand {\slideentry {6}{0}{2}{47/51}{}{0}}
-\headcommand {\beamer@framepages {47}{51}}
-\headcommand {\beamer@partpages {1}{51}}
-\headcommand {\beamer@subsectionpages {46}{51}}
-\headcommand {\beamer@sectionpages {46}{51}}
-\headcommand {\beamer@documentpages {51}}
-\headcommand {\gdef \inserttotalframenumber {30}}
+\headcommand {\beamer@subsectionpages {39}{40}}
+\headcommand {\beamer@subsectionentry {0}{4}{3}{41}{Vercel Implementation and Supabase Integration}}
+\headcommand {\slideentry {4}{3}{1}{41/41}{Vercel Implementation and Supabase Integration}{0}}
+\headcommand {\beamer@framepages {41}{41}}
+\headcommand {\slideentry {4}{3}{2}{42/42}{Vercel Implementation and Supabase Integration}{0}}
+\headcommand {\beamer@framepages {42}{42}}
+\headcommand {\beamer@sectionpages {36}{42}}
+\headcommand {\beamer@subsectionpages {41}{42}}
+\headcommand {\sectionentry {5}{Results}{43}{Results}{0}}
+\headcommand {\slideentry {5}{0}{1}{43/43}{}{0}}
+\headcommand {\beamer@framepages {43}{43}}
+\headcommand {\beamer@subsectionpages {43}{43}}
+\headcommand {\beamer@subsectionentry {0}{5}{1}{44}{System Verification and Validation}}
+\headcommand {\slideentry {5}{1}{1}{44/44}{System Verification and Validation}{0}}
+\headcommand {\beamer@framepages {44}{44}}
+\headcommand {\slideentry {5}{1}{2}{45/48}{System Verification and Validation}{0}}
+\headcommand {\beamer@framepages {45}{48}}
+\headcommand {\beamer@subsectionpages {44}{48}}
+\headcommand {\beamer@subsectionentry {0}{5}{2}{49}{Testing on Datasets}}
+\headcommand {\slideentry {5}{2}{1}{49/49}{Testing on Datasets}{0}}
+\headcommand {\beamer@framepages {49}{49}}
+\headcommand {\slideentry {5}{2}{2}{50/50}{Testing on Datasets}{0}}
+\headcommand {\beamer@framepages {50}{50}}
+\headcommand {\slideentry {5}{2}{3}{51/51}{Testing on Datasets}{0}}
+\headcommand {\beamer@framepages {51}{51}}
+\headcommand {\beamer@subsectionpages {49}{51}}
+\headcommand {\beamer@subsectionentry {0}{5}{3}{52}{Deployment}}
+\headcommand {\slideentry {5}{3}{1}{52/52}{Deployment}{0}}
+\headcommand {\beamer@framepages {52}{52}}
+\headcommand {\slideentry {5}{3}{2}{53/53}{Deployment}{0}}
+\headcommand {\beamer@framepages {53}{53}}
+\headcommand {\slideentry {5}{3}{3}{54/54}{Deployment}{0}}
+\headcommand {\beamer@framepages {54}{54}}
+\headcommand {\beamer@sectionpages {43}{54}}
+\headcommand {\beamer@subsectionpages {52}{54}}
+\headcommand {\sectionentry {6}{Conclusions}{55}{Conclusions}{0}}
+\headcommand {\slideentry {6}{0}{1}{55/55}{}{0}}
+\headcommand {\beamer@framepages {55}{55}}
+\headcommand {\slideentry {6}{0}{2}{56/60}{}{0}}
+\headcommand {\beamer@framepages {56}{60}}
+\headcommand {\beamer@partpages {1}{60}}
+\headcommand {\beamer@subsectionpages {55}{60}}
+\headcommand {\beamer@sectionpages {55}{60}}
+\headcommand {\beamer@documentpages {60}}
+\headcommand {\gdef \inserttotalframenumber {36}}

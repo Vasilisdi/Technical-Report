@@ -15,7 +15,8 @@
 
 \title{Diploma Thesis}
 
-\subtitle{Investigation of Machine Vibration Analysis System Design}
+\subtitle{On the Design Space Exploration of Vibration Analysis
+	Systems}
 \institute{
 	Department of Electrical and Software Engineering \\
 	University of Thessaly
@@ -77,7 +78,10 @@
 			\item Sensing entity for data collection.
 			\item Processing unit for data analysis.
 			\item Space for data storage.
-			\item Cloud-based for remote access.		
+			\item Cloud-based for remote access.	
+			
+			\item Vibration dataset for threshold validation.
+			\item Actual rotating machine for deployment.	
 		\end{itemize}
 	\end{frame}
 
@@ -86,7 +90,7 @@
 	    \begin{itemize}[<+-| alert@+>]
 			\item Development of a low-cost embedded system for predictive maintenance [see Figure \ref{fig:System}].
 			\item Development of software for data acquisition and transmission from Arduino UNO R3 to Raspberry Pi 4.
-			\item Development of software for FFT-based spectral analysis software on Raspberry Pi 4 for frequency-domain feature extraction.
+			\item Development of software for FFT-based spectral analysis software on Raspberry Pi 4 for frequency-domain decomposition.
 			\item Development of a secure, authenticated API client for structured data transmission from Raspberry Pi 4 to Supabase.
 			\item Implementation of a Vercel API endpoint that fetches measurement data from Supabase database.
 			\item Development of a React frontend that requests and visualizes data from the Vercel API.
@@ -111,8 +115,8 @@
 	
 	\section{Background}
 	
-	\subsection{Fast-Fourier Transform}
-	\begin{frame}{FFT}
+	\subsection{Fourier Transform}
+	\begin{frame}{FFT and DFT}
 		\begin{figure}[h]
 			\centering
 			\includegraphics[width=1\linewidth]{images/FFT.png}
@@ -123,7 +127,7 @@
 	
 	
 	\subsection{Fault Detection}
-	\begin{frame}{Machinery Fault Tree Analysis}
+	\begin{frame}{Seeking a Repeating Pattern and Their Frequency Magnitudes}
 	\begin{figure}[h]
 		\centering
 		\resizebox{\columnwidth}{!}{
@@ -200,6 +204,7 @@
 	\begin{frame}{System boundaries}
 		\begin{itemize}[<+-| alert@+>]
 			\item The ADXL335 measurement range is $\pm 3\,g$.
+			\item The ADXL335 sensitivity is $\ 300 mV / g $.
 			\item The Arduino UNO R3 sampling rate is 700 [Hz].
 			\item Flash memory and SRAM limitations require data to be transmitted in batches.
 			\item The frequency-domain analysis is limited to 350 Hz (Nyquist limit).
@@ -220,7 +225,7 @@
 				
 				% Nodes with rectangles
 				\node (sensor) [draw, rectangle] {AnalogRead() from ADXL335};
-				\node (buffer) [draw, rectangle, below of=sensor] {Store in Batch Buffer (3$\times$10 samples = 60B)};
+				\node (buffer) [draw, rectangle, below of=sensor] {Store in Batch Buffer (3$\times$10$\times$18B/sample samples = 180B)};
 				\node (send) [draw, rectangle, below of=buffer] {Send Batch via Serial to Raspberry Pi};
 				\node (loop) [draw, rectangle, below of=send] {Repeat Acquisition};
 				
@@ -305,6 +310,7 @@
 
 	
 	\section{Results}
+	\subsection{System Verification and Validation}
 	\begin{frame}{System Verification and Validation}
 		\begin{itemize}[<+-| alert@+>]
 			\item End-to-end checks were performed across the entire system: data acquisition from ADXL335 sensors via Arduino UNO, serial transmission to Raspberry Pi 4, processing and posting to Supabase, and frontend visualization in Vercel/React.
@@ -314,13 +320,65 @@
 		\end{itemize}
 	\end{frame}
 	
-	\begin{frame}{System Verification and Validation}
-		\begin{figure}[h]
+	\subsection{Testing on Datasets}
+	\begin{frame}{Testing performance for 1[g] threshold}
+		\begin{table}[ht]
 			\centering
-			\includegraphics[width=0.7\linewidth]{images/vercelimage4.png}
-			\caption{Visualization of the overall vibration magnitude. This chart combines all three coordinate axes into a single representation, showing the total vibration energy with the healthy baseline (blue) compared against the current state (green).}
-			\label{fig:vercel4}
-		\end{figure}
+			\caption{Summary of critical system failures}
+			\label{tab:critical_failures}
+			\begin{tabular}{lcccc}
+				\hline
+				Fault Condition & Speed & Test Cases & Correct & Incorrect Prediction \\
+				\hline
+				Unbalance & 50 Hz & 11 & 0 & No Alarm \\
+				Misalignment & 50 Hz & 14 & 0 & Correct Alarm \\
+				Ball Fault & 24 Hz & 3 & 0 & No Alarm \\
+				Ball Fault & 50 Hz & 4 & 0 & No Alarm \\
+				Inner Race Fault & 24 Hz & 4 & 0 & No Alarm \\
+				Outer Race Fault & 24 Hz & 3 & 0 & No Alarm \\
+				\hline
+			\end{tabular}
+		\end{table}
+	\end{frame}
+	
+	\begin{frame}{Testing performance for 1[g] threshold}
+		\begin{table}[ht]
+			\centering
+			\caption{Summary of system test results}
+			\label{tab:system_summary}
+			\resizebox{1.1\textwidth}{!}{ % scale to 70% of text width
+				\begin{tabular}{lcc}
+					\hline
+					Task / Condition & Test Cases & Success Rate \\
+					\hline
+					Misalignment Prediction & 14 & 100\% \\
+					Other Bearing Failure   & 25 & 0\% \\
+					Data Transmission (Raspberry $\rightarrow$ Supabase) & 3 & 100\% \\
+					Data Transmission (Arduino $\rightarrow$ Raspberry Pi) & 3 & 100\% \\
+					\hline
+				\end{tabular}
+			}
+		\end{table}
+	\end{frame}
+	
+	\subsection{Deployment}
+	\begin{frame}{Deployment on working fan for 30secs}
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=1.2\linewidth]{images/vercelimage1.png}
+				\caption{30 seconds deployment, 500 frequency points and 20684 rows.}
+				\label{fig:vercel1}
+			\end{figure}
+
+	\end{frame}
+	
+	\begin{frame}{Deployment on working fan for 60secs}
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=1.2\linewidth]{images/vercelimage2_1.png}
+				\caption{60 seconds deployment, 2500 frequency points and 41434 rows.}
+				\label{fig:vercel2}
+			\end{figure}
 	\end{frame}
 	
 	
