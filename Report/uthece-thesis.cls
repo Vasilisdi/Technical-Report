@@ -492,9 +492,9 @@
 \newcommand{\supervisorname}{\supervisorMaleFemale}
 \newcommand{\keywordsname}{Λέξεις Κλειδιά}
 
-\newcommand{\programme}{}
+\newcommand{\programme}{MSc in Science and Technology of Electrical and Computer Engineering}
 \newcommand{\beforeprogramme}{}
-\newcommand{\programmeO}{}
+\newcommand{\programmeO}{Επιστήμη και Τεχνολογία Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών}
 \newcommand{\beforeprogrammeO}{}
 % More Names
 
